@@ -167,6 +167,9 @@ Finally, this utility method is provided.
 ```java
 public static Map jsonStringToMap(String jsonString)
 ```
+## Build instructions
+
+mvn clean compile assembly:single
 
 ## References
 

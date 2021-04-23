@@ -7,7 +7,7 @@ import com.aerospike.client.Key;
  * Constants used in testing
  */
 public class TestConstants {
-    public static final String AEROSPIKE_SERVER_IP = "172.28.128.3";
+    public static final String AEROSPIKE_SERVER_IP = "172.28.128.6";
     public static final String AEROSPIKE_NAMESPACE = "test";
     public static final String AEROSPIKE_SET = "documentAPI";
 
