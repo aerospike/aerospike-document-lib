@@ -8,11 +8,8 @@ import java.util.*;
 public class TestUtils {
 
     /**
-     * Are two JSON objects equivalent
-     * Does this by serializing maps and list in a specific way and then testing serializations to see if they are equal
-     * @param object1
-     * @param object2
-     * @return
+     * Determine whether two JSON objects are equivalent -
+     * by serializing maps and list in a specific way and then testing serializations to see if they are equal.
      */
     public static boolean jsonEquals(Object object1, Object object2) {
         if ((object1 instanceof Map) && (object2 instanceof Map)) {
@@ -25,7 +22,7 @@ public class TestUtils {
     }
 
     /**
-     * Check that our jsonEquals function works correctly
+     * Verify jsonEquals functionality.
      */
     @Test
     public void testMapEquals() {
@@ -42,9 +39,7 @@ public class TestUtils {
     }
 
     /**
-     * Generic JSON to string method
-     * @param o
-     * @return
+     * Generic JSON to string method.
      */
     private static String jsonToString(Object o) {
         if (o instanceof Map) {
@@ -59,9 +54,7 @@ public class TestUtils {
     }
 
     /**
-     * Serialization of JSON map
-     * @param map
-     * @return
+     * Serialization of JSON map.
      */
     private static String jsonMapToString(Map<String, Object> map) {
         List<String> orderedKeys = new ArrayList(map.keySet());
@@ -78,9 +71,7 @@ public class TestUtils {
     }
 
     /**
-     * Serialization of JSON list
-     * @param list
-     * @return
+     * Serialization of JSON list.
      */
     private static String jsonListToString(List list) {
         Iterator listIterator = list.listIterator();
@@ -93,20 +84,14 @@ public class TestUtils {
     }
 
     /**
-     * Are two JSON maps equivalent
-     * @param map1
-     * @param map2
-     * @return
+     * Determine whether two JSON maps are equivalent.
      */
     private static boolean mapEquals(Map map1, Map map2) {
         return jsonMapToString(map1).equals(jsonMapToString(map2));
     }
 
     /**
-     * Are two JSON lists equivalent
-     * @param list1
-     * @param list2
-     * @return
+     * Determine whether two JSON lists are equivalent.
      */
     private static boolean listEquals(List list1, List list2) {
         return jsonListToString(list1).equals(jsonListToString(list2));

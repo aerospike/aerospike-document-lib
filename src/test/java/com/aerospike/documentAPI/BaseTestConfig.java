@@ -1,6 +1,7 @@
 package com.aerospike.documentAPI;
 
 import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -19,7 +20,7 @@ public class BaseTestConfig {
 
     public static final Key TEST_AEROSPIKE_KEY = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY);
 
-    public static AerospikeClient client;
+    public static IAerospikeClient client;
 
     @BeforeClass
     public static void setupClass() {

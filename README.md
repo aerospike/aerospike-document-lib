@@ -58,7 +58,7 @@ Consider the following json
 We add this to our Aerospike database as follows
 
 ``` java
-   Map jsonAsMap = AerospikeDocumentClient.jsonStringToMap(jsonString);
+   Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
    // For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
    Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE,AEROSPIKE_SET,"tommy-lee-jones.json");
    documentClient.put(tommyLeeJonesDBKey, jsonAsMap);
@@ -149,7 +149,7 @@ Below is the interface against which the API has been written
 The Aerospike Document Client is instantiated as follows
 
 ``` java
-   AerospikeDocumentClient(AerospikeClient client)
+   AerospikeDocumentClient(IAerospikeClient client)
 ```
 
 There are getters and setters for the read and write policies, as well as the default bin name
@@ -167,7 +167,7 @@ There are getters and setters for the read and write policies, as well as the de
 Finally, this utility method is provided.
 
 ```java
-public static Map jsonStringToMap(String jsonString)
+public static Map convertJSONFromStringToMap(String jsonString)
 ```
 ## Build instructions
 

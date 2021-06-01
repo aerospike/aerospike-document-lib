@@ -4,9 +4,7 @@ import com.aerospike.client.*;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentAPI.AerospikeDocumentClient;
-import com.aerospike.documentAPI.JsonPathParser;
-import com.aerospike.documentAPI.BaseTestConfig;
+import com.aerospike.documentAPI.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -14,8 +12,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
-
-import com.aerospike.documentAPI.DebugUtils;
 
 /**
  * These are not really tests - just code I've written to work out how to do various things
@@ -27,13 +23,13 @@ public class LearningTests extends BaseTestConfig {
      */
     @Test
     public void getJsonFromFile() throws IOException {
-        String s = DebugUtils.readLineByLineJava("src/main/resources/tommy-lee-jones.json");
+        String s = DebugUtils.readJSONFromAFile("src/main/resources/tommy-lee-jones.json");
         System.out.println(s);
 
     }
 
     /**
-     * Turn POJO into a string
+     * Turn POJO into a string.
      */
     @Test
     public void pojoToString() throws JsonProcessingException {// Java objects to JSON string - compact-print
@@ -44,7 +40,7 @@ public class LearningTests extends BaseTestConfig {
     }
 
     /**
-     * POJO as pretty printed string
+     * POJO as pretty printed string.
      */
     @Test
     public void pojoToStringPrettyPrint() throws JsonProcessingException {
@@ -53,30 +49,25 @@ public class LearningTests extends BaseTestConfig {
         DebugUtils.consoleHeader("Object mapper POJO -> String");
         System.out.println(jsonString);
         DebugUtils.newLine();
-
     }
 
     /**
-     * Json string to map
-     * @throws JsonProcessingException
-     * @throws IOException
+     * JSON string to map.
      */
     @Test
-    public void stringToMap() throws JsonProcessingException, IOException{
-        Map result = AerospikeDocumentClient.jsonStringToMap(pojoToString(getTestStaffMemberObject()));
+    public void stringToMap() throws IOException{
+        Map result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
         DebugUtils.consoleHeader("Read JSON string into map- show map.toString");
         System.out.println(result);
         DebugUtils.newLine();
-
     }
 
     /**
-     * Convert POJO to map, save to Aerospike DB and read
-     * @throws IOException
+     * Convert POJO to map, save to Aerospike DB and read.
      */
     @Test
     public void writePOJOToDB() throws IOException{
-        Map result = AerospikeDocumentClient.jsonStringToMap(pojoToString(getTestStaffMemberObject()));
+        Map result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
         putMapToDB(result, TEST_AEROSPIKE_KEY);
 
         Map m = getMapFromDB(TEST_AEROSPIKE_KEY);
@@ -89,12 +80,12 @@ public class LearningTests extends BaseTestConfig {
 
     @Test
     public void demo() throws IOException, JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
-        String jsonString = DebugUtils.readLineByLineJava("src/main/resources/tommy-lee-jones.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/main/resources/tommy-lee-jones.json");
 
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        Map jsonAsMap = AerospikeDocumentClient.jsonStringToMap(jsonString);
+        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
         documentClient.put(tommyLeeJonesDBKey, jsonAsMap);
 
@@ -110,11 +101,9 @@ public class LearningTests extends BaseTestConfig {
         System.out.println(documentClient.get(tommyLeeJonesDBKey, "$.best_films_ranked[0].films[0]"));
         System.out.println(documentClient.get(tommyLeeJonesDBKey, "$.best_films_ranked[0].films[5]"));
         System.out.println(documentClient.get(tommyLeeJonesDBKey, "$.selected_filmography.2019"));
-
     }
 
     private static StaffMember getTestStaffMemberObject() {
-
         StaffMember staff = new StaffMember();
 
         staff.setName("mkyong");
