@@ -29,7 +29,7 @@ public class JsonPathParser {
      */
 
     // Store our representation of the individual path parts
-    List<PathPart> pathParts= new Vector<PathPart>();
+    List<PathPart> pathParts= new Vector<>();
 
     JsonPathParser(){}
 
@@ -40,10 +40,14 @@ public class JsonPathParser {
      * @throws JsonParseException
      */
     List<PathPart> parse (String jsonString) throws JsonParseException{
-        if(jsonString.charAt(0) != '$') throw new JsonPrefixException(jsonString);
-        StringTokenizer tokenizer = new StringTokenizer(jsonString,JSON_PATH_SEPARATOR);
-        if(! tokenizer.nextToken().equals(DOCUMENT_ROOT_TOKEN)) throw new JsonPrefixException(jsonString);
-        while(tokenizer.hasMoreTokens()){
+        if (jsonString.charAt(0) != '$') {
+            throw new JsonPrefixException(jsonString);
+        }
+        StringTokenizer tokenizer = new StringTokenizer(jsonString, JSON_PATH_SEPARATOR);
+        if (!tokenizer.nextToken().equals(DOCUMENT_ROOT_TOKEN)) {
+            throw new JsonPrefixException(jsonString);
+        }
+        while (tokenizer.hasMoreTokens()) {
             parsePathPart(tokenizer.nextToken());
         }
         return pathParts;
@@ -58,18 +62,17 @@ public class JsonPathParser {
      */
     private void parsePathPart(String pathPart) throws JsonParseException{
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
-        if((pathPart.indexOf("[") == -1) & (pathPart.indexOf("]") == -1)){
+        if ((!pathPart.contains("[")) & (!pathPart.contains("]"))) {
             pathParts.add(new MapPart(pathPart));
-        }
-        else if(keyMatcher.find()) {
+        } else if (keyMatcher.find()) {
             String key = keyMatcher.group(1);
             pathParts.add(new MapPart(key));
             Matcher indexMatcher = INDEX_PATTERN.matcher(pathPart);
+
             while (indexMatcher.find()) {
                 pathParts.add(new ListPart(Integer.parseInt(indexMatcher.group(2))));
             }
-        }
-        else {
+        } else {
             throw new JsonPathException(pathPart);
         }
     }
@@ -81,10 +84,10 @@ public class JsonPathParser {
         abstract CTX toAerospikeContext();
         abstract Operation toAerospikeGetOperation(String binName, CTX[] contexts);
         abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts);
-        public Operation toAerospikeAppendOperation(String binName,Object object,CTX[] contexts){
-            return ListOperation.append(binName,Value.get(object),contexts);
+        public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts){
+            return ListOperation.append(binName, Value.get(object), contexts);
         }
-        abstract Operation toAerospikeDeleteOperation(String binName,CTX[] contexts);
+        abstract Operation toAerospikeDeleteOperation(String binName, CTX[] contexts);
     }
 
     /**
@@ -110,15 +113,15 @@ public class JsonPathParser {
         }
 
         public Operation toAerospikeGetOperation(String binName, CTX[] contexts){
-            return MapOperation.getByKey(binName,Value.get(key),MapReturnType.VALUE,contexts);
+            return MapOperation.getByKey(binName, Value.get(key), MapReturnType.VALUE, contexts);
         }
 
-        public Operation toAerospikePutOperation(String binName,Object object,CTX[] contexts){
-            return MapOperation.put(new MapPolicy(),binName,Value.get(key),Value.get(object),contexts);
+        public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts){
+            return MapOperation.put(new MapPolicy(), binName, Value.get(key), Value.get(object), contexts);
         }
 
-        public Operation toAerospikeDeleteOperation(String binName,CTX[] contexts){
-            return MapOperation.removeByKey(binName,Value.get(key),MapReturnType.NONE,contexts);
+        public Operation toAerospikeDeleteOperation(String binName, CTX[] contexts){
+            return MapOperation.removeByKey(binName, Value.get(key), MapReturnType.NONE, contexts);
         }
     }
 
@@ -145,15 +148,15 @@ public class JsonPathParser {
         }
 
         public Operation toAerospikeGetOperation(String binName, CTX[] contexts){
-            return ListOperation.getByIndex(binName,listPosition,ListReturnType.VALUE,contexts);
+            return ListOperation.getByIndex(binName, listPosition, ListReturnType.VALUE, contexts);
         }
 
-        public Operation toAerospikePutOperation(String binName,Object object,CTX[] contexts){
-            return ListOperation.insert(binName,listPosition,Value.get(object),contexts);
+        public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts){
+            return ListOperation.insert(binName, listPosition, Value.get(object), contexts);
         }
 
-        public Operation toAerospikeDeleteOperation(String binName,CTX[] contexts){
-            return ListOperation.removeByIndex(binName,listPosition,ListReturnType.NONE,contexts);
+        public Operation toAerospikeDeleteOperation(String binName, CTX[] contexts){
+            return ListOperation.removeByIndex(binName, listPosition, ListReturnType.NONE, contexts);
         }
     }
 
@@ -164,9 +167,10 @@ public class JsonPathParser {
      * @return
      */
     public static List<CTX> pathPartsToContexts(List<PathPart> pathParts){
-        List<CTX> contextList = new Vector<CTX>();
-        Iterator<PathPart> pathPartIterator = pathParts.iterator();
-        while(pathPartIterator.hasNext()) contextList.add(pathPartIterator.next().toAerospikeContext());
+        List<CTX> contextList = new Vector<>();
+        for (PathPart pathPart : pathParts) {
+            contextList.add(pathPart.toAerospikeContext());
+        }
         return contextList;
     }
 

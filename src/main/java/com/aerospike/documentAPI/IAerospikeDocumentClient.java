@@ -1,6 +1,5 @@
 package com.aerospike.documentAPI;
 
-import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 
 import java.util.Map;

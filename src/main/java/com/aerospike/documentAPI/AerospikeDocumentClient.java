@@ -18,7 +18,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
     public static String DEFAULT_DOCUMENT_BIN_NAME = "documentBin";
 
     // Member variables
-    private AerospikeClient client;
+    private final AerospikeClient client;
     private String documentBinName = DEFAULT_DOCUMENT_BIN_NAME;
     private WritePolicy writePolicy;
     private Policy readPolicy;
@@ -42,7 +42,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
     public static Map jsonStringToMap(String jsonString) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         // Reading string into a map
-        return mapper.readValue(jsonString,Map.class);
+        return mapper.readValue(jsonString, Map.class);
     }
 
     /**
@@ -102,12 +102,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
      * @throws AerospikeDocumentClientException
      * @throws AerospikeException
      */
-    public Object get(Key documentKey,String jsonPath) throws JsonPathParser.JsonParseException, AerospikeDocumentClientException {
+    public Object get(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException, AerospikeDocumentClientException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, retrieve the full document
-        if(pathParts.size() == 0){
-            return client.get(readPolicy,documentKey).getValue(documentBinName);
+        if (pathParts.size() == 0) {
+            return client.get(readPolicy, documentKey).getValue(documentBinName);
         }
         // else retrieve using contexts
         else {
@@ -134,7 +134,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
      * @param documentKey - document key
      * @param jsonObject - document
      */
-    public void put(Key documentKey,Map jsonObject) {
+    public void put(Key documentKey, Map jsonObject) {
         client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
     }
 
@@ -147,12 +147,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
      * @throws JsonPathParser.JsonParseException
      * @throws AerospikeDocumentClientException
      */
-    public void put(Key documentKey,String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException, AerospikeDocumentClientException{
+    public void put(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException, AerospikeDocumentClientException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, put the full document
-        if(pathParts.size() == 0){
-            client.put(writePolicy,documentKey,new Bin(documentBinName,jsonObject));
+        if (pathParts.size() == 0) {
+            client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
         }
         // else put using contexts
         else {
@@ -165,7 +165,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikePutOperation(documentBinName, jsonObject, ctxArray));
             }
-            catch(AerospikeException e){
+            catch(AerospikeException e) {
                 processDocumentException(e);
             }
         }
@@ -179,14 +179,13 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
      * @throws JsonPathParser.JsonParseException
      * @throws AerospikeDocumentClientException
      */
-    public void append(Key documentKey,String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException, AerospikeDocumentClientException{
+    public void append(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException, AerospikeDocumentClientException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, you can't append
-        if(pathParts.size() == 0){
+        if (pathParts.size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
-        }
-        else {
+        } else {
             // We need to treat the last part of the path differently
             JsonPathParser.PathPart finalPathPart = pathParts.get(pathParts.size() - 1);
             // Then turn the rest into the contexts representation
@@ -196,7 +195,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeAppendOperation(documentBinName, jsonObject, ctxArray));
             }
-            catch(AerospikeException e){
+            catch(AerospikeException e) {
                 processDocumentException(e);
             }
         }
@@ -209,14 +208,13 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
      * @throws JsonPathParser.JsonParseException
      * @throws AerospikeDocumentClient.AerospikeDocumentClientException
      */
-    public void delete(Key documentKey,String jsonPath) throws JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException{
+    public void delete(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, you can't append
-        if(pathParts.size() == 0){
+        if (pathParts.size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
-        }
-        else {
+        } else {
             // We need to treat the last part of the path differently
             JsonPathParser.PathPart finalPathPart = pathParts.remove(pathParts.size() - 1);
             // Then turn the rest into the contexts representation
@@ -226,7 +224,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeDeleteOperation(documentBinName, ctxArray));
             }
-            catch(AerospikeException e){
+            catch(AerospikeException e) {
                 processDocumentException(e);
             }
         }
@@ -235,19 +233,18 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
     /**
      * Classes used to type the errors that can be returned
      */
-    public abstract static class AerospikeDocumentClientException extends Exception
-    {
+    public abstract static class AerospikeDocumentClientException extends Exception {
         AerospikeException e;
-        public AerospikeDocumentClientException(AerospikeException e){
+        public AerospikeDocumentClientException(AerospikeException e) {
             this.e = e;
         }
     }
 
     /**
-     * Thrown if a map or list is accessed that doesn't exist. Also if accessing a list element out of existing lisb bounds
+     * Thrown if a map or list is accessed that doesn't exist. Also if accessing a list element out of existing list bounds
      */
-    public static class ObjectNotFoundException extends AerospikeDocumentClientException{
-        public ObjectNotFoundException(AerospikeException e){
+    public static class ObjectNotFoundException extends AerospikeDocumentClientException {
+        public ObjectNotFoundException(AerospikeException e) {
             super(e);
         }
     }
@@ -255,8 +252,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
     /**
      * Thrown if accessing a list as if it was a map, or looking for a key in a map that doesn't exist
      */
-    public static class KeyNotFoundException extends AerospikeDocumentClientException{
-        public KeyNotFoundException(AerospikeException e){
+    public static class KeyNotFoundException extends AerospikeDocumentClientException {
+        public KeyNotFoundException(AerospikeException e) {
             super(e);
         }
     }
@@ -264,11 +261,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
     /**
      * Thrown if accessing a map as if it were a list or looking for a list element in a list that doesn't exist
      */
-    public static class NotAListException extends AerospikeDocumentClientException{
-        public NotAListException(AerospikeException e){
+    public static class NotAListException extends AerospikeDocumentClientException {
+        public NotAListException(AerospikeException e) {
             super(e);
         }
-
     }
 
     /**
@@ -279,13 +275,17 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient{
      * @throws AerospikeException
      */
     private static AerospikeDocumentClientException processDocumentException(AerospikeException e) throws
-    AerospikeDocumentClientException{
-        if(e.getResultCode() == ResultCode.PARAMETER_ERROR) throw new KeyNotFoundException(e);
-        else if(e.getResultCode() == ResultCode.BIN_TYPE_ERROR) throw new NotAListException(e);
-        else if(e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) throw new ObjectNotFoundException(e);
-        else throw e;
+    AerospikeDocumentClientException {
+        if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {
+            throw new KeyNotFoundException(e);
+        } else if (e.getResultCode() == ResultCode.BIN_TYPE_ERROR) {
+            throw new NotAListException(e);
+        } else if (e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) {
+            throw new ObjectNotFoundException(e);
+        } else {
+            throw e;
+        }
     }
-
 }
 
 
