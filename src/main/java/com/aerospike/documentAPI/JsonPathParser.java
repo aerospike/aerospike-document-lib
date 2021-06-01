@@ -39,7 +39,7 @@ public class JsonPathParser {
      * @return List<PathPart></PathPart>
      * @throws JsonParseException
      */
-    List<PathPart> parse (String jsonString) throws JsonParseException{
+    List<PathPart> parse(String jsonString) throws JsonParseException{
         if (jsonString.charAt(0) != '$') {
             throw new JsonPrefixException(jsonString);
         }
