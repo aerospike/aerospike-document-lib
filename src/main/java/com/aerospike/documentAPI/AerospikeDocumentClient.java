@@ -1,6 +1,7 @@
 package com.aerospike.documentAPI;
 
 import com.aerospike.client.*;
+import com.aerospike.client.Record;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
