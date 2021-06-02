@@ -8,9 +8,9 @@ public class StaffMember implements TestPOJO {
 
     private String name;
     private int age;
-    private String[] position;              //  Array
-    private List<String> skills;            //  List
-    private Map<String, BigDecimal> salary; //  Map
+    private String[] position;
+    private List<String> skills;
+    private Map<String, BigDecimal> salary;
 
     public String getName() {
         return name;
@@ -51,6 +51,4 @@ public class StaffMember implements TestPOJO {
     public void setSalary(Map<String, BigDecimal> salary) {
         this.salary = salary;
     }
-
-    // getters , setters, some boring stuff
 }

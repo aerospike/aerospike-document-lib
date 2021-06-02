@@ -11,6 +11,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <jackson-databind.version>2.12.3</jackson-databind.version>
+        <aerospike-client.version>5.1.2</aerospike-client.version>
+        <junit.version>4.13.2</junit.version>
     </properties>
     <build>
         <plugins>
@@ -26,8 +29,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -36,17 +39,17 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.8</version>
+            <version>${jackson-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.aerospike</groupId>
             <artifactId>aerospike-client</artifactId>
-            <version>4.4.7</version>
+            <version>${aerospike-client.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.0</version>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
 

@@ -10,34 +10,34 @@ import java.util.stream.Stream;
  * Utility functions for test/debug
  */
 public class DebugUtils {
+
     /**
-     * Print header to console
-     * @param header
+     * Print header to console.
      */
-    public static void consoleHeader(String header){
+    public static void consoleHeader(String header) {
         System.out.println(header);
-        for(int i=0;i<header.length();i++) System.out.print("=");
+        for (int i = 0; i < header.length(); i++) {
+            System.out.print("=");
+        }
         System.out.print("\n\n");
     }
 
     /**
-     * Newline in console
+     * Newline in console.
      */
-    public static void newLine(){
-        System.out.println("");
+    public static void newLine() {
+        System.out.println();
     }
 
     /**
-     * Output content of filePath to console
-     * @param filePath
-     * @return
-     * @throws IOException
+     * Read JSON file from a given path and return it as a String.
+     * @param filePath given path of a file containing JSON content.
+     * @return JSON content as a String.
+     * @throws IOException an IOException will be thrown in case of an error.
      */
-    public static String readLineByLineJava(String filePath) throws IOException
-    {
+    public static String readJSONFromAFile(String filePath) throws IOException {
         StringBuilder contentBuilder = new StringBuilder();
-        Stream<String> stream;
-        stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8);
+        Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8);
         stream.forEach(s -> contentBuilder.append(s).append("\n"));
         return contentBuilder.toString();
     }
