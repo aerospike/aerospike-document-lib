@@ -19,7 +19,8 @@ public class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {}
+        } catch (JsonPathParser.JsonParseException ignored) {
+        }
     }
 
     /**
@@ -32,7 +33,8 @@ public class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {}
+        } catch (JsonPathParser.JsonParseException ignored) {
+        }
     }
 
     /**
@@ -111,11 +113,11 @@ public class JsonPathParserTest {
     public void parseFailsBadPath1() {
         String testPath = "$.key[";
         JsonPathParser parser = new JsonPathParser();
-        List<JsonPathParser.PathPart> pathParts = null;
         try {
-            pathParts = parser.parse(testPath);
+            parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {}
+        } catch (JsonPathParser.JsonParseException ignored) {
+        }
     }
 
     /**
@@ -125,11 +127,11 @@ public class JsonPathParserTest {
     public void parseFailsBadPath2() {
         String testPath = "$.key[]";
         JsonPathParser parser = new JsonPathParser();
-        List<JsonPathParser.PathPart> pathParts = null;
         try {
-            pathParts = parser.parse(testPath);
+            parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {}
+        } catch (JsonPathParser.JsonParseException ignored) {
+        }
     }
 
     /**
@@ -139,11 +141,11 @@ public class JsonPathParserTest {
     public void parseFailsBadPath3() {
         String testPath = "$.key[a]";
         JsonPathParser parser = new JsonPathParser();
-        List<JsonPathParser.PathPart> pathParts = null;
         try {
-            pathParts = parser.parse(testPath);
+            parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {}
+        } catch (JsonPathParser.JsonParseException ignored) {
+        }
     }
 
     /**
@@ -153,10 +155,10 @@ public class JsonPathParserTest {
     public void parseFailsBadPath4() {
         String testPath = "$.key]";
         JsonPathParser parser = new JsonPathParser();
-        List<JsonPathParser.PathPart> pathParts = null;
         try {
-            pathParts = parser.parse(testPath);
+            parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {}
+        } catch (JsonPathParser.JsonParseException ignored) {
+        }
     }
 }

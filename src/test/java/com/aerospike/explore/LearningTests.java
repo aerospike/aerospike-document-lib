@@ -25,7 +25,6 @@ public class LearningTests extends BaseTestConfig {
     public void getJsonFromFile() throws IOException {
         String s = DebugUtils.readJSONFromAFile("src/main/resources/tommy-lee-jones.json");
         System.out.println(s);
-
     }
 
     /**
@@ -56,7 +55,7 @@ public class LearningTests extends BaseTestConfig {
      */
     @Test
     public void stringToMap() throws IOException{
-        Map result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
+        Map<String, Object> result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
         DebugUtils.consoleHeader("Read JSON string into map- show map.toString");
         System.out.println(result);
         DebugUtils.newLine();
@@ -67,10 +66,10 @@ public class LearningTests extends BaseTestConfig {
      */
     @Test
     public void writePOJOToDB() throws IOException{
-        Map result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
+        Map<String, Object> result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
         putMapToDB(result, TEST_AEROSPIKE_KEY);
 
-        Map m = getMapFromDB(TEST_AEROSPIKE_KEY);
+        Map<?, ?> m = getMapFromDB(TEST_AEROSPIKE_KEY);
         deleteKey(TEST_AEROSPIKE_KEY);
 
         DebugUtils.consoleHeader("Putting and getting from the db");
@@ -85,7 +84,7 @@ public class LearningTests extends BaseTestConfig {
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
         documentClient.put(tommyLeeJonesDBKey, jsonAsMap);
 
@@ -109,7 +108,7 @@ public class LearningTests extends BaseTestConfig {
         staff.setName("mkyong");
         staff.setAge(38);
         staff.setPosition(new String[]{"Founder", "CTO", "Writer"});
-        Map<String, BigDecimal> salary = new HashMap() {{
+        Map<String, BigDecimal> salary = new HashMap<String, BigDecimal>() {{
             put("2010", new BigDecimal(10000));
             put("2012", new BigDecimal(12000));
             put("2018", new BigDecimal(14000));
@@ -120,11 +119,11 @@ public class LearningTests extends BaseTestConfig {
         return staff;
     }
 
-    private static void putMapToDB(Map map, Key key) {
+    private static void putMapToDB(Map<?, ?> map, Key key) {
         client.put(null, key, new Bin(JSON_EXAMPLE_BIN, map));
     }
 
-    private static Map getMapFromDB(Key key) {
+    private static Map<?, ?> getMapFromDB(Key key) {
         Record r = client.get(new Policy(), key);
         return r.getMap(JSON_EXAMPLE_BIN);
     }
