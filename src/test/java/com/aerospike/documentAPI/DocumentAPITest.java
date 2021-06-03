@@ -33,7 +33,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testPositivePathRetrieval() throws IOException,
             JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
         // Load the test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -130,7 +130,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testNegativePathRetrieval() throws IOException, JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException
     {
         // Load the test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -204,7 +204,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testPositivePut() throws IOException,
     JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException{
         // Set up test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -241,7 +241,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testNegativePut() throws IOException,
             JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException{
         // Load the test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -296,7 +296,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testPositiveAppend() throws IOException,
             JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
         // Set up test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -334,7 +334,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testNegativeAppend() throws IOException,
             JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
         // Load the test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -388,7 +388,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testPositiveDelete() throws IOException,
             JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
         // Set up test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -478,7 +478,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testNegativeDelete() throws IOException,
             JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
         // Set up test document
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/jsonTestMaterial.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);

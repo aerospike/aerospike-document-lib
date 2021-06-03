@@ -23,7 +23,7 @@ public class LearningTests extends BaseTestConfig {
      */
     @Test
     public void getJsonFromFile() throws IOException {
-        String s = DebugUtils.readJSONFromAFile("src/test/content/tommy-lee-jones.json");
+        String s = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
         System.out.println(s);
     }
 
@@ -79,13 +79,13 @@ public class LearningTests extends BaseTestConfig {
 
     @Test
     public void demo() throws IOException, JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/content/tommy-lee-jones.json");
+        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
 
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
-        Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "src/test/content/tommy-lee-jones.json");
+        Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "src/test/resources/tommy-lee-jones.json");
         documentClient.put(tommyLeeJonesDBKey, jsonAsMap);
 
         documentClient.put(tommyLeeJonesDBKey, "$.imdb_rank.rank",45);
