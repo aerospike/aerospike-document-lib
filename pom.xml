@@ -7,34 +7,62 @@
     <groupId>com.aerospike</groupId>
     <artifactId>documentAPI</artifactId>
     <version>0.5.0-BETA</version>
+
+    <name>Aerospike Document API</name>
+    <description>This project provides an API which allows Aerospike CDT (Collection Data Type) objects to be accessed and mutated using JSON like syntax.
+        Effectively this provides what can be termed a document API as CDT objects can be used to represent JSON in the Aerospike database.</description>
+    <url>https://github.com/aerospike/aerospike-document-lib</url>
+    <organization>
+        <name>Aerospike Inc.</name>
+        <url>https://www.aerospike.com</url>
+    </organization>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <maven.javadoc.plugin.version>3.3.0</maven.javadoc.plugin.version>
+        <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <jackson-databind.version>2.12.3</jackson-databind.version>
         <aerospike-client.version>5.1.2</aerospike-client.version>
         <junit.version>4.13.2</junit.version>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>Ken Tune</id>
+            <name>Ken Tune</name>
+            <email>ktune@aerospike.com</email>
+            <url>https://www.aerospike.com</url>
+            <organization>Aerospike Inc.</organization>
+            <organizationUrl>https://www.aerospike.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/aerospike/aerospike-document-lib.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:aerospike/aerospike-document-lib.git</developerConnection>
+        <url>https://github.com/aerospike/aerospike-document-lib</url>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -53,4 +81,61 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <doclint>none</doclint>
+                    <reportOutputDirectory>${basedir}</reportOutputDirectory>
+                    <doctitle>Aerospike Document API</doctitle>
+                    <show>public</show>
+                    <splitindex>true</splitindex>
+                    <bottom>Copyright &#169; 2020&#x2013;{currentYear} Aerospike, Inc. All rights reserved.</bottom>
+                    <sourcepath>${basedir}/src/main</sourcepath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven.gpg.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
