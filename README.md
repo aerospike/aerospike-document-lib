@@ -10,6 +10,11 @@ Familiarity with Aerospike - see [Java Introduction](https://www.aerospike.com/d
 
 Some knowledge of Aerospike CDTs - see reference above, but not essential
 
+## Build instructions
+```sh
+mvn clean package
+```
+
 ## Quick Start
 
 Consider the following json
@@ -50,7 +55,6 @@ Consider the following json
     }
   ]
 }
-
 ```
 
 ### Create
@@ -70,7 +74,6 @@ We can find out the name of Jones' best film according to 'Rotten Tomatoes' usin
 
 ```java
    documentClient.get(tommyLeeJonesDBKey,"$.best_films_ranked[0].films[0]");
-
 ```
 
 ### Insert
@@ -81,7 +84,6 @@ We can add filmography for 2019 using the path ```$.selected_filmography.2019```
   List<String> _2019Films = new Vector<String>();
   _2019Films.add("Ad Astra");
   documentClient.put(tommyLeeJonesDBKey,"$.selected_filmography.2019",_2019Films);
-
 ```
 
 ### Update
@@ -99,7 +101,6 @@ We can append to 'Rotten Tomatoes' list of best films using the reference ```$.b
 ```java
    documentClient.append(tommyLeeJonesDBKey,"$.best_films_ranked[0].films","Rolling Thunder");
    documentClient.append(tommyLeeJonesDBKey,"$.best_films_ranked[0].films","The Three Burials");
-
 ```
 
 ### Delete
@@ -108,7 +109,6 @@ We can delete a node e.g. the Medium reviewer's rankings
 
 ```java
    documentClient.delete(tommyLeeJonesDBKey,"$.best_films_ranked[1]");
-
 ```
 
 ### Document API
@@ -161,7 +161,6 @@ There are getters and setters for the read and write policies, as well as the de
     public void setReadPolicy(Policy readPolicy)
     public WritePolicy getWritePolicy() 
     public void setWritePolicy(WritePolicy writePolicy)
-
 ```
 
 Finally, this utility method is provided.
@@ -169,17 +168,9 @@ Finally, this utility method is provided.
 ```java
 public static Map convertJSONFromStringToMap(String jsonString)
 ```
-## Build instructions
-
-mvn clean compile assembly:single
 
 ## References
 
 See [AerospikeDocumentClient.java](../../../master/ken-tune/aerospike-document-api/src/main/java/com/aerospike/documentAPI/AerospikeDocumentClient.java) for full details of the API
 
 See [AerospikeDocumentClientTest.java](../../../master/ken-tune/aerospike-document-api/src/test/java/com/aerospike/documentAPI/DocumentAPITest.java) for unit tests showing API usage
-
-
-
-
-
