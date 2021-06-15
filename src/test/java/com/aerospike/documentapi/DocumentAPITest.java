@@ -34,7 +34,7 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -56,62 +56,62 @@ public class DocumentAPITest extends BaseTestConfig {
 
         jsonPath = "$.example3[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)jsonAsMap.get("example3")).get(1);
+        expectedObject = ((List<?>)jsonAsMap.get("example3")).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key10";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)jsonAsMap.get("example4")).get("key10");
+        expectedObject = ((Map<?, ?>)jsonAsMap.get("example4")).get("key10");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example1.key01[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)jsonAsMap.get("example1")).get("key01")).get(2);
+        expectedObject = ((List<?>)((Map<?, ?>)jsonAsMap.get("example1")).get("key01")).get(2);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key09[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((List)jsonAsMap.get("example3")).get(1)).get("key09")).get(2);
+        expectedObject = ((List<?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(1)).get("key09")).get(2);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key10.key11";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((Map)jsonAsMap.get("example4")).get("key10")).get("key11");
+        expectedObject = ((Map<?, ?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key10")).get("key11");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key13.key15[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((Map)jsonAsMap.get("example4")).get("key13")).get("key15")).get(1);
+        expectedObject = ((List<?>)((Map<?, ?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key13")).get("key15")).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key21";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((List)((Map)jsonAsMap.get("example4")).get("key19")).get(2)).get("key21");
+        expectedObject = ((Map<?, ?>)((List<?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key19")).get(2)).get("key21");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key20[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((List)((Map)jsonAsMap.get("example4")).get("key19")).get(2)).get("key20")).get(1);
+        expectedObject = ((List<?>)((Map<?, ?>)((List<?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key19")).get(2)).get("key20")).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[2].key21.key23";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((Map)((List)jsonAsMap.get("example3")).get(2)).get("key21")).get("key23");
+        expectedObject = ((Map<?, ?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(2)).get("key21")).get("key23");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key16";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((List)((Map)((List)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key16");
+        expectedObject = ((Map<?, ?>)((List<?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key16");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key17[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((List)((Map)((List)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
+        expectedObject = ((List<?>)((Map<?, ?>)((List<?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[3][1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((List)((Map)jsonAsMap.get("example4")).get("key19")).get(3)).get(1);
+        expectedObject = ((List<?>)((List<?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key19")).get(3)).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
     }
 
@@ -130,7 +130,7 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testNegativePathRetrieval() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -204,7 +204,7 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
@@ -241,7 +241,7 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -296,20 +296,20 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
         // Test different append paths
         String jsonPath;
         int putValue;
-        List appendedList;
+        List<?> appendedList;
 
         // Appending to an array referenced by a key
         jsonPath = "$.example1.key01";
         putValue = 83;
         documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        appendedList = ((List)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
+        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         Assert.assertTrue(TestUtils.jsonEquals(appendedList.get(appendedList.size() -1), putValue));
 
@@ -317,7 +317,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example4.key19[3]";
         putValue = 84;
         documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        appendedList = ((List)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
+        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         Assert.assertTrue(TestUtils.jsonEquals(appendedList.get(appendedList.size() -1), putValue));
     }
@@ -334,7 +334,7 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -388,7 +388,7 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
@@ -478,7 +478,7 @@ public class DocumentAPITest extends BaseTestConfig {
             JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
