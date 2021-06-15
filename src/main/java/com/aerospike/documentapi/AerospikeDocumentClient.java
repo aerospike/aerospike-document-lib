@@ -44,7 +44,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public Object get(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        return get(null, null, documentKey, jsonPath);
+        return get(client.getReadPolicyDefault(), client.getWritePolicyDefault(), documentKey, jsonPath);
     }
 
     /**
@@ -56,7 +56,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public Object get(Policy readPolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        return get(readPolicy, null, documentKey, jsonPath);
+        return get(readPolicy, client.getWritePolicyDefault(), documentKey, jsonPath);
     }
 
     /**
@@ -100,7 +100,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject A JSON object to put.
      */
     public void put(Key documentKey, Map<?, ?> jsonObject) {
-        put(null, documentKey, jsonObject);
+        put(client.getWritePolicyDefault(), documentKey, jsonObject);
     }
 
     /**
@@ -121,7 +121,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public void put(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        put(null, documentKey, jsonPath, jsonObject);
+        put(client.getWritePolicyDefault(), documentKey, jsonPath, jsonObject);
     }
 
     /**
@@ -163,7 +163,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public void append(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        append(null, documentKey, jsonPath, jsonObject);
+        append(client.getWritePolicyDefault(), documentKey, jsonPath, jsonObject);
     }
 
     /**
@@ -202,7 +202,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public void delete(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        delete(null, documentKey, jsonPath);
+        delete(client.getWritePolicyDefault(), documentKey, jsonPath);
     }
 
     /**
