@@ -4,7 +4,7 @@ import com.aerospike.client.*;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentAPI.*;
+import com.aerospike.documentapi.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.aerospike.documentAPI;
+package com.aerospike.documentapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

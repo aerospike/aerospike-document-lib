@@ -1,4 +1,4 @@
-package com.aerospike.documentAPI;
+package com.aerospike.documentapi;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
