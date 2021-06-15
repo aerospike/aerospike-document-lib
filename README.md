@@ -152,17 +152,6 @@ The Aerospike Document Client is instantiated as follows
    AerospikeDocumentClient(IAerospikeClient client)
 ```
 
-There are getters and setters for the read and write policies, as well as the default bin name
-
-``` java
-    public String getDocumentBinName() 
-    public void setDocumentBinName(String documentBinName) {
-    public Policy getReadPolicy() 
-    public void setReadPolicy(Policy readPolicy)
-    public WritePolicy getWritePolicy() 
-    public void setWritePolicy(WritePolicy writePolicy)
-```
-
 Finally, this utility method is provided.
 
 ```java
