@@ -68,7 +68,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             // Retrieve the part of the document referred to by the JSON path
             Record r;
             try {
-                r = client.operate(new WritePolicy(readPolicy), documentKey,
+                WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
+                r = client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
             } catch (AerospikeException e) {
                 throw AerospikeDocumentClientExceptions.toDocumentException(e);
