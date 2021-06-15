@@ -44,7 +44,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public Object get(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        return get(null, null, documentKey, jsonPath);
+        return get(null, documentKey, jsonPath);
     }
 
     /**
@@ -55,19 +55,6 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     public Object get(Policy readPolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
-        return get(readPolicy, null, documentKey, jsonPath);
-    }
-
-    /**
-     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
-     * @param readPolicy An Aerospike read policy to use for the get() operation.
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
-     */
-    public Object get(Policy readPolicy, WritePolicy writePolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
@@ -85,7 +72,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             // Retrieve the part of the document referred to by the JSON path
             Record r;
             try {
-                r = client.operate(writePolicy, documentKey,
+                r = client.operate(new WritePolicy(readPolicy), documentKey,
                         finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
             } catch (AerospikeException e) {
                 throw AerospikeDocumentClientExceptions.toDocumentException(e);
