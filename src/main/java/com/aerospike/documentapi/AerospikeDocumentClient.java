@@ -38,7 +38,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     public Object get(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         return get(null, documentKey, jsonPath);
     }
 
@@ -51,7 +51,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     public Object get(Policy readPolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, retrieve the full document
@@ -71,7 +71,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 r = client.operate(new WritePolicy(readPolicy), documentKey,
                         finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
             } catch (AerospikeException e) {
-                throw AerospikeDocumentClientExceptions.toDocumentException(e);
+                throw DocumentApiException.toDocumentException(e);
             }
             return r.getValue(documentBinName);
         }
@@ -106,7 +106,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     public void put(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         put(null, documentKey, jsonPath, jsonObject);
     }
 
@@ -119,7 +119,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     public void put(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, put the full document
@@ -137,7 +137,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikePutOperation(documentBinName, jsonObject, ctxArray));
             } catch (AerospikeException e) {
-                throw AerospikeDocumentClientExceptions.toDocumentException(e);
+                throw DocumentApiException.toDocumentException(e);
             }
         }
     }
@@ -150,7 +150,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     public void append(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         append(null, documentKey, jsonPath, jsonObject);
     }
 
@@ -163,7 +163,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     public void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, you can't append
@@ -179,7 +179,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeAppendOperation(documentBinName, jsonObject, ctxArray));
             } catch (AerospikeException e) {
-                throw AerospikeDocumentClientExceptions.toDocumentException(e);
+                throw DocumentApiException.toDocumentException(e);
             }
         }
     }
@@ -191,7 +191,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     public void delete(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         delete(null, documentKey, jsonPath);
     }
 
@@ -203,7 +203,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     public void delete(WritePolicy writePolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+            DocumentApiException {
         // Turn the String path representation into a PathParts representation
         List<JsonPathParser.PathPart> pathParts = new JsonPathParser().parse(jsonPath);
         // If there are no parts, you can't append
@@ -219,7 +219,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeDeleteOperation(documentBinName, ctxArray));
             } catch (AerospikeException e) {
-                throw AerospikeDocumentClientExceptions.toDocumentException(e);
+                throw DocumentApiException.toDocumentException(e);
             }
         }
     }

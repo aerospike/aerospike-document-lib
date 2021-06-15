@@ -78,7 +78,7 @@ public class LearningTests extends BaseTestConfig {
     }
 
     @Test
-    public void demo() throws IOException, JsonPathParser.JsonParseException, AerospikeDocumentClientExceptions.AerospikeDocumentClientException {
+    public void demo() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
 
         // Put it in the DB

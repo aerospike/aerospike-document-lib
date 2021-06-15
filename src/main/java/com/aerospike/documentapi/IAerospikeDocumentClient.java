@@ -14,7 +14,7 @@ public interface IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     Object get(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClientExceptions.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Put a document.
@@ -32,7 +32,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     void put(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClientExceptions.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Append an object to a list in a document specified by a JSON path.
@@ -42,7 +42,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     void append(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClientExceptions.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Delete an object in a document specified by a JSON path.
@@ -51,5 +51,5 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     void delete(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClientExceptions.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 }
