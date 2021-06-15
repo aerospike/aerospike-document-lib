@@ -144,7 +144,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example3[1].key08.nonexistentkey"; // returns error 4 - parameter error
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Reference a map as if it were a list
@@ -152,7 +152,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example1[1]";
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.NotAListException should have been thrown");
+            Assert.fail("DocumentApiException.NotAListException should have been thrown");
         } catch (DocumentApiException.NotAListException ignored) {}
 
         // Reference a primitive as if it was a map
@@ -160,7 +160,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example4.key10.key11.nonexistentkey";
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Reference a primitive as if it was a list
@@ -168,28 +168,28 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example4.key10.key11[2]";
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.NotAListException should have been thrown");
+            Assert.fail("DocumentApiException.NotAListException should have been thrown");
         } catch (DocumentApiException.NotAListException ignored) {}
 
         // Reference a list item that is not there
         jsonPath = "$.example4.key13.key15[9]"; // error 26 - not applicable
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Reference a map that isn't there
         jsonPath = "$.example4.nosuchkey.nosuchkey"; // returns error 26
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Reference a list that isn't there
         jsonPath = "$.example4.nosuchkey[1]"; // returns error 26
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
 
@@ -257,7 +257,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 79;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Access a list that doesn't exist
@@ -265,7 +265,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 80;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Treat a map as if it were a list
@@ -273,7 +273,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 81;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Treat a list as if it were a map
@@ -281,7 +281,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 82;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
     }
 
@@ -350,7 +350,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 83;
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Append to a map
@@ -359,7 +359,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 84;
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Append to a primitive
@@ -368,7 +368,7 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 85;
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
 
