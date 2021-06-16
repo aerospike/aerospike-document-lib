@@ -62,10 +62,10 @@ Consider the following json
 We add this to our Aerospike database as follows
 
 ``` java
-   Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+   JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
    // For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
    Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE,AEROSPIKE_SET,"tommy-lee-jones.json");
-   documentClient.put(tommyLeeJonesDBKey, jsonAsMap);
+   documentClient.put(tommyLeeJonesDBKey, jsonNode);
 ```
 
 ### Get
@@ -117,45 +117,109 @@ Below is the interface against which the API has been written
 
 ``` java
    /**
-    * Retrieve the object in the document with key documentKey that is referenced by the Json path
-    */
+     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
+     *
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path to get the reference from.
+     * @return Object referenced by jsonPath.
+     */
     Object get(Key documentKey, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException;
 
-   /**
-    * Put a document
-    */
-    void put(Key documentKey, Map jsonObject);
+    /**
+     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
+     *
+     * @param readPolicy  An Aerospike read policy to use for the get() operation.
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path to get the reference from.
+     * @return Object referenced by jsonPath.
+     */
+    Object get(Policy readPolicy, Key documentKey, String jsonPath)
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
-   /**
-    * Put a map representation of a JSON object at a particular path in a json document
-    */
+    /**
+     * Put a document.
+     *
+     * @param documentKey An Aerospike Key.
+     * @param jsonObject  A JSON object to put.
+     */
+    void put(Key documentKey, JsonNode jsonObject);
+
+    /**
+     * Put a document.
+     *
+     * @param writePolicy An Aerospike write policy to use for the put() operation.
+     * @param documentKey An Aerospike Key.
+     * @param jsonObject  A JSON object to put.
+     */
+    void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonObject);
+
+    /**
+     * Put a map representation of a JSON object at a particular path in a JSON document.
+     *
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path to put the given JSON object in.
+     * @param jsonObject  A JSON object to put in the given JSON path.
+     */
     void put(Key documentKey, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException;
 
-   /**
-    * Append an object to a list in a document specified by a json path
-    */
+    /**
+     * Put a map representation of a JSON object at a particular path in a JSON document.
+     *
+     * @param writePolicy An Aerospike write policy to use for the put() and operate() operations.
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path to put the given JSON object in.
+     * @param jsonObject  A JSON object to put in the given JSON path.
+     */
+    void put(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject)
+            throws JsonPathParser.JsonParseException, DocumentApiException;
+
+    /**
+     * Append an object to a list in a document specified by a JSON path.
+     *
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
+     * @param jsonObject  A JSON object to append to the list at the given JSON path.
+     */
     void append(Key documentKey, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException;
 
-   /**
-    * Delete an object in a document specified by a json path
-    */
-    void delete(Key documentKey, String jsonPath) 
-      throws JsonPathParser.JsonParseException, DocumentApiException;
+    /**
+     * Append an object to a list in a document specified by a JSON path.
+     *
+     * @param writePolicy An Aerospike write policy to use for the operate() operation.
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
+     * @param jsonObject  A JSON object to append to the list at the given JSON path.
+     */
+    void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject)
+            throws JsonPathParser.JsonParseException, DocumentApiException;
+
+    /**
+     * Delete an object in a document specified by a JSON path.
+     *
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path for the object deletion.
+     */
+    void delete(Key documentKey, String jsonPath)
+            throws JsonPathParser.JsonParseException, DocumentApiException;
+
+    /**
+     * Delete an object in a document specified by a JSON path.
+     *
+     * @param writePolicy An Aerospike write policy to use for the operate() operation.
+     * @param documentKey An Aerospike Key.
+     * @param jsonPath    A JSON path for the object deletion.
+     */
+    void delete(WritePolicy writePolicy, Key documentKey, String jsonPath)
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 ```
 
 The Aerospike Document Client is instantiated as follows
 
 ``` java
    AerospikeDocumentClient(IAerospikeClient client)
-```
-
-Finally, this utility method is provided.
-
-```java
-public static Map convertJSONFromStringToMap(String jsonString)
 ```
 
 ## References
