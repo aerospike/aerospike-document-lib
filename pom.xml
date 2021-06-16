@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aerospike</groupId>
-    <artifactId>documentAPI</artifactId>
+    <artifactId>aerospike-document-api</artifactId>
     <version>0.5.0-BETA</version>
 
     <name>Aerospike Document API</name>
