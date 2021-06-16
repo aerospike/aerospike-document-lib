@@ -3,8 +3,7 @@ package com.aerospike.documentapi;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public interface IAerospikeDocumentClient {
 
@@ -35,7 +34,7 @@ public interface IAerospikeDocumentClient {
      * @param documentKey An Aerospike Key.
      * @param jsonObject  A JSON object to put.
      */
-    void put(Key documentKey, Map<?, ?> jsonObject);
+    void put(Key documentKey, JsonNode jsonObject);
 
     /**
      * Put a document.
@@ -44,7 +43,7 @@ public interface IAerospikeDocumentClient {
      * @param documentKey An Aerospike Key.
      * @param jsonObject  A JSON object to put.
      */
-    void put(WritePolicy writePolicy, Key documentKey, Map<?, ?> jsonObject);
+    void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonObject);
 
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.

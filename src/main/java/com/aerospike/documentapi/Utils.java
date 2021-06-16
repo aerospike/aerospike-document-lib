@@ -1,23 +1,14 @@
 package com.aerospike.documentapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.util.Map;
+import com.aerospike.client.Bin;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class Utils {
-
-    /**
-     * Given a serialized json object, return it's equivalent representation as a Java map
-     *
-     * @param jsonString a given JSON as a String.
-     * @return The given JSON as a Java Map.
-     * @throws IOException an IOException will be thrown in case of an error.
-     */
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> convertJSONFromStringToMap(String jsonString) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        // Reading string into a map
-        return (Map<String, Object>) mapper.readValue(jsonString, Map.class);
+    public static Bin createBinByJsonNodeType(String binName, JsonNode jsonNode) {
+        if (jsonNode.isArray()) {
+            return new Bin(binName, JsonConverters.convertJsonNodeToList(jsonNode));
+        } else {
+            return new Bin(binName, JsonConverters.convertJsonNodeToMap(jsonNode));
+        }
     }
 }
