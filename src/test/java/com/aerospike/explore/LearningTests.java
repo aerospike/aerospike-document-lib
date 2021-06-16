@@ -6,6 +6,7 @@ import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
@@ -55,7 +56,7 @@ public class LearningTests extends BaseTestConfig {
      */
     @Test
     public void stringToMap() throws IOException{
-        Map<String, Object> result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
+        JsonNode result = JsonConverters.convertStringToJsonNode(pojoToString(getTestStaffMemberObject()));
         DebugUtils.consoleHeader("Read JSON string into map- show map.toString");
         System.out.println(result);
         DebugUtils.newLine();
@@ -66,8 +67,8 @@ public class LearningTests extends BaseTestConfig {
      */
     @Test
     public void writePOJOToDB() throws IOException{
-        Map<String, Object> result = Utils.convertJSONFromStringToMap(pojoToString(getTestStaffMemberObject()));
-        putMapToDB(result, TEST_AEROSPIKE_KEY);
+        JsonNode result = JsonConverters.convertStringToJsonNode(pojoToString(getTestStaffMemberObject()));
+        putJsonNodeToDB(result, TEST_AEROSPIKE_KEY);
 
         Map<?, ?> m = getMapFromDB(TEST_AEROSPIKE_KEY);
         deleteKey(TEST_AEROSPIKE_KEY);
@@ -84,9 +85,9 @@ public class LearningTests extends BaseTestConfig {
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
         Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "src/test/resources/tommy-lee-jones.json");
-        documentClient.put(tommyLeeJonesDBKey, jsonAsMap);
+        documentClient.put(tommyLeeJonesDBKey, jsonNode);
 
         documentClient.put(tommyLeeJonesDBKey, "$.imdb_rank.rank",45);
         List<String> _2019Films = new Vector<>();
@@ -119,8 +120,8 @@ public class LearningTests extends BaseTestConfig {
         return staff;
     }
 
-    private static void putMapToDB(Map<?, ?> map, Key key) {
-        client.put(null, key, new Bin(JSON_EXAMPLE_BIN, map));
+    private static void putJsonNodeToDB(JsonNode jsonNode, Key key) {
+        client.put(null, key, Utils.createBinByJsonNodeType(JSON_EXAMPLE_BIN, jsonNode));
     }
 
     private static Map<?, ?> getMapFromDB(Key key) {

@@ -8,9 +8,9 @@ import com.aerospike.client.Record;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Primary object for accessing and mutating documents.
@@ -82,10 +82,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * Put a document.
      *
      * @param documentKey An Aerospike Key.
-     * @param jsonObject  A JSON object to put.
+     * @param jsonNode  A JSON node to put.
      */
-    public void put(Key documentKey, Map<?, ?> jsonObject) {
-        put(null, documentKey, jsonObject);
+    public void put(Key documentKey, JsonNode jsonNode) {
+        put(null, documentKey, jsonNode);
     }
 
     /**
@@ -93,10 +93,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      *
      * @param writePolicy An Aerospike write policy to use for the put() operation.
      * @param documentKey An Aerospike Key.
-     * @param jsonObject  A JSON object to put.
+     * @param jsonNode  A JSON node to put.
      */
-    public void put(WritePolicy writePolicy, Key documentKey, Map<?, ?> jsonObject) {
-        client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
+    public void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonNode) {
+        client.put(writePolicy, documentKey, Utils.createBinByJsonNodeType(documentBinName, jsonNode));
     }
 
     /**

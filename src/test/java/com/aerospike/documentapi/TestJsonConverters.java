@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-public class TestUtils {
+public class TestJsonConverters {
 
     /**
      * Determine whether two JSON objects are equivalent -
@@ -42,7 +42,7 @@ public class TestUtils {
         map2.put("key3", 3);
         map2.put("key1", 1);
         map2.put("key2", 2);
-        Assert.assertTrue(TestUtils.jsonEquals(map1, map2));
+        Assert.assertTrue(TestJsonConverters.jsonEquals(map1, map2));
     }
 
     /**
