@@ -1,4 +1,4 @@
-package com.aerospike.documentAPI;
+package com.aerospike.documentapi;
 
 import com.aerospike.client.Operation;
 import com.aerospike.client.Value;

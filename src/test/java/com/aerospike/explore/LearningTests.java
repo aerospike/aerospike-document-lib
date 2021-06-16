@@ -4,7 +4,7 @@ import com.aerospike.client.*;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentAPI.*;
+import com.aerospike.documentapi.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -78,7 +78,7 @@ public class LearningTests extends BaseTestConfig {
     }
 
     @Test
-    public void demo() throws IOException, JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
+    public void demo() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
 
         // Put it in the DB

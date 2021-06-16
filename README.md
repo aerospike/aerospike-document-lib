@@ -120,7 +120,7 @@ Below is the interface against which the API has been written
     * Retrieve the object in the document with key documentKey that is referenced by the Json path
     */
     Object get(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
    /**
     * Put a document
@@ -131,36 +131,25 @@ Below is the interface against which the API has been written
     * Put a map representation of a JSON object at a particular path in a json document
     */
     void put(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
    /**
     * Append an object to a list in a document specified by a json path
     */
     void append(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
    /**
     * Delete an object in a document specified by a json path
     */
     void delete(Key documentKey, String jsonPath) 
-      throws JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException;
+      throws JsonPathParser.JsonParseException, DocumentApiException;
 ```
 
 The Aerospike Document Client is instantiated as follows
 
 ``` java
    AerospikeDocumentClient(IAerospikeClient client)
-```
-
-There are getters and setters for the read and write policies, as well as the default bin name
-
-``` java
-    public String getDocumentBinName() 
-    public void setDocumentBinName(String documentBinName) {
-    public Policy getReadPolicy() 
-    public void setReadPolicy(Policy readPolicy)
-    public WritePolicy getWritePolicy() 
-    public void setWritePolicy(WritePolicy writePolicy)
 ```
 
 Finally, this utility method is provided.

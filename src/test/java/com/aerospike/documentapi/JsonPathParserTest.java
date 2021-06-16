@@ -1,4 +1,4 @@
-package com.aerospike.documentAPI;
+package com.aerospike.documentapi;
 
 import org.junit.Assert;
 import org.junit.Test;

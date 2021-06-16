@@ -1,4 +1,4 @@
-package com.aerospike.documentAPI;
+package com.aerospike.documentapi;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,10 +31,10 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testPositivePathRetrieval() throws IOException,
-            JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -56,62 +56,62 @@ public class DocumentAPITest extends BaseTestConfig {
 
         jsonPath = "$.example3[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)jsonAsMap.get("example3")).get(1);
+        expectedObject = ((List<?>)jsonAsMap.get("example3")).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key10";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)jsonAsMap.get("example4")).get("key10");
+        expectedObject = ((Map<?, ?>)jsonAsMap.get("example4")).get("key10");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example1.key01[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)jsonAsMap.get("example1")).get("key01")).get(2);
+        expectedObject = ((List<?>)((Map<?, ?>)jsonAsMap.get("example1")).get("key01")).get(2);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key09[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((List)jsonAsMap.get("example3")).get(1)).get("key09")).get(2);
+        expectedObject = ((List<?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(1)).get("key09")).get(2);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key10.key11";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((Map)jsonAsMap.get("example4")).get("key10")).get("key11");
+        expectedObject = ((Map<?, ?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key10")).get("key11");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key13.key15[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((Map)jsonAsMap.get("example4")).get("key13")).get("key15")).get(1);
+        expectedObject = ((List<?>)((Map<?, ?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key13")).get("key15")).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key21";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((List)((Map)jsonAsMap.get("example4")).get("key19")).get(2)).get("key21");
+        expectedObject = ((Map<?, ?>)((List<?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key19")).get(2)).get("key21");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key20[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((List)((Map)jsonAsMap.get("example4")).get("key19")).get(2)).get("key20")).get(1);
+        expectedObject = ((List<?>)((Map<?, ?>)((List<?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key19")).get(2)).get("key20")).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[2].key21.key23";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((Map)((List)jsonAsMap.get("example3")).get(2)).get("key21")).get("key23");
+        expectedObject = ((Map<?, ?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(2)).get("key21")).get("key23");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key16";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((Map)((List)((Map)((List)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key16");
+        expectedObject = ((Map<?, ?>)((List<?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key16");
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key17[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((Map)((List)((Map)((List)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
+        expectedObject = ((List<?>)((Map<?, ?>)((List<?>)((Map<?, ?>)((List<?>)jsonAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[3][1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = ((List)((List)((Map)jsonAsMap.get("example4")).get("key19")).get(3)).get(1);
+        expectedObject = ((List<?>)((List<?>)((Map<?, ?>)jsonAsMap.get("example4")).get("key19")).get(3)).get(1);
         Assert.assertTrue(TestUtils.jsonEquals(objectFromDB, expectedObject));
     }
 
@@ -127,11 +127,10 @@ public class DocumentAPITest extends BaseTestConfig {
      * Reference a list that isn't there
      */
     @Test
-    public void testNegativePathRetrieval() throws IOException, JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException
-    {
+    public void testNegativePathRetrieval() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -145,53 +144,53 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example3[1].key08.nonexistentkey"; // returns error 4 - parameter error
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Reference a map as if it were a list
         // $.example1 is a map
         jsonPath = "$.example1[1]";
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.NotAListException should have been thrown");
-        } catch (AerospikeDocumentClient.NotAListException ignored) {}
+            Assert.fail("DocumentApiException.NotAListException should have been thrown");
+        } catch (DocumentApiException.NotAListException ignored) {}
 
         // Reference a primitive as if it was a map
         // $.example4.key10.key11 is a primitive
         jsonPath = "$.example4.key10.key11.nonexistentkey";
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Reference a primitive as if it was a list
         // $.example4.key10.key11 is a primitive
         jsonPath = "$.example4.key10.key11[2]";
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.NotAListException should have been thrown");
-        } catch (AerospikeDocumentClient.NotAListException ignored) {}
+            Assert.fail("DocumentApiException.NotAListException should have been thrown");
+        } catch (DocumentApiException.NotAListException ignored) {}
 
         // Reference a list item that is not there
         jsonPath = "$.example4.key13.key15[9]"; // error 26 - not applicable
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Reference a map that isn't there
         jsonPath = "$.example4.nosuchkey.nosuchkey"; // returns error 26
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Reference a list that isn't there
         jsonPath = "$.example4.nosuchkey[1]"; // returns error 26
         try {
             objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
 
     /**
@@ -202,10 +201,10 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testPositivePut() throws IOException,
-    JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException{
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
@@ -239,10 +238,10 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testNegativePut() throws IOException,
-            JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException{
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -258,32 +257,32 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 79;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Access a list that doesn't exist
         jsonPath = "$.example9[2]";
         putValue = 80;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Treat a map as if it were a list
         jsonPath = "$.example2.key09";
         putValue = 81;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Treat a list as if it were a map
         jsonPath = "$.example1[1]";
         putValue = 82;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
     }
 
     /**
@@ -294,23 +293,23 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testPositiveAppend() throws IOException,
-            JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
         // Test different append paths
         String jsonPath;
         int putValue;
-        List appendedList;
+        List<?> appendedList;
 
         // Appending to an array referenced by a key
         jsonPath = "$.example1.key01";
         putValue = 83;
         documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        appendedList = ((List)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
+        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         Assert.assertTrue(TestUtils.jsonEquals(appendedList.get(appendedList.size() -1), putValue));
 
@@ -318,7 +317,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example4.key19[3]";
         putValue = 84;
         documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        appendedList = ((List)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
+        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         Assert.assertTrue(TestUtils.jsonEquals(appendedList.get(appendedList.size() -1), putValue));
     }
@@ -332,10 +331,10 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testNegativeAppend() throws IOException,
-            JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
@@ -351,8 +350,8 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 83;
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Append to a map
         // Throws key not found exception
@@ -360,8 +359,8 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 84;
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.KeyNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.KeyNotFoundException should have been thrown");
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Append to a primitive
         // Throws key not found exception
@@ -369,8 +368,8 @@ public class DocumentAPITest extends BaseTestConfig {
         putValue = 85;
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-            Assert.fail("AerospikeDocumentClient.ObjectNotFoundException should have been thrown");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+            Assert.fail("DocumentApiException.ObjectNotFoundException should have been thrown");
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
 
     /**
@@ -386,10 +385,10 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testPositiveDelete() throws IOException,
-            JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
@@ -448,7 +447,7 @@ public class DocumentAPITest extends BaseTestConfig {
             deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             // Check the deleted object does not exist, or that we now have a different object (possible in a list delete)
             Assert.assertTrue(deletedObjectRead == null | !deletedObjectRead.equals(originalObject));
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete a list using a list reference
         jsonPath = "$.example4.key19[3]";
@@ -460,7 +459,7 @@ public class DocumentAPITest extends BaseTestConfig {
             deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             // Check the deleted object does not exist, or that we now have a different object (possible in a list delete)
             Assert.assertTrue(deletedObjectRead == null | !deletedObjectRead.equals(originalObject));
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
 
     /**
@@ -476,10 +475,10 @@ public class DocumentAPITest extends BaseTestConfig {
      */
     @Test
     public void testNegativeDelete() throws IOException,
-            JsonPathParser.JsonParseException, AerospikeDocumentClient.AerospikeDocumentClientException {
+            JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
-        Map jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
+        Map<String, Object> jsonAsMap = Utils.convertJSONFromStringToMap(jsonString);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonAsMap);
 
@@ -505,13 +504,13 @@ public class DocumentAPITest extends BaseTestConfig {
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete a key in a list
         jsonPath = "$.example2.nokey";
@@ -519,13 +518,13 @@ public class DocumentAPITest extends BaseTestConfig {
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Delete an index in a map
         jsonPath = "$.example1[1]";
@@ -533,13 +532,13 @@ public class DocumentAPITest extends BaseTestConfig {
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.NotAListException ignored) {}
+        } catch (DocumentApiException.NotAListException ignored) {}
 
         // Delete call should throw an error
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.KeyNotFoundException ignored) {}
+        } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Delete a key in a map that doesn't exist
         jsonPath = "$.nokey.nokey";
@@ -547,13 +546,13 @@ public class DocumentAPITest extends BaseTestConfig {
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete an index in a list that doesn't exist
         jsonPath = "$.nolist[1]";
@@ -561,12 +560,12 @@ public class DocumentAPITest extends BaseTestConfig {
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
             Assert.fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (AerospikeDocumentClient.ObjectNotFoundException ignored) {}
+        } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
 }
