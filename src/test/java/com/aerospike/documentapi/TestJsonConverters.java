@@ -1,7 +1,7 @@
 package com.aerospike.documentapi;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class TestJsonConverters {
         map2.put("key3", 3);
         map2.put("key1", 1);
         map2.put("key2", 2);
-        Assert.assertTrue(TestJsonConverters.jsonEquals(map1, map2));
+        Assertions.assertTrue(TestJsonConverters.jsonEquals(map1, map2));
     }
 
     /**
