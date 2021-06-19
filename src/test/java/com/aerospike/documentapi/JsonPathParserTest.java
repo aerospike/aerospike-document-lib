@@ -1,9 +1,12 @@
 package com.aerospike.documentapi;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class JsonPathParserTest {
 
@@ -16,7 +19,7 @@ public class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-            Assertions.fail("Should not be here, parser should have thrown error");
+            fail("Should not be here, parser should have thrown error");
         } catch (JsonPathParser.JsonParseException ignored) {
         }
     }
@@ -30,7 +33,7 @@ public class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-            Assertions.fail("Should not be here, parser should have thrown error");
+            fail("Should not be here, parser should have thrown error");
         } catch (JsonPathParser.JsonParseException ignored) {
         }
     }
@@ -45,7 +48,7 @@ public class JsonPathParserTest {
         try {
             parser.parse(testPath);
         } catch (JsonPathParser.JsonParseException e) {
-            Assertions.fail("Should not be here, parser should not have thrown error");
+            fail("Should not be here, parser should not have thrown error");
         }
     }
 
@@ -60,10 +63,10 @@ public class JsonPathParserTest {
         try {
             pathParts = parser.parse(testPath);
         } catch (JsonPathParser.JsonParseException e) {
-            Assertions.fail("Should not be here, parser should not have thrown error");
+            fail("Should not be here, parser should not have thrown error");
         }
-        Assertions.assertEquals(1, pathParts.size());
-        Assertions.assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
+        assertEquals(1, pathParts.size());
+        assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
     }
 
     /**
@@ -77,11 +80,11 @@ public class JsonPathParserTest {
         try {
             pathParts = parser.parse(testPath);
         } catch (JsonPathParser.JsonParseException e) {
-            Assertions.fail("Should not be here, parser should not have thrown error");
+            fail("Should not be here, parser should not have thrown error");
         }
-        Assertions.assertEquals(2, pathParts.size());
-        Assertions.assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
-        Assertions.assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(2)));
+        assertEquals(2, pathParts.size());
+        assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
+        assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(2)));
     }
 
     /**
@@ -95,12 +98,12 @@ public class JsonPathParserTest {
         try {
             pathParts = parser.parse(testPath);
         } catch (JsonPathParser.JsonParseException e) {
-            Assertions.fail("Should not be here, parser should not have thrown error");
+            fail("Should not be here, parser should not have thrown error");
         }
-        Assertions.assertEquals(3, pathParts.size());
-        Assertions.assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
-        Assertions.assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(1)));
-        Assertions.assertTrue(((JsonPathParser.ListPart) pathParts.get(2)).equals(parser.new ListPart(2)));
+        assertEquals(3, pathParts.size());
+        assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
+        assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(1)));
+        assertTrue(((JsonPathParser.ListPart) pathParts.get(2)).equals(parser.new ListPart(2)));
 
     }
 
@@ -113,7 +116,7 @@ public class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-            Assertions.fail("Should not be here, parser should have thrown error");
+            fail("Should not be here, parser should have thrown error");
         } catch (JsonPathParser.JsonParseException ignored) {
         }
     }
@@ -127,7 +130,7 @@ public class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-            Assertions.fail("Should not be here, parser should have thrown error");
+            fail("Should not be here, parser should have thrown error");
         } catch (JsonPathParser.JsonParseException ignored) {
         }
     }
@@ -141,7 +144,7 @@ public class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-            Assertions.fail("Should not be here, parser should have thrown error");
+            fail("Should not be here, parser should have thrown error");
         } catch (JsonPathParser.JsonParseException ignored) {
         }
     }
@@ -155,7 +158,7 @@ public class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-            Assertions.fail("Should not be here, parser should have thrown error");
+            fail("Should not be here, parser should have thrown error");
         } catch (JsonPathParser.JsonParseException ignored) {
         }
     }
