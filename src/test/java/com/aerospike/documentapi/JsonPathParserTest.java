@@ -1,11 +1,12 @@
 package com.aerospike.documentapi;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class JsonPathParserTest {
 
@@ -64,8 +65,8 @@ public class JsonPathParserTest {
         } catch (JsonPathParser.JsonParseException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        Assert.assertEquals(1, pathParts.size());
-        Assert.assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
+        assertEquals(1, pathParts.size());
+        assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
     }
 
     /**
@@ -81,9 +82,9 @@ public class JsonPathParserTest {
         } catch (JsonPathParser.JsonParseException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        Assert.assertEquals(2, pathParts.size());
-        Assert.assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
-        Assert.assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(2)));
+        assertEquals(2, pathParts.size());
+        assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
+        assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(2)));
     }
 
     /**
@@ -99,10 +100,10 @@ public class JsonPathParserTest {
         } catch (JsonPathParser.JsonParseException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        Assert.assertEquals(3, pathParts.size());
-        Assert.assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
-        Assert.assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(1)));
-        Assert.assertTrue(((JsonPathParser.ListPart) pathParts.get(2)).equals(parser.new ListPart(2)));
+        assertEquals(3, pathParts.size());
+        assertTrue(((JsonPathParser.MapPart) pathParts.get(0)).equals(parser.new MapPart("key")));
+        assertTrue(((JsonPathParser.ListPart) pathParts.get(1)).equals(parser.new ListPart(1)));
+        assertTrue(((JsonPathParser.ListPart) pathParts.get(2)).equals(parser.new ListPart(2)));
 
     }
 

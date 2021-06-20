@@ -3,8 +3,8 @@ package com.aerospike.documentapi;
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 /**
  * Constants used in testing
@@ -22,12 +22,12 @@ public class BaseTestConfig {
 
     public static IAerospikeClient client;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() {
         client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleanupClass() {
         if (client != null) {
             client.close();
