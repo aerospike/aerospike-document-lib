@@ -1,8 +1,9 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.Operation;
-import com.aerospike.client.Value;
 import com.aerospike.client.cdt.*;
+import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.documentapi.pathparts.ListPathPart;
+import com.aerospike.documentapi.pathparts.MapPathPart;
 
 import java.util.List;
 import java.util.StringTokenizer;
@@ -24,7 +25,7 @@ public class JsonPathParser {
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
 
     // Store our representation of the individual path parts
-    List<PathPart> pathParts= new Vector<>();
+    JsonPathObject jsonPathObject = new JsonPathObject();
 
     JsonPathParser() {}
 
@@ -34,7 +35,7 @@ public class JsonPathParser {
      * @return List<PathPart></PathPart>
      * @throws JsonParseException a JsonParseException will be thrown in case of an error.
      */
-    List<PathPart> parse(String jsonString) throws JsonParseException {
+    JsonPathObject parse(String jsonString) throws JsonParseException {
         if (jsonString.charAt(0) != '$') {
             throw new JsonPrefixException(jsonString);
         }
@@ -45,7 +46,8 @@ public class JsonPathParser {
         while (tokenizer.hasMoreTokens()) {
             parsePathPart(tokenizer.nextToken());
         }
-        return pathParts;
+
+        return jsonPathObject;
     }
 
     /**
@@ -57,116 +59,48 @@ public class JsonPathParser {
      */
     private void parsePathPart(String pathPart) throws JsonParseException {
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
-        if ((!pathPart.contains("[")) & (!pathPart.contains("]"))) {
-            pathParts.add(new MapPart(pathPart));
+        if ((!pathPart.contains("[")) && (!pathPart.contains("]"))) {
+            // ignore * wildcard after a dot, its the same as ending with a .path
+            if (!pathPart.equals("*")) {
+                jsonPathObject.addPathPart(new MapPathPart(pathPart));
+            }
         } else if (keyMatcher.find()) {
             String key = keyMatcher.group(1);
-            pathParts.add(new MapPart(key));
+            jsonPathObject.addPathPart(new MapPathPart(key));
             Matcher indexMatcher = INDEX_PATTERN.matcher(pathPart);
 
             while (indexMatcher.find()) {
-                pathParts.add(new ListPart(Integer.parseInt(indexMatcher.group(2))));
+                jsonPathObject.addPathPart(new ListPathPart(Integer.parseInt(indexMatcher.group(2))));
             }
+        } else if (pathPart.contains("[*]")) {
+            String key = pathPart.substring(0, pathPart.indexOf("["));
+            jsonPathObject.addPathPart(new MapPathPart(key, true));
+            jsonPathObject.setRequiresJsonPathQuery(true);
         } else {
             throw new JsonPathException(pathPart);
         }
     }
 
-    /**
-     * PathPart analysis is ultimately used to create CTX (context) objects and operations
-     */
-    abstract class PathPart {
-        abstract CTX toAerospikeContext();
-        abstract Operation toAerospikeGetOperation(String binName, CTX[] contexts);
-        abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts);
-        public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) {
-            return ListOperation.append(binName, Value.get(object), contexts);
-        }
-        abstract Operation toAerospikeDeleteOperation(String binName, CTX[] contexts);
+    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
+        return pathParts.get(pathParts.size() - 1);
     }
 
-    /**
-     * MapPart is a representation of key access
-     */
-    class MapPart extends PathPart {
-        String key;
-
-        MapPart(String key) {
-            this.key = key;
-        }
-
-        String getKey() {
-            return key;
-        }
-
-        boolean equals(MapPart m) {
-            return m.key.equals(key);
-        }
-
-        public CTX toAerospikeContext() {
-            return CTX.mapKey(Value.get(key));
-        }
-
-        public Operation toAerospikeGetOperation(String binName, CTX[] contexts) {
-            return MapOperation.getByKey(binName, Value.get(key), MapReturnType.VALUE, contexts);
-        }
-
-        public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) {
-            return MapOperation.put(new MapPolicy(), binName, Value.get(key), Value.get(object), contexts);
-        }
-
-        public Operation toAerospikeDeleteOperation(String binName, CTX[] contexts) {
-            return MapOperation.removeByKey(binName, Value.get(key), MapReturnType.NONE, contexts);
-        }
-    }
-
-    /**
-     * A ListPart is a representation of a list access
-     */
-    class ListPart extends PathPart {
-        int listPosition;
-
-        ListPart(int listPosition) {
-            this.listPosition = listPosition;
-        }
-
-        int getListPosition() {
-            return listPosition;
-        }
-
-        boolean equals(ListPart l) {
-            return l.listPosition == listPosition;
-        }
-
-        public CTX toAerospikeContext() {
-            return CTX.listIndex(listPosition);
-        }
-
-        public Operation toAerospikeGetOperation(String binName, CTX[] contexts) {
-            return ListOperation.getByIndex(binName, listPosition, ListReturnType.VALUE, contexts);
-        }
-
-        public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) {
-            return ListOperation.insert(binName, listPosition, Value.get(object), contexts);
-        }
-
-        public Operation toAerospikeDeleteOperation(String binName, CTX[] contexts) {
-            return ListOperation.removeByIndex(binName, listPosition, ListReturnType.NONE, contexts);
-        }
+    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
+        return pathParts.remove(pathParts.size() - 1);
     }
 
     /**
      * Given a list of path parts, convert this to the list of contexts you would need
      * to retrieve the JSON path represented by the list of path parts
      * @param pathParts pathParts list to convert.
-     * @return A list of contexts (CTXs).
+     * @return An array of contexts (CTXs).
      */
-    public static List<CTX> pathPartsToContexts(List<PathPart> pathParts) {
+    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
         List<CTX> contextList = new Vector<>();
         for (PathPart pathPart : pathParts) {
             contextList.add(pathPart.toAerospikeContext());
         }
-        return contextList;
+        return contextList.toArray(new CTX[contextList.size()]);
     }
 
     /**

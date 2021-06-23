@@ -1,5 +1,6 @@
 package com.aerospike.documentapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,5 +43,10 @@ public class JsonConverters {
     public static List<Object> convertJsonNodeToList(JsonNode jsonNode) {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(jsonNode, new TypeReference<List<Object>>(){});
+    }
+
+    public static String convertMapToJsonString(Map<?, ?> map) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(map);
     }
 }
