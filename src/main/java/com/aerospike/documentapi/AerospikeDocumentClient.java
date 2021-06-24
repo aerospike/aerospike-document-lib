@@ -6,6 +6,7 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     public Object get(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         return get(null, documentKey, jsonPath);
     }
 
@@ -49,20 +50,18 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     public Object get(Policy readPolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         // Turn the String path representation into a PathParts representation
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
-        // If there are no parts, retrieve the full document
-        if (jsonPathObject.getAccessPathParts().size() == 0) {
-            return client.get(readPolicy, documentKey).getValue(documentBinName);
-        }
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathQuery jsonPathQuery = new JsonPathQuery(client);
-            return jsonPathQuery.wildcardInBracketsQuery(readPolicy, jsonPathObject, documentKey, documentBinName);
+            return jsonPathQuery.execute(readPolicy, jsonPathObject, documentKey, documentBinName);
         }
-        // else retrieve using pure contexts
-        else {
-            List<PathPart> pathPart = jsonPathObject.getAccessPathParts();
+        // If there are no parts, retrieve the full document
+        else if (jsonPathObject.getPathParts().size() == 0) {
+            return client.get(readPolicy, documentKey).getValue(documentBinName);
+        } else { // else retrieve using pure contexts
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
@@ -129,12 +128,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
         }
         // If there are no parts, put the full document
-        if (jsonPathObject.getAccessPathParts().size() == 0) {
+        else if (jsonPathObject.getPathParts().size() == 0) {
             client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
-        }
-        // else put using contexts
-        else {
-            List<PathPart> pathPart = jsonPathObject.getAccessPathParts();
+        } else { // else put using contexts
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
@@ -176,11 +173,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
         }
         // If there are no parts, you can't append
-        if (jsonPathObject.getAccessPathParts().size() == 0) {
+        else if (jsonPathObject.getPathParts().size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
-        }
-        else {
-            List<PathPart> pathPart = jsonPathObject.getAccessPathParts();
+        } else {
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathPart);
             // Then turn the rest into the contexts representation
@@ -220,10 +216,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
         }
         // If there are no parts, you can't append
-        if (jsonPathObject.getAccessPathParts().size() == 0) {
+        else if (jsonPathObject.getPathParts().size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
         } else {
-            List<PathPart> pathPart = jsonPathObject.getAccessPathParts();
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation

@@ -65,8 +65,8 @@ public class JsonPathParserTest {
         } catch (JsonPathParser.JsonParseException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(1, jsonPathObject.getAccessPathParts().size());
-        assertTrue(((MapPathPart) jsonPathObject.getAccessPathParts().get(0)).equals(new MapPathPart("key")));
+        assertEquals(1, jsonPathObject.getPathParts().size());
+        assertTrue(((MapPathPart) jsonPathObject.getPathParts().get(0)).equals(new MapPathPart("key")));
     }
 
     /**
@@ -82,9 +82,9 @@ public class JsonPathParserTest {
         } catch (JsonPathParser.JsonParseException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(2, jsonPathObject.getAccessPathParts().size());
-        assertTrue(((MapPathPart) jsonPathObject.getAccessPathParts().get(0)).equals(new MapPathPart("key")));
-        assertTrue(((ListPathPart) jsonPathObject.getAccessPathParts().get(1)).equals(new ListPathPart(2)));
+        assertEquals(2, jsonPathObject.getPathParts().size());
+        assertTrue(((MapPathPart) jsonPathObject.getPathParts().get(0)).equals(new MapPathPart("key")));
+        assertTrue(((ListPathPart) jsonPathObject.getPathParts().get(1)).equals(new ListPathPart(2)));
     }
 
     /**
@@ -100,10 +100,10 @@ public class JsonPathParserTest {
         } catch (JsonPathParser.JsonParseException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(3, jsonPathObject.getAccessPathParts().size());
-        assertTrue(((MapPathPart) jsonPathObject.getAccessPathParts().get(0)).equals(new MapPathPart("key")));
-        assertTrue(((ListPathPart) jsonPathObject.getAccessPathParts().get(1)).equals(new ListPathPart(1)));
-        assertTrue(((ListPathPart) jsonPathObject.getAccessPathParts().get(2)).equals(new ListPathPart(2)));
+        assertEquals(3, jsonPathObject.getPathParts().size());
+        assertTrue(((MapPathPart) jsonPathObject.getPathParts().get(0)).equals(new MapPathPart("key")));
+        assertTrue(((ListPathPart) jsonPathObject.getPathParts().get(1)).equals(new ListPathPart(1)));
+        assertTrue(((ListPathPart) jsonPathObject.getPathParts().get(2)).equals(new ListPathPart(2)));
 
     }
 

@@ -6,6 +6,8 @@ import com.aerospike.client.Key;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.io.IOException;
+
 /**
  * Constants used in testing
  */
@@ -22,9 +24,16 @@ public class BaseTestConfig {
 
     public static IAerospikeClient client;
 
+
+    public static String testMaterialJson;
+    public static String storeJson;
+    public static String tommyLeeJonesJson;
+    public static String topLevelArrayTypeJson;
+
     @BeforeAll
-    public static void setupClass() {
+    public static void setupClass() throws IOException {
         client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
+        loadJsonFiles();
     }
 
     @AfterAll
@@ -32,5 +41,12 @@ public class BaseTestConfig {
         if (client != null) {
             client.close();
         }
+    }
+
+    private static void loadJsonFiles() throws IOException {
+        testMaterialJson = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
+        storeJson = DebugUtils.readJSONFromAFile("src/test/resources/store.json");
+        tommyLeeJonesJson = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
+        topLevelArrayTypeJson = DebugUtils.readJSONFromAFile("src/test/resources/topLevelArrayType.json");
     }
 }

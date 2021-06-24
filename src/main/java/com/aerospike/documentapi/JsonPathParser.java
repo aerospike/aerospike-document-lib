@@ -5,9 +5,7 @@ import com.aerospike.documentapi.pathparts.PathPart;
 import com.aerospike.documentapi.pathparts.ListPathPart;
 import com.aerospike.documentapi.pathparts.MapPathPart;
 
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +21,8 @@ public class JsonPathParser {
     static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
     // This pattern to extract index1,index2 ...
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
+
+    private final List<String> jsonPathQueryIndications = new ArrayList<>(Arrays.asList("[*]", "..", "[?"));
 
     // Store our representation of the individual path parts
     JsonPathObject jsonPathObject = new JsonPathObject();
@@ -43,6 +43,29 @@ public class JsonPathParser {
         if (!tokenizer.nextToken().equals(DOCUMENT_ROOT_TOKEN)) {
             throw new JsonPrefixException(jsonString);
         }
+
+        Integer index = getFirstIndexOfAQueryIndication(jsonString);
+        // Query is required
+        if (index != null) {
+            jsonPathObject.setRequiresJsonPathQuery(true);
+            /*
+                Split the jsonString into 2 parts:
+                    1. A string of path parts before a query operator to fetch the smallest Json possible from Aerospike.
+                    2. A string of the remaining JsonPath to later use for executing a JsonPath query on the fetched Json from Aerospike.
+
+                For example:
+                $.store.book[*].author
+                store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results from Aerospike (key = book, value = nested Json).
+            */
+            String aerospikePathPartsString = jsonString.substring(0, index);
+            String jsonPathPathPartsString = jsonString.substring(index);
+            jsonPathObject.setJsonPathSecondStepQuery(jsonPathPathPartsString);
+            tokenizer = new StringTokenizer(aerospikePathPartsString, JSON_PATH_SEPARATOR);
+            if (!tokenizer.nextToken().equals(DOCUMENT_ROOT_TOKEN)) {
+                throw new JsonPrefixException(jsonString);
+            }
+        }
+
         while (tokenizer.hasMoreTokens()) {
             parsePathPart(tokenizer.nextToken());
         }
@@ -72,10 +95,6 @@ public class JsonPathParser {
             while (indexMatcher.find()) {
                 jsonPathObject.addPathPart(new ListPathPart(Integer.parseInt(indexMatcher.group(2))));
             }
-        } else if (pathPart.contains("[*]")) {
-            String key = pathPart.substring(0, pathPart.indexOf("["));
-            jsonPathObject.addPathPart(new MapPathPart(key, true));
-            jsonPathObject.setRequiresJsonPathQuery(true);
         } else {
             throw new JsonPathException(pathPart);
         }
@@ -101,6 +120,14 @@ public class JsonPathParser {
             contextList.add(pathPart.toAerospikeContext());
         }
         return contextList.toArray(new CTX[contextList.size()]);
+    }
+
+    private Integer getFirstIndexOfAQueryIndication(String jsonPath) {
+        return jsonPathQueryIndications.stream()
+                .map(jsonPath::indexOf)
+                .filter(index -> index > 0)
+                .min(Integer::compare)
+                .orElse(null); // in case there no match for a query indication
     }
 
     /**

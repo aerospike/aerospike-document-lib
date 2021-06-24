@@ -3,6 +3,7 @@ package com.aerospike.documentapi;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public interface IAerospikeDocumentClient {
@@ -15,7 +16,7 @@ public interface IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     Object get(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
@@ -26,7 +27,7 @@ public interface IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     Object get(Policy readPolicy, Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Put a document.

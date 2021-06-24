@@ -7,13 +7,14 @@ import java.util.List;
 
 public class JsonPathObject {
     private final List<PathPart> pathParts;
+    private String jsonPathSecondStepQuery;
     private boolean requiresJsonPathQuery;
 
     public JsonPathObject() {
         pathParts = new ArrayList<>();
     }
 
-    public List<PathPart> getAccessPathParts() {
+    public List<PathPart> getPathParts() {
         return pathParts;
     }
 
@@ -27,5 +28,13 @@ public class JsonPathObject {
 
     public void setRequiresJsonPathQuery(boolean status) {
         requiresJsonPathQuery = status;
+    }
+
+    public String getJsonPathSecondStepQuery() {
+        return jsonPathSecondStepQuery;
+    }
+
+    public void setJsonPathSecondStepQuery(String jsonPathSecondStepQuery) {
+        this.jsonPathSecondStepQuery = jsonPathSecondStepQuery;
     }
 }

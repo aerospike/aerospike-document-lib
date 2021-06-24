@@ -23,9 +23,8 @@ public class LearningTests extends BaseTestConfig {
      * Read json from file & output to console
      */
     @Test
-    public void getJsonFromFile() throws IOException {
-        String s = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
-        System.out.println(s);
+    public void getJsonFromFile() {
+        System.out.println(tommyLeeJonesJson);
     }
 
     /**
@@ -80,12 +79,10 @@ public class LearningTests extends BaseTestConfig {
 
     @Test
     public void demo() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
-        String jsonString = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
-
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(tommyLeeJonesJson);
         Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "src/test/resources/tommy-lee-jones.json");
         documentClient.put(tommyLeeJonesDBKey, jsonNode);
 

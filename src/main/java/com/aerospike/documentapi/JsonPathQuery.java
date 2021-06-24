@@ -8,12 +8,10 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
-import com.aerospike.documentapi.pathparts.MapPathPart;
-import com.aerospike.documentapi.pathparts.PathPartTypeEnum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPath;
 
-import java.util.List;
+import java.util.Map;
 
 public class JsonPathQuery {
 
@@ -23,47 +21,37 @@ public class JsonPathQuery {
         this.client = client;
     }
 
-    public Object wildcardInBracketsQuery(Policy readPolicy, JsonPathObject jsonPathObject, Key documentKey, String documentBinName) throws DocumentApiException {
-        int wildcardIndex = 0;
+    public Object execute(Policy readPolicy, JsonPathObject jsonPathObject, Key documentKey, String documentBinName) throws DocumentApiException, JsonProcessingException {
+        String json;
+        String jsonPath;
+        Record r;
+        Object fullDocument;
 
-        for (int i = 0; i < jsonPathObject.getAccessPathParts().size(); i++) {
-            if (jsonPathObject.getAccessPathParts().get(i).getType().equals(PathPartTypeEnum.MAP)) {
-                if (((MapPathPart)jsonPathObject.getAccessPathParts().get(i)).isWildcard()) {
-                    wildcardIndex = i+1;
-                    break;
-                }
+        // If there are no parts, retrieve the full document
+        if (jsonPathObject.getPathParts().size() == 0) {
+            fullDocument = client.get(readPolicy, documentKey).getValue(documentBinName);
+            json = JsonConverters.convertMapToJsonString((Map<?, ?>) fullDocument);
+            jsonPath = "$" +
+                    jsonPathObject.getJsonPathSecondStepQuery();
+        } else {
+            // We need to treat the last part of the path differently
+            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(jsonPathObject.getPathParts());
+            // Then turn the rest into the contexts representation
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(jsonPathObject.getPathParts());
+            // Retrieve the part of the document referred to by the JSON path
+
+            try {
+                WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
+                r = client.operate(writePolicy, documentKey,
+                        finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
+                json = JsonConverters.convertMapToJsonString(r.bins);
+                jsonPath = "$." +
+                        documentBinName +
+                        jsonPathObject.getJsonPathSecondStepQuery();
+            } catch (AerospikeException e) {
+                throw DocumentApiException.toDocumentException(e);
             }
         }
-
-        List<PathPart> pathPartsTillWildCard = jsonPathObject.getAccessPathParts().subList(0, wildcardIndex);
-        PathPart pathPartAfterWildCard = jsonPathObject.getAccessPathParts().get(wildcardIndex);
-
-        // We need to treat the last part of the path differently
-        PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPartsTillWildCard);
-        // Then turn the rest into the contexts representation
-        CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPartsTillWildCard);
-        // Retrieve the part of the document referred to by the JSON path
-        Record r;
-        try {
-            WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
-            r = client.operate(writePolicy, documentKey,
-                    finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
-        } catch (AerospikeException e) {
-            throw DocumentApiException.toDocumentException(e);
-        }
-
-        String json;
-
-        try {
-            json = JsonConverters.convertMapToJsonString(r.bins);
-        } catch (JsonProcessingException e){
-            throw new AerospikeException(e);
-        }
-
-        String jsonPath = "$." +
-                documentBinName +
-                "[*]." +
-                ((MapPathPart) pathPartAfterWildCard).getKey();
 
         return JsonPath.read(json, jsonPath);
     }

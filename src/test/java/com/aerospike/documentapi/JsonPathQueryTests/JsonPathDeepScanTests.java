@@ -6,37 +6,30 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JsonPathWildcardTests extends BaseTestConfig {
+public class JsonPathDeepScanTests extends BaseTestConfig {
 
     @Test
-    public void testWildcardAfterDot() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testDeepScan() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
-        Map<String, Object> jsonNodeAsMap  = JsonConverters.convertJsonNodeToMap(jsonNode);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
 
-        String jsonPath = "$.store.*";
+        String jsonPath = "$.store..price";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        Object expectedObject = jsonNodeAsMap.get("store");
-        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
-
-        jsonPath = "$.store.*";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = jsonNodeAsMap.get("store");
+        Object expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
 
     @Test
-    public void testWildcardInsideBrackets() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testDeepScanAtTheBeginning() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
 
-        String jsonPath = "$.store.book[*].author";
+        String jsonPath = "$..book[2]";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));

@@ -13,15 +13,9 @@ import com.aerospike.client.cdt.MapReturnType;
 public class MapPathPart extends PathPart {
 
     String key;
-    private boolean isWildcard;
 
     public MapPathPart(String key) {
         this.key = key;
-    }
-
-    public MapPathPart(String key, boolean isWildcard) {
-        this.key = key;
-        this.isWildcard = isWildcard;
     }
 
     public String getKey() {
@@ -55,13 +49,5 @@ public class MapPathPart extends PathPart {
     @Override
     public PathPartTypeEnum getType() {
         return PathPartTypeEnum.MAP;
-    }
-
-    public boolean isWildcard() {
-        return isWildcard;
-    }
-
-    public void setIsWildcard(boolean isWildcard) {
-        this.isWildcard = isWildcard;
     }
 }
