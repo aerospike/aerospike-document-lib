@@ -1,15 +1,12 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.Record;
-import com.aerospike.client.*;
-import com.aerospike.client.cdt.CTX;
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.IAerospikeClient;
+import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentapi.pathparts.PathPart;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-
-import java.util.List;
 
 /**
  * Primary object for accessing and mutating documents.
@@ -18,15 +15,18 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     public static String DEFAULT_DOCUMENT_BIN_NAME = "documentBin";
 
     private final IAerospikeClient client;
+    private AerospikeDocumentEngine aerospikeDocumentEngine;
     private String documentBinName = DEFAULT_DOCUMENT_BIN_NAME;
 
     public AerospikeDocumentClient(IAerospikeClient client) {
         this.client = client;
+        this.aerospikeDocumentEngine = new AerospikeDocumentEngine(client, documentBinName);
     }
 
     public AerospikeDocumentClient(IAerospikeClient client, String documentBinName) {
         this(client);
         this.documentBinName = documentBinName;
+        this.aerospikeDocumentEngine = new AerospikeDocumentEngine(client, documentBinName);
     }
 
     /**
@@ -51,31 +51,14 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public Object get(Policy readPolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             DocumentApiException, JsonProcessingException {
-        // Turn the String path representation into a PathParts representation
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
+
+        Object result = aerospikeDocumentEngine.get(readPolicy, documentKey, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathQuery jsonPathQuery = new JsonPathQuery(client);
-            return jsonPathQuery.execute(readPolicy, jsonPathObject, documentKey, documentBinName);
+            return JsonPathQuery.execute(jsonPathObject, result);
         }
-        // If there are no parts, retrieve the full document
-        else if (jsonPathObject.getPathParts().size() == 0) {
-            return client.get(readPolicy, documentKey).getValue(documentBinName);
-        } else { // else retrieve using pure contexts
-            List<PathPart> pathPart = jsonPathObject.getPathParts();
-            // We need to treat the last part of the path differently
-            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
-            // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
-            // Retrieve the part of the document referred to by the JSON path
-            Record r;
-            try {
-                WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
-                r = client.operate(writePolicy, documentKey,
-                        finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
-            } catch (AerospikeException e) {
-                throw DocumentApiException.toDocumentException(e);
-            }
-            return r.getValue(documentBinName);
+        else {
+            return result;
         }
     }
 
@@ -122,26 +105,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public void put(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
             DocumentApiException {
-        // Turn the String path representation into a PathParts representation
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
-        }
-        // If there are no parts, put the full document
-        else if (jsonPathObject.getPathParts().size() == 0) {
-            client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
-        } else { // else put using contexts
-            List<PathPart> pathPart = jsonPathObject.getPathParts();
-            // We need to treat the last part of the path differently
-            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
-            // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
-            try {
-                client.operate(writePolicy, documentKey,
-                        finalPathPart.toAerospikePutOperation(documentBinName, jsonObject, ctxArray));
-            } catch (AerospikeException e) {
-                throw DocumentApiException.toDocumentException(e);
-            }
+        } else {
+            aerospikeDocumentEngine.put(writePolicy, documentKey, jsonObject, jsonPathObject);
         }
     }
 
@@ -167,26 +135,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
             DocumentApiException {
-        // Turn the String path representation into a PathParts representation
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
-        }
-        // If there are no parts, you can't append
-        else if (jsonPathObject.getPathParts().size() == 0) {
-            throw new JsonPathParser.ListException(jsonPath);
         } else {
-            List<PathPart> pathPart = jsonPathObject.getPathParts();
-            // We need to treat the last part of the path differently
-            PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathPart);
-            // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
-            try {
-                client.operate(writePolicy, documentKey,
-                        finalPathPart.toAerospikeAppendOperation(documentBinName, jsonObject, ctxArray));
-            } catch (AerospikeException e) {
-                throw DocumentApiException.toDocumentException(e);
-            }
+            aerospikeDocumentEngine.append(writePolicy, documentKey, jsonPath, jsonObject, jsonPathObject);
         }
     }
 
@@ -210,26 +163,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      */
     public void delete(WritePolicy writePolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
             DocumentApiException {
-        // Turn the String path representation into a PathParts representation
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
-        }
-        // If there are no parts, you can't append
-        else if (jsonPathObject.getPathParts().size() == 0) {
-            throw new JsonPathParser.ListException(jsonPath);
         } else {
-            List<PathPart> pathPart = jsonPathObject.getPathParts();
-            // We need to treat the last part of the path differently
-            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
-            // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
-            try {
-                client.operate(writePolicy, documentKey,
-                        finalPathPart.toAerospikeDeleteOperation(documentBinName, ctxArray));
-            } catch (AerospikeException e) {
-                throw DocumentApiException.toDocumentException(e);
-            }
+            aerospikeDocumentEngine.delete(writePolicy, documentKey, jsonPath, jsonPathObject);
         }
     }
 }

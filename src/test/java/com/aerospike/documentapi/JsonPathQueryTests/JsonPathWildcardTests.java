@@ -19,14 +19,10 @@ public class JsonPathWildcardTests extends BaseTestConfig {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
 
+        // All things, both books and bicycles
         String jsonPath = "$.store.*";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
         Object expectedObject = jsonNodeAsMap.get("store");
-        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
-
-        jsonPath = "$.store.*";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
-        expectedObject = jsonNodeAsMap.get("store");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
 
@@ -36,6 +32,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
 
+        // The authors of all books
         String jsonPath = "$.store.book[*].author";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);

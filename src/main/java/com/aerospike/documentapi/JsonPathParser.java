@@ -47,7 +47,6 @@ public class JsonPathParser {
         Integer index = getFirstIndexOfAQueryIndication(jsonString);
         // Query is required
         if (index != null) {
-            jsonPathObject.setRequiresJsonPathQuery(true);
             /*
                 Split the jsonString into 2 parts:
                     1. A string of path parts before a query operator to fetch the smallest Json possible from Aerospike.
@@ -57,6 +56,7 @@ public class JsonPathParser {
                 $.store.book[*].author
                 store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results from Aerospike (key = book, value = nested Json).
             */
+            jsonPathObject.setRequiresJsonPathQuery(true);
             String aerospikePathPartsString = jsonString.substring(0, index);
             String jsonPathPathPartsString = jsonString.substring(index);
             jsonPathObject.setJsonPathSecondStepQuery(jsonPathPathPartsString);
