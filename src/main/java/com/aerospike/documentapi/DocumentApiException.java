@@ -45,8 +45,8 @@ public class DocumentApiException extends Exception {
     /**
      * Thrown if a JsonPath that contains a json path query was given to a non-read method.
      */
-    public static class QueryToANonReadOperationException extends DocumentApiException {
-        public QueryToANonReadOperationException(AerospikeException e ) {
+    public static class QueryToAppendOperationException extends DocumentApiException {
+        public QueryToAppendOperationException(AerospikeException e ) {
             super(e);
         }
     }

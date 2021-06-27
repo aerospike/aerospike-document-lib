@@ -140,7 +140,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             DocumentApiException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
+            throw new DocumentApiException.QueryToAppendOperationException(new AerospikeException("Append operation does not support JsonPath queries."));
         } else {
             aerospikeDocumentEngine.append(writePolicy, documentKey, jsonPath, jsonObject, jsonPathObject);
         }
