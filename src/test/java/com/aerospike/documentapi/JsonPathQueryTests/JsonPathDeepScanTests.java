@@ -66,4 +66,20 @@ public class JsonPathDeepScanTests extends BaseTestConfig {
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
+
+    @Test
+    public void testDeepScanDelete() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+
+        // The price of everything
+        String jsonPath = "$.store..price";
+        // Delete the price field of every object exists in the store
+        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        Object modifiedJson = JsonPath.parse(storeJson).delete(jsonPath).json();
+        Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
+    }
 }

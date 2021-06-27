@@ -153,7 +153,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     public void delete(Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         delete(null, documentKey, jsonPath);
     }
 
@@ -165,10 +165,13 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     public void delete(WritePolicy writePolicy, Key documentKey, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
+            JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
+            Object result = aerospikeDocumentEngine.get(null, documentKey, jsonPathObject);
+            Object queryResult = JsonPathQuery.delete(jsonPathObject, result);
+            aerospikeDocumentEngine.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
             aerospikeDocumentEngine.delete(writePolicy, documentKey, jsonPath, jsonPathObject);
         }

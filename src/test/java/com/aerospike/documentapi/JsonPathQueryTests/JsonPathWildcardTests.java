@@ -55,4 +55,20 @@ public class JsonPathWildcardTests extends BaseTestConfig {
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
+
+    @Test
+    public void testWildcardInsideBracketsDelete() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+
+        // The authors of all books
+        String jsonPath = "$.store.book[*].author";
+        // Delete the author field of all the books
+        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        Object modifiedJson = JsonPath.parse(storeJson).delete(jsonPath).json();
+        Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
+    }
 }

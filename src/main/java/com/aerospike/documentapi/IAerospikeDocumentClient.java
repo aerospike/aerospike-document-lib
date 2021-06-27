@@ -95,7 +95,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     void delete(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Delete an object in a document specified by a JSON path.
@@ -105,5 +105,5 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path for the object deletion.
      */
     void delete(WritePolicy writePolicy, Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 }
