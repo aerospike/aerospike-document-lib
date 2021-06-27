@@ -14,6 +14,19 @@ public class JsonPathObject {
         pathParts = new ArrayList<>();
     }
 
+    public JsonPathObject copyJsonPathObject() {
+        String newJsonPathSecondStepQuery = getJsonPathSecondStepQuery();
+        boolean newRequiresJsonPathQuery = requiresJsonPathQuery();
+
+        JsonPathObject newJsonPathObject = new JsonPathObject();
+        for (PathPart pathPart : pathParts) {
+            newJsonPathObject.addPathPart(pathPart);
+        }
+        newJsonPathObject.setJsonPathSecondStepQuery(newJsonPathSecondStepQuery);
+        newJsonPathObject.setRequiresJsonPathQuery(newRequiresJsonPathQuery);
+        return newJsonPathObject;
+    }
+
     public List<PathPart> getPathParts() {
         return pathParts;
     }

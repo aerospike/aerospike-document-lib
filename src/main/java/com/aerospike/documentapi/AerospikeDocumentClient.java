@@ -55,7 +55,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         Object result = aerospikeDocumentEngine.get(readPolicy, documentKey, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            return JsonPathQuery.execute(jsonPathObject, result);
+            return JsonPathQuery.read(jsonPathObject, result);
         }
         else {
             return result;
@@ -91,7 +91,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     public void put(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         put(null, documentKey, jsonPath, jsonObject);
     }
 
@@ -104,10 +104,13 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     public void put(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            throw new DocumentApiException.QueryToANonReadOperationException(new AerospikeException("Query to a non-read operation exception."));
+            JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
+            Object result = aerospikeDocumentEngine.get(null, documentKey, jsonPathObject);
+            Object queryResult = JsonPathQuery.set(jsonPathObject, result, jsonObject);
+            aerospikeDocumentEngine.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
             aerospikeDocumentEngine.put(writePolicy, documentKey, jsonObject, jsonPathObject);
         }

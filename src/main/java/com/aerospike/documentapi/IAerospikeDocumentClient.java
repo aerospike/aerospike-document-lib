@@ -54,7 +54,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     void put(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.
@@ -65,7 +65,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
     void put(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Append an object to a list in a document specified by a JSON path.
