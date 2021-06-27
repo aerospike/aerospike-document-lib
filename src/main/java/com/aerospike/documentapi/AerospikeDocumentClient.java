@@ -1,6 +1,5 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.AerospikeException;
 import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
@@ -12,21 +11,14 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Primary object for accessing and mutating documents.
  */
 public class AerospikeDocumentClient implements IAerospikeDocumentClient {
-    public static String DEFAULT_DOCUMENT_BIN_NAME = "documentBin";
-
-    private final IAerospikeClient client;
-    private AerospikeDocumentEngine aerospikeDocumentEngine;
-    private String documentBinName = DEFAULT_DOCUMENT_BIN_NAME;
+    private final AerospikeDocumentRepository aerospikeDocumentRepository;
 
     public AerospikeDocumentClient(IAerospikeClient client) {
-        this.client = client;
-        this.aerospikeDocumentEngine = new AerospikeDocumentEngine(client, documentBinName);
+        this.aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
     }
 
     public AerospikeDocumentClient(IAerospikeClient client, String documentBinName) {
-        this(client);
-        this.documentBinName = documentBinName;
-        this.aerospikeDocumentEngine = new AerospikeDocumentEngine(client, documentBinName);
+        this.aerospikeDocumentRepository = new AerospikeDocumentRepository(client, documentBinName);
     }
 
     /**
@@ -53,7 +45,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
 
-        Object result = aerospikeDocumentEngine.get(readPolicy, documentKey, jsonPathObject);
+        Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
             return JsonPathQuery.read(jsonPathObject, result);
         }
@@ -80,7 +72,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonNode  A JSON node to put.
      */
     public void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonNode) {
-        client.put(writePolicy, documentKey, Utils.createBinByJsonNodeType(documentBinName, jsonNode));
+        aerospikeDocumentRepository.put(writePolicy, documentKey, jsonNode);
     }
 
     /**
@@ -108,11 +100,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
-            Object result = aerospikeDocumentEngine.get(null, documentKey, jsonPathObject);
+            Object result = aerospikeDocumentRepository.get(null, documentKey, jsonPathObject);
             Object queryResult = JsonPathQuery.set(jsonPathObject, result, jsonObject);
-            aerospikeDocumentEngine.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
+            aerospikeDocumentRepository.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
-            aerospikeDocumentEngine.put(writePolicy, documentKey, jsonObject, jsonPathObject);
+            aerospikeDocumentRepository.put(writePolicy, documentKey, jsonObject, jsonPathObject);
         }
     }
 
@@ -124,7 +116,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     public void append(Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         append(null, documentKey, jsonPath, jsonObject);
     }
 
@@ -137,12 +129,15 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     public void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+            DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            throw new DocumentApiException.QueryToAppendOperationException(new AerospikeException("Append operation does not support JsonPath queries."));
+            JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
+            Object result = aerospikeDocumentRepository.get(null, documentKey, jsonPathObject);
+            Object queryResult = JsonPathQuery.append(jsonPathObject, result, jsonObject);
+            aerospikeDocumentRepository.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
-            aerospikeDocumentEngine.append(writePolicy, documentKey, jsonPath, jsonObject, jsonPathObject);
+            aerospikeDocumentRepository.append(writePolicy, documentKey, jsonPath, jsonObject, jsonPathObject);
         }
     }
 
@@ -169,11 +164,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
-            Object result = aerospikeDocumentEngine.get(null, documentKey, jsonPathObject);
+            Object result = aerospikeDocumentRepository.get(null, documentKey, jsonPathObject);
             Object queryResult = JsonPathQuery.delete(jsonPathObject, result);
-            aerospikeDocumentEngine.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
+            aerospikeDocumentRepository.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
-            aerospikeDocumentEngine.delete(writePolicy, documentKey, jsonPath, jsonPathObject);
+            aerospikeDocumentRepository.delete(writePolicy, documentKey, jsonPath, jsonPathObject);
         }
     }
 }

@@ -17,6 +17,12 @@ public class JsonPathQuery {
         return JsonPath.parse(resultJson).set(jsonPath, value).json();
     }
 
+    public static Object append(JsonPathObject jsonPathObject, Object object, Object value) throws JsonProcessingException {
+        String resultJson = JsonConverters.convertObjectToJsonString(object);
+        String jsonPath = "$" + jsonPathObject.getJsonPathSecondStepQuery();
+        return JsonPath.parse(resultJson).add(jsonPath, value).json();
+    }
+
     public static Object delete(JsonPathObject jsonPathObject, Object object) throws JsonProcessingException {
         String resultJson = JsonConverters.convertObjectToJsonString(object);
         String jsonPath = "$" + jsonPathObject.getJsonPathSecondStepQuery();

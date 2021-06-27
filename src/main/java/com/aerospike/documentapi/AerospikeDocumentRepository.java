@@ -6,14 +6,21 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
 
-public class AerospikeDocumentEngine {
-    IAerospikeClient client;
-    String documentBinName;
+class AerospikeDocumentRepository {
+    public static String DEFAULT_DOCUMENT_BIN_NAME = "documentBin";
 
-    public AerospikeDocumentEngine(IAerospikeClient client, String documentBinName) {
+    private final IAerospikeClient client;
+    private String documentBinName = DEFAULT_DOCUMENT_BIN_NAME;
+
+    AerospikeDocumentRepository(IAerospikeClient client) {
+        this.client = client;
+    }
+
+    AerospikeDocumentRepository(IAerospikeClient client, String documentBinName) {
         this.client = client;
         this.documentBinName = documentBinName;
     }
@@ -39,6 +46,10 @@ public class AerospikeDocumentEngine {
             }
             return r.getValue(documentBinName);
         }
+    }
+
+    void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonNode) {
+        client.put(writePolicy, documentKey, Utils.createBinByJsonNodeType(documentBinName, jsonNode));
     }
 
     void put(WritePolicy writePolicy, Key documentKey, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException {

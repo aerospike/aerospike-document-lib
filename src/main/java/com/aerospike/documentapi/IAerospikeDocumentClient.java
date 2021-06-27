@@ -75,7 +75,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     void append(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Append an object to a list in a document specified by a JSON path.
@@ -86,7 +86,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
     void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
      * Delete an object in a document specified by a JSON path.
