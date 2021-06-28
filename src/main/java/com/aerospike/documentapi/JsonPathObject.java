@@ -14,7 +14,7 @@ public class JsonPathObject {
         pathParts = new ArrayList<>();
     }
 
-    public JsonPathObject copyJsonPathObject() {
+    public JsonPathObject copy() {
         String newJsonPathSecondStepQuery = getJsonPathSecondStepQuery();
         boolean newRequiresJsonPathQuery = requiresJsonPathQuery();
 
