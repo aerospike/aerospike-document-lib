@@ -66,7 +66,7 @@ public class JsonPathParserTest {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(1, jsonPathObject.getPathParts().size());
-        assertTrue(((MapPathPart) jsonPathObject.getPathParts().get(0)).equals(new MapPathPart("key")));
+        assertEquals(new MapPathPart("key"), jsonPathObject.getPathParts().get(0));
     }
 
     /**
@@ -83,8 +83,8 @@ public class JsonPathParserTest {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(2, jsonPathObject.getPathParts().size());
-        assertTrue(((MapPathPart) jsonPathObject.getPathParts().get(0)).equals(new MapPathPart("key")));
-        assertTrue(((ListPathPart) jsonPathObject.getPathParts().get(1)).equals(new ListPathPart(2)));
+        assertEquals(new MapPathPart("key"), jsonPathObject.getPathParts().get(0));
+        assertEquals(new ListPathPart(2), jsonPathObject.getPathParts().get(1));
     }
 
     /**
@@ -101,10 +101,9 @@ public class JsonPathParserTest {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(3, jsonPathObject.getPathParts().size());
-        assertTrue(((MapPathPart) jsonPathObject.getPathParts().get(0)).equals(new MapPathPart("key")));
-        assertTrue(((ListPathPart) jsonPathObject.getPathParts().get(1)).equals(new ListPathPart(1)));
-        assertTrue(((ListPathPart) jsonPathObject.getPathParts().get(2)).equals(new ListPathPart(2)));
-
+        assertEquals(new MapPathPart("key"), jsonPathObject.getPathParts().get(0));
+        assertEquals(new ListPathPart(1), jsonPathObject.getPathParts().get(1));
+        assertEquals(new ListPathPart(2), jsonPathObject.getPathParts().get(2));
     }
 
     /**

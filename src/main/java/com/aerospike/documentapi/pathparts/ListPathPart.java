@@ -6,11 +6,14 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.client.cdt.ListReturnType;
 
+import java.util.Objects;
+
 /**
  * A ListPart is a representation of a list access
  */
 public class ListPathPart extends PathPart {
-    int listPosition;
+
+    private final int listPosition;
 
     public ListPathPart(int listPosition) {
         this.listPosition = listPosition;
@@ -20,8 +23,23 @@ public class ListPathPart extends PathPart {
         return listPosition;
     }
 
-    public boolean equals(ListPathPart l) {
-        return l.listPosition == listPosition;
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(listPosition);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ListPathPart)) {
+            return false;
+        }
+        ListPathPart that = (ListPathPart) obj;
+        return listPosition == that.listPosition;
     }
 
     @Override

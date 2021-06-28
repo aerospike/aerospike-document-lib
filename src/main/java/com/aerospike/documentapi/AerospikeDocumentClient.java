@@ -99,8 +99,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
-            Object result = aerospikeDocumentRepository.get(null, documentKey, jsonPathObject);
+            JsonPathObject originalJsonPathObject = jsonPathObject.copy();
+            Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, jsonPathObject);
             Object queryResult = JsonPathQuery.set(jsonPathObject, result, jsonObject);
             aerospikeDocumentRepository.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
@@ -132,8 +132,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
-            Object result = aerospikeDocumentRepository.get(null, documentKey, jsonPathObject);
+            JsonPathObject originalJsonPathObject = jsonPathObject.copy();
+            Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, jsonPathObject);
             Object queryResult = JsonPathQuery.append(jsonPathObject, result, jsonObject);
             aerospikeDocumentRepository.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {
@@ -163,8 +163,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathObject originalJsonPathObject = jsonPathObject.copyJsonPathObject();
-            Object result = aerospikeDocumentRepository.get(null, documentKey, jsonPathObject);
+            JsonPathObject originalJsonPathObject = jsonPathObject.copy();
+            Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, jsonPathObject);
             Object queryResult = JsonPathQuery.delete(jsonPathObject, result);
             aerospikeDocumentRepository.put(writePolicy, documentKey, queryResult, originalJsonPathObject);
         } else {

@@ -7,12 +7,14 @@ import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.cdt.MapPolicy;
 import com.aerospike.client.cdt.MapReturnType;
 
+import java.util.Objects;
+
 /**
  * MapPart is a representation of key access
  */
 public class MapPathPart extends PathPart {
 
-    String key;
+    private final String key;
 
     public MapPathPart(String key) {
         this.key = key;
@@ -22,8 +24,23 @@ public class MapPathPart extends PathPart {
         return key;
     }
 
-    public boolean equals(MapPathPart m) {
-        return m.key.equals(key);
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(key);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof MapPathPart)) {
+            return false;
+        }
+        MapPathPart that = (MapPathPart) obj;
+        return key.equals(that.key);
     }
 
     @Override
