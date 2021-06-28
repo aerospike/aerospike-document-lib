@@ -89,6 +89,7 @@ public class TestJsonConverters {
         while (listIterator.hasNext()) {
             stringRepresentations.add(jsonToString(listIterator.next()));
         }
+        Collections.sort(stringRepresentations);
         return "[" + String.join(",", stringRepresentations) + "]";
     }
 
