@@ -10,22 +10,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
 
-class AerospikeDocumentRepository {
-    public static String DEFAULT_DOCUMENT_BIN_NAME = "documentBin";
-
+class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     private final IAerospikeClient client;
-    private String documentBinName = DEFAULT_DOCUMENT_BIN_NAME;
 
     AerospikeDocumentRepository(IAerospikeClient client) {
         this.client = client;
     }
 
-    AerospikeDocumentRepository(IAerospikeClient client, String documentBinName) {
-        this.client = client;
-        this.documentBinName = documentBinName;
-    }
-
-    Object get(Policy readPolicy, Key documentKey, JsonPathObject jsonPathObject) throws DocumentApiException {
+    @Override
+    public Object get(Policy readPolicy, Key documentKey, JsonPathObject jsonPathObject, String documentBinName) throws DocumentApiException {
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().size() == 0) {
             return client.get(readPolicy, documentKey).getValue(documentBinName);
@@ -48,11 +41,13 @@ class AerospikeDocumentRepository {
         }
     }
 
-    void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonNode) {
+    @Override
+    public void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonNode, String documentBinName) {
         client.put(writePolicy, documentKey, Utils.createBinByJsonNodeType(documentBinName, jsonNode));
     }
 
-    void put(WritePolicy writePolicy, Key documentKey, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException {
+    @Override
+    public void put(WritePolicy writePolicy, Key documentKey, Object jsonObject, JsonPathObject jsonPathObject, String documentBinName) throws DocumentApiException {
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().size() == 0) {
             client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
@@ -71,7 +66,8 @@ class AerospikeDocumentRepository {
         }
     }
 
-    void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+    @Override
+    public void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject, String documentBinName) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
@@ -90,7 +86,8 @@ class AerospikeDocumentRepository {
         }
     }
 
-    void delete(WritePolicy writePolicy, Key documentKey, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+    @Override
+    public void delete(WritePolicy writePolicy, Key documentKey, String jsonPath, JsonPathObject jsonPathObject, String documentBinName) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
