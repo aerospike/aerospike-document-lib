@@ -65,7 +65,7 @@ The Aerospike Document Client is instantiated as follows
 
 ``` java
    AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
-   AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client)
+   AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 ```
 
 ### Create
