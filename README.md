@@ -76,8 +76,9 @@ We add this to our Aerospike database as follows
 ``` java
    JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
    // For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
-   Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE,AEROSPIKE_SET,"tommy-lee-jones.json");
-   documentClient.put(tommyLeeJonesDBKey, jsonNode);
+   Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
+   String documentBinName = "documentBin";
+   documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
 ```
 
 ### Get
@@ -85,7 +86,7 @@ We add this to our Aerospike database as follows
 We can find out the name of Jones' best film according to 'Rotten Tomatoes' using the path ```$.best_films_ranked[0].films[0]```
 
 ```java
-   documentClient.get(tommyLeeJonesDBKey,"$.best_films_ranked[0].films[0]");
+   documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
 ```
 
 ### Insert
@@ -95,7 +96,7 @@ We can add filmography for 2019 using the path ```$.selected_filmography.2019```
 ```java
   List<String> _2019Films = new Vector<String>();
   _2019Films.add("Ad Astra");
-  documentClient.put(tommyLeeJonesDBKey,"$.selected_filmography.2019",_2019Films);
+  documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019",_2019Films);
 ```
 
 ### Update
@@ -103,7 +104,7 @@ We can add filmography for 2019 using the path ```$.selected_filmography.2019```
 Update Jones' IMDB ranking using ```$.imdb_rank.rank```
 
 ``` java
-  documentClient.put(tommyLeeJonesDBKey,"$.imdb_rank.rank",45);
+  documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
 ```
 
 ### Append
@@ -111,8 +112,8 @@ Update Jones' IMDB ranking using ```$.imdb_rank.rank```
 We can append to 'Rotten Tomatoes' list of best films using the reference ```$.best_films_ranked[0].films```
 
 ```java
-   documentClient.append(tommyLeeJonesDBKey,"$.best_films_ranked[0].films","Rolling Thunder");
-   documentClient.append(tommyLeeJonesDBKey,"$.best_films_ranked[0].films","The Three Burials");
+   documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
+   documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
 ```
 
 ### Delete
@@ -120,7 +121,7 @@ We can append to 'Rotten Tomatoes' list of best films using the reference ```$.b
 We can delete a node e.g. the Medium reviewer's rankings
 
 ```java
-   documentClient.delete(tommyLeeJonesDBKey,"$.best_films_ranked[1]");
+   documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
 ```
 
 ### JsonPath Queries
@@ -179,36 +180,36 @@ Here are some examples:
 ```java
 // All things, both books and bicycles
 String jsonPath = "$.store.*";
-Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
 // The authors of all books
 String jsonPath = "$.store.book[*].author";
-Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
 // The authors of all books
 String jsonPath = "$.store.book[*].author";
 String jsonObject = "J.K. Rowling";
 // Modify the authors of all books to "J.K. Rowling"
-documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, jsonObject);
-Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, jsonObject);
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
 // All books with an ISBN number
 jsonPath = "$..book[?(@.isbn)]";
-objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
 // All books in store cheaper than 10
 jsonPath = "$.store.book[?(@.price < 10)]";
-objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
 // All books matching regex (ignore case)
 jsonPath = "$..book[?(@.author =~ /.*REES/i)]";
-objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
 // The price of everything
 String jsonPath = "$.store..price";
 // Delete the price field of every object exists in the store
-documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
-Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);        
+documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);        
 ```
 
 ## References
