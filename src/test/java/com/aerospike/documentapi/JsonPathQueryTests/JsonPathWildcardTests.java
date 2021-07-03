@@ -17,11 +17,11 @@ public class JsonPathWildcardTests extends BaseTestConfig {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         Map<String, Object> jsonNodeAsMap  = JsonConverters.convertJsonNodeToMap(jsonNode);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // All things, both books and bicycles
         String jsonPath = "$.store.*";
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object expectedObject = jsonNodeAsMap.get("store");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
@@ -30,11 +30,11 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     public void testWildcardInsideBrackets() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // The authors of all books
         String jsonPath = "$.store.book[*].author";
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
@@ -43,14 +43,14 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     public void testWildcardInsideBracketsPut() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // The authors of all books
         String jsonPath = "$.store.book[*].author";
         String jsonObject = "J.K. Rowling";
         // Modify the authors of all books to "J.K. Rowling"
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, jsonObject);
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, jsonObject);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object modifiedJson = JsonPath.parse(storeJson).set(jsonPath, jsonObject).json();
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
@@ -60,14 +60,14 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     public void testWildcardInsideBracketsAppend() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // The authors of all books
         String jsonPath = "$.store.book[*].author";
         String jsonObject = "J.K. Rowling";
         // Modify the authors of all books to "J.K. Rowling"
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, jsonObject);
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, jsonObject);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object modifiedJson = JsonPath.parse(storeJson).set(jsonPath, jsonObject).json();
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
@@ -77,14 +77,14 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     public void testWildcardInsideBracketsDelete() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // The ref field of all books
         String jsonPath = "$.store.book[*].ref";
         Integer jsonObject = 999;
         // Add 999 at the end of the inner "ref" array of each book
-        documentClient.append(TEST_AEROSPIKE_KEY, jsonPath,jsonObject);
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, jsonObject);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object modifiedJson = JsonPath.parse(storeJson).add(jsonPath, jsonObject).json();
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));

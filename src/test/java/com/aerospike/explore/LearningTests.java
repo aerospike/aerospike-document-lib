@@ -84,20 +84,20 @@ public class LearningTests extends BaseTestConfig {
 
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(tommyLeeJonesJson);
         Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "src/test/resources/tommy-lee-jones.json");
-        documentClient.put(tommyLeeJonesDBKey, jsonNode);
+        documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
 
-        documentClient.put(tommyLeeJonesDBKey, "$.imdb_rank.rank",45);
+        documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank", 45);
         List<String> _2019Films = new Vector<>();
         _2019Films.add("Ad Astra");
-        documentClient.put(tommyLeeJonesDBKey, "$.selected_filmography.2019",_2019Films);
+        documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019", _2019Films);
 
-        documentClient.append(tommyLeeJonesDBKey, "$.best_films_ranked[0].films", "Rolling Thunder");
-        documentClient.append(tommyLeeJonesDBKey, "$.best_films_ranked[0].films", "The Three Burials Of Melquiades Estrada");
-        documentClient.delete(tommyLeeJonesDBKey, "$.best_films_ranked[1]");
+        documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films", "Rolling Thunder");
+        documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films", "The Three Burials Of Melquiades Estrada");
+        documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
 
-        System.out.println(documentClient.get(tommyLeeJonesDBKey, "$.best_films_ranked[0].films[0]"));
-        System.out.println(documentClient.get(tommyLeeJonesDBKey, "$.best_films_ranked[0].films[5]"));
-        System.out.println(documentClient.get(tommyLeeJonesDBKey, "$.selected_filmography.2019"));
+        System.out.println(documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]"));
+        System.out.println(documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[5]"));
+        System.out.println(documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019"));
     }
 
     private static StaffMember getTestStaffMemberObject() {

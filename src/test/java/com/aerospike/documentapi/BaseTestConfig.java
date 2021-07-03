@@ -23,7 +23,7 @@ public class BaseTestConfig {
     public static final Key TEST_AEROSPIKE_KEY = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY);
 
     public static IAerospikeClient client;
-
+    public static String documentBinName = "documentBin";
 
     public static String testMaterialJson;
     public static String storeJson;

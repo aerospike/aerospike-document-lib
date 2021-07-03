@@ -40,7 +40,7 @@ public class DocumentAPITest extends BaseTestConfig {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
         Map<String, Object> jsonNodeAsMap  = JsonConverters.convertJsonNodeToMap(jsonNode);
 
         // Test different retrieval paths
@@ -49,72 +49,72 @@ public class DocumentAPITest extends BaseTestConfig {
         Object expectedObject;
 
         jsonPath = "$";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = jsonNodeAsMap;
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example1";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = jsonNodeAsMap.get("example1");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)jsonNodeAsMap.get("example3")).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key10";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((Map<?, ?>)jsonNodeAsMap.get("example4")).get("key10");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example1.key01[2]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)((Map<?, ?>)jsonNodeAsMap.get("example1")).get("key01")).get(2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key09[2]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)((Map<?, ?>)((List<?>)jsonNodeAsMap.get("example3")).get(1)).get("key09")).get(2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key10.key11";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((Map<?, ?>)((Map<?, ?>)jsonNodeAsMap.get("example4")).get("key10")).get("key11");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key13.key15[1]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)((Map<?, ?>)((Map<?, ?>)jsonNodeAsMap.get("example4")).get("key13")).get("key15")).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key21";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((Map<?, ?>)((List<?>)((Map<?, ?>)jsonNodeAsMap.get("example4")).get("key19")).get(2)).get("key21");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key20[1]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)((Map<?, ?>)((List<?>)((Map<?, ?>)jsonNodeAsMap.get("example4")).get("key19")).get(2)).get("key20")).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[2].key21.key23";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((Map<?, ?>)((Map<?, ?>)((List<?>)jsonNodeAsMap.get("example3")).get(2)).get("key21")).get("key23");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key16";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((Map<?, ?>)((List<?>)((Map<?, ?>)((List<?>)jsonNodeAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key16");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key17[2]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)((Map<?, ?>)((List<?>)((Map<?, ?>)((List<?>)jsonNodeAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[3][1]";
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>)((List<?>)((Map<?, ?>)jsonNodeAsMap.get("example4")).get("key19")).get(3)).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
@@ -136,7 +136,7 @@ public class DocumentAPITest extends BaseTestConfig {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different retrieval paths
         String jsonPath;
@@ -146,7 +146,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // $.example3[1].key08 is a list
         jsonPath = "$.example3[1].key08.nonexistentkey"; // returns error 4 - parameter error
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
@@ -154,7 +154,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // $.example1 is a map
         jsonPath = "$.example1[1]";
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.NotAListException should have been thrown");
         } catch (DocumentApiException.NotAListException ignored) {}
 
@@ -162,7 +162,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // $.example4.key10.key11 is a primitive
         jsonPath = "$.example4.key10.key11.nonexistentkey";
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
@@ -170,28 +170,28 @@ public class DocumentAPITest extends BaseTestConfig {
         // $.example4.key10.key11 is a primitive
         jsonPath = "$.example4.key10.key11[2]";
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.NotAListException should have been thrown");
         } catch (DocumentApiException.NotAListException ignored) {}
 
         // Reference a list item that is not there
         jsonPath = "$.example4.key13.key15[9]"; // error 26 - not applicable
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Reference a map that isn't there
         jsonPath = "$.example4.nosuchkey.nosuchkey"; // returns error 26
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Reference a list that isn't there
         jsonPath = "$.example4.nosuchkey[1]"; // returns error 26
         try {
-            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
@@ -208,7 +208,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different put paths
         String jsonPath;
@@ -218,15 +218,15 @@ public class DocumentAPITest extends BaseTestConfig {
         // Putting a new key into an existing map
         jsonPath = "$.example1.key27";
         putValue = 77;
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, putValue));
 
         // Putting a new key into an existing array
         jsonPath = "$.example1.key01[10]";
         putValue = 78;
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, putValue));
     }
 
@@ -245,7 +245,7 @@ public class DocumentAPITest extends BaseTestConfig {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different put paths
         String jsonPath;
@@ -257,7 +257,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example9.key01";
         putValue = 79;
         try {
-            documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
@@ -265,7 +265,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example9[2]";
         putValue = 80;
         try {
-            documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
@@ -273,7 +273,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example2.key09";
         putValue = 81;
         try {
-            documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
@@ -281,7 +281,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example1[1]";
         putValue = 82;
         try {
-            documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
     }
@@ -298,7 +298,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different append paths
         String jsonPath;
@@ -308,16 +308,16 @@ public class DocumentAPITest extends BaseTestConfig {
         // Appending to an array referenced by a key
         jsonPath = "$.example1.key01";
         putValue = 83;
-        documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
+        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
+        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() -1), putValue));
 
         // Appending to an array referenced by an index
         jsonPath = "$.example4.key19[3]";
         putValue = 84;
-        documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
-        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, jsonPath));
+        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
+        appendedList = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() -1), putValue));
     }
@@ -336,7 +336,7 @@ public class DocumentAPITest extends BaseTestConfig {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different put paths
         String jsonPath;
@@ -348,7 +348,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example9";
         putValue = 83;
         try {
-            documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
@@ -357,7 +357,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example1";
         putValue = 84;
         try {
-            documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
@@ -366,7 +366,7 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example2.key02";
         putValue = 85;
         try {
-            documentClient.append(TEST_AEROSPIKE_KEY, jsonPath, putValue);
+            documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
@@ -388,7 +388,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different delete paths
         String jsonPath;
@@ -397,64 +397,64 @@ public class DocumentAPITest extends BaseTestConfig {
 
         // Delete a primitive using a map reference
         jsonPath = "$.example4.key10.key11";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object exists
         assertTrue(originalObject instanceof String);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
-        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the deleted object does not exist
         assertNull(deletedObjectRead);
 
         // Delete a primitive using a list reference
         jsonPath = "$.example3[0].key07[1]";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object exists
         assertTrue(originalObject instanceof String);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
-        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the deleted object does not exist, or that we now have a different object (possible in a list delete)
         assertTrue(deletedObjectRead == null | ! deletedObjectRead.equals(originalObject));
 
         // Delete a map using a map reference
         jsonPath = "$.example4.key10";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object exists
         assertTrue(originalObject instanceof Map);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
-        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the deleted object does not exist
         assertNull(deletedObjectRead);
 
         // Delete a list using a map reference
         jsonPath = "$.example4.key13.key15";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object exists
         assertTrue(originalObject instanceof List);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
-        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the deleted object does not exist
         assertNull(deletedObjectRead);
 
         // Delete a map using a list reference
         jsonPath = "$.example2[1]";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object exists
         assertTrue(originalObject instanceof Map);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         try {
-            deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             // Check the deleted object does not exist, or that we now have a different object (possible in a list delete)
             assertTrue(deletedObjectRead == null | !deletedObjectRead.equals(originalObject));
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete a list using a list reference
         jsonPath = "$.example4.key19[3]";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object exists
         assertTrue(originalObject instanceof List);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         try {
-            deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             // Check the deleted object does not exist, or that we now have a different object (possible in a list delete)
             assertTrue(deletedObjectRead == null | !deletedObjectRead.equals(originalObject));
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
@@ -477,7 +477,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         // Test different delete paths
         String jsonPath;
@@ -486,12 +486,12 @@ public class DocumentAPITest extends BaseTestConfig {
 
         // Delete a key in an existing map where key does not exist
         jsonPath = "$.example1.nokey";
-        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the original object doesn't exist
         assertNull(originalObject);
-        documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // This call will succeed
-        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        deletedObjectRead = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         // Check the deleted object does not exist
         assertNull(deletedObjectRead);
 
@@ -499,13 +499,13 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example2[3]";
         // accessing this path throws an error so we know it's not there to start with
         try {
-            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
-            documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+            documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
@@ -513,13 +513,13 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example2.nokey";
         // accessing this path throws an error so we know it's not there to start with
         try {
-            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
-            documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+            documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
@@ -527,13 +527,13 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example1[1]";
         // accessing this path throws an error so we know it's not there to start with
         try {
-            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.NotAListException ignored) {}
 
         // Delete call should throw an error
         try {
-            documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+            documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.KeyNotFoundException ignored) {}
 
@@ -541,13 +541,13 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.nokey.nokey";
         // accessing this path throws an error so we know it's not there to start with
         try {
-            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
-            documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+            documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
@@ -555,13 +555,13 @@ public class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.nolist[1]";
         // accessing this path throws an error so we know it's not there to start with
         try {
-            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+            originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
 
         // Delete call should throw an error
         try {
-            documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+            documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {}
     }
@@ -570,11 +570,11 @@ public class DocumentAPITest extends BaseTestConfig {
     public void testTopLevelArrayType() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(topLevelArrayTypeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
         List<Object> jsonNodeAsList = JsonConverters.convertJsonNodeToList(jsonNode);
 
         String jsonPath = "$";
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, jsonNodeAsList));
     }
