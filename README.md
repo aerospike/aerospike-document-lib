@@ -59,6 +59,16 @@ Consider the following json
 }
 ```
 
+### Creating an Aerospike Document Client
+
+The Aerospike Document Client is instantiated as follows
+* You can create a new AerospikeClient using other constructors - in this example we are using IP and Port only.
+
+``` java
+   AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
+   AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+```
+
 ### Create
 
 We add this to our Aerospike database as follows
@@ -113,115 +123,92 @@ We can delete a node e.g. the Medium reviewer's rankings
    documentClient.delete(tommyLeeJonesDBKey,"$.best_films_ranked[1]");
 ```
 
-### Document API
+### JsonPath Queries
 
-Below is the interface against which the API has been written
+JsonPath is a query language for JSON.
+It supports operators, functions and filters.
 
-``` java
-   /**
-     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
-     *
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
-     */
-    Object get(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+Consider the following json
 
-    /**
-     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
-     *
-     * @param readPolicy  An Aerospike read policy to use for the get() operation.
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
-     */
-    Object get(Policy readPolicy, Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Put a document.
-     *
-     * @param documentKey An Aerospike Key.
-     * @param jsonObject  A JSON object to put.
-     */
-    void put(Key documentKey, JsonNode jsonObject);
-
-    /**
-     * Put a document.
-     *
-     * @param writePolicy An Aerospike write policy to use for the put() operation.
-     * @param documentKey An Aerospike Key.
-     * @param jsonObject  A JSON object to put.
-     */
-    void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonObject);
-
-    /**
-     * Put a map representation of a JSON object at a particular path in a JSON document.
-     *
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path to put the given JSON object in.
-     * @param jsonObject  A JSON object to put in the given JSON path.
-     */
-    void put(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Put a map representation of a JSON object at a particular path in a JSON document.
-     *
-     * @param writePolicy An Aerospike write policy to use for the put() and operate() operations.
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path to put the given JSON object in.
-     * @param jsonObject  A JSON object to put in the given JSON path.
-     */
-    void put(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Append an object to a list in a document specified by a JSON path.
-     *
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
-     * @param jsonObject  A JSON object to append to the list at the given JSON path.
-     */
-    void append(Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Append an object to a list in a document specified by a JSON path.
-     *
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
-     * @param jsonObject  A JSON object to append to the list at the given JSON path.
-     */
-    void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Delete an object in a document specified by a JSON path.
-     *
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path for the object deletion.
-     */
-    void delete(Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Delete an object in a document specified by a JSON path.
-     *
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
-     * @param jsonPath    A JSON path for the object deletion.
-     */
-    void delete(WritePolicy writePolicy, Key documentKey, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+``` json
+{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95,
+        "ref": [1,2]
+      },
+      {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99,
+        "ref": [2,4,16]
+      },
+      {
+        "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99,
+        "ref": [1,3,5]
+      },
+      {
+        "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99,
+        "ref": [1,2,7]
+      }
+    ],
+    "bicycle": {
+      "color": "red",
+      "price": 19.95
+    }
+  },
+  "expensive": 10
+}
 ```
 
-The Aerospike Document Client is instantiated as follows
+Here are some examples:
 
-``` java
-   AerospikeDocumentClient(IAerospikeClient client)
+```java
+// All things, both books and bicycles
+String jsonPath = "$.store.*";
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+
+// The authors of all books
+String jsonPath = "$.store.book[*].author";
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+
+// The authors of all books
+String jsonPath = "$.store.book[*].author";
+String jsonObject = "J.K. Rowling";
+// Modify the authors of all books to "J.K. Rowling"
+documentClient.put(TEST_AEROSPIKE_KEY, jsonPath, jsonObject);
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+
+// All books with an ISBN number
+jsonPath = "$..book[?(@.isbn)]";
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+
+// All books in store cheaper than 10
+jsonPath = "$.store.book[?(@.price < 10)]";
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+
+// All books matching regex (ignore case)
+jsonPath = "$..book[?(@.author =~ /.*REES/i)]";
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);
+
+// The price of everything
+String jsonPath = "$.store..price";
+// Delete the price field of every object exists in the store
+documentClient.delete(TEST_AEROSPIKE_KEY, jsonPath);
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, jsonPath);        
 ```
 
 ## References
