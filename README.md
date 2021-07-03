@@ -62,6 +62,7 @@ Consider the following json
 ### Creating an Aerospike Document Client
 
 The Aerospike Document Client is instantiated as follows
+* You can create a new AerospikeClient using other constructors - in this example we are using IP and Port only.
 
 ``` java
    AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
@@ -124,7 +125,7 @@ We can delete a node e.g. the Medium reviewer's rankings
 
 ### JsonPath Queries
 
-JsonPath queries is java DSL for reading JSON documents.
+JsonPath is a query language for JSON.
 It supports operators, functions and filters.
 
 Consider the following json
