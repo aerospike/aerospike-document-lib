@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface IAerospikeDocumentRepository {
 
-    Object get(Policy readPolicy, Key documentKey, JsonPathObject jsonPathObject, String documentBinName) throws DocumentApiException;
+    Object get(Policy readPolicy, Key documentKey, String documentBinName, JsonPathObject jsonPathObject) throws DocumentApiException;
 
-    void put(WritePolicy writePolicy, Key documentKey, JsonNode jsonNode, String documentBinName);
+    void put(WritePolicy writePolicy, Key documentKey, String documentBinName, JsonNode jsonNode);
 
-    void put(WritePolicy writePolicy, Key documentKey, Object jsonObject, JsonPathObject jsonPathObject, String documentBinName) throws DocumentApiException;
+    void put(WritePolicy writePolicy, Key documentKey, String documentBinName, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException;
 
-    void append(WritePolicy writePolicy, Key documentKey, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject, String documentBinName) throws JsonPathParser.ListException, DocumentApiException;
+    void append(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
 
-    void delete(WritePolicy writePolicy, Key documentKey, String jsonPath, JsonPathObject jsonPathObject, String documentBinName) throws JsonPathParser.ListException, DocumentApiException;
+    void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
 }
