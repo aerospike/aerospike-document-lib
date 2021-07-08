@@ -4,8 +4,6 @@
 
 This project provides an API which allows Aerospike [CDT (Collection Data Type)](https://www.aerospike.com/docs/client/java/index.html) objects to be accessed and mutated using JSON like syntax. Effectively this provides what can be termed a document API as CDT objects can be used to represent JSON in the Aerospike database.
 
-*This project is now in beta. If you’re an enterprise customer feel free to reach out to our support with feedback and feature requests. We appreciate feedback from the Aerospike community on [issues](https://github.com/aerospike/aerospike-document-lib/issues) related to the Document API library.*
-
 **Assumptions :** 
 
 Familiarity with Aerospike - see [Java Introduction](https://www.aerospike.com/docs/client/java/index.html) if needed.
@@ -15,6 +13,18 @@ Some knowledge of Aerospike CDTs - see reference above, but not essential
 ## Build instructions
 ```sh
 mvn clean package
+```
+
+## Maven dependency
+
+Add the Maven dependency:
+
+```xml
+<dependency>
+  <groupId>com.aerospike</groupId>
+  <artifactId>aerospike-document-api</artifactId>
+  <version>1.0.0</version>
+</dependency>
 ```
 
 ## Quick Start
