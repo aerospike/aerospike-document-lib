@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class JsonConverters {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     /**
      * Given a serialized json object, return it's equivalent representation as a JsonNode.
      *
@@ -19,7 +21,6 @@ public class JsonConverters {
      * @throws IOException an IOException will be thrown in case of an error.
      */
     public static JsonNode convertStringToJsonNode(String jsonString) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(jsonString, JsonNode.class);
     }
 
@@ -30,7 +31,6 @@ public class JsonConverters {
      * @return The given JSON as a Java Map.
      */
     public static Map<String, Object> convertJsonNodeToMap(JsonNode jsonNode) {
-        ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>(){});
     }
 
@@ -41,7 +41,6 @@ public class JsonConverters {
      * @return The given JSON as a Java List.
      */
     public static List<Object> convertJsonNodeToList(JsonNode jsonNode) {
-        ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(jsonNode, new TypeReference<List<Object>>(){});
     }
 
@@ -69,7 +68,6 @@ public class JsonConverters {
      * @return The given JSON as a String.
      */
     public static String convertMapToJsonString(Map<?, ?> map) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(map);
     }
 
@@ -80,7 +78,6 @@ public class JsonConverters {
      * @return The given JSON as a String.
      */
     public static String convertListToJsonString(List<?> list) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(list);
     }
 }
