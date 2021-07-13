@@ -2,20 +2,28 @@
 [![Build project](https://github.com/aerospike/aerospike-document-lib/actions/workflows/build.yml/badge.svg)](https://github.com/aerospike/aerospike-document-lib/actions/workflows/build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.aerospike/aerospike-document-api/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.aerospike/aerospike-document-api/)
 
-This project provides an API which allows Aerospike [CDT (Collection Data Type)](https://www.aerospike.com/docs/client/java/index.html) objects to be accessed and mutated using JSON like syntax. Effectively this provides what can be termed a document API as CDT objects can be used to represent JSON in the Aerospike database.
+This project provides an API for accessing and mutating Aerospike
+[Collection Data Type](https://www.aerospike.com/docs/client/java/index.html)(CDT)
+objects using a [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
+This effectively provides a document API, with CDT objects used to represent
+JSON documents in the Aerospike database.
 
-**Assumptions :** 
+### Assumptions
 
-Familiarity with Aerospike - see [Java Introduction](https://www.aerospike.com/docs/client/java/index.html) if needed.
+ * Familiarity with the Aerospike client for Java (see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
+ * Some knowledge of Aerospike CDTs (see reference above)
 
-Some knowledge of Aerospike CDTs - see reference above, but not essential
+## Getting Started Blog Posts
+
+ 1. [Aerospike Document API](https://medium.com/aerospike-developer-blog/aerospike-document-api-fd8870b4106c?source=friends_link&sk=b733e9fbe5a089ccca4f692e4f429711)
+ 2. [Aerospike Document API: JSONPath Queries](https://medium.com/aerospike-developer-blog/aerospike-document-api-jsonpath-queries-bd6260b2d076?source=friends_link&sk=d2c75b3beec691a36aa73513945f22a1)
 
 ## Build instructions
 ```sh
 mvn clean package
 ```
 
-## Maven dependency
+### Maven dependency
 
 Add the Maven dependency:
 
@@ -29,7 +37,7 @@ Add the Maven dependency:
 
 ## Quick Start
 
-Consider the following json
+Consider the following JSON
 
 ``` json
 {
@@ -69,7 +77,7 @@ Consider the following json
 }
 ```
 
-### Creating an Aerospike Document Client
+### Instantiating an Aerospike Document Client
 
 The Aerospike Document Client is instantiated as follows
 * You can create a new AerospikeClient using other constructors - in this example we are using IP and Port only.
@@ -81,7 +89,7 @@ The Aerospike Document Client is instantiated as follows
 
 ### Create
 
-We add this to our Aerospike database as follows
+We add the example JSON document to our Aerospike database as follows
 
 ``` java
    JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
@@ -91,17 +99,9 @@ We add this to our Aerospike database as follows
    documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
 ```
 
-### Get
-
-We can find out the name of Jones' best film according to 'Rotten Tomatoes' using the path ```$.best_films_ranked[0].films[0]```
-
-```java
-   documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
-```
-
 ### Insert
 
-We can add filmography for 2019 using the path ```$.selected_filmography.2019```
+We can add filmography for 2019 using the JSONPath ```$.selected_filmography.2019```
 
 ```java
   List<String> _2019Films = new Vector<String>();
@@ -111,7 +111,7 @@ We can add filmography for 2019 using the path ```$.selected_filmography.2019```
 
 ### Update
 
-Update Jones' IMDB ranking using ```$.imdb_rank.rank```
+Update Jones' IMDB ranking using the JSONPath ```$.imdb_rank.rank```
 
 ``` java
   documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
@@ -134,12 +134,20 @@ We can delete a node e.g. the Medium reviewer's rankings
    documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
 ```
 
-### JsonPath Queries
+### Get
 
-JsonPath is a query language for JSON.
+We can find out the name of Jones' best film according to 'Rotten Tomatoes' using the JSONPath ```$.best_films_ranked[0].films[0]```
+
+```java
+   documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
+```
+
+### JSONPath Queries
+
+JSONPath is a query language for JSON.
 It supports operators, functions and filters.
 
-Consider the following json
+Consider the following JSON document
 
 ``` json
 {
@@ -185,7 +193,8 @@ Consider the following json
 }
 ```
 
-Here are some examples:
+#### Examples
+Here are some examples of JSONPath queries
 
 ```java
 // All things, both books and bicycles
@@ -224,6 +233,6 @@ Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, js
 
 ## References
 
-See [AerospikeDocumentClient.java](../../../master/ken-tune/aerospike-document-api/src/main/java/com/aerospike/documentAPI/AerospikeDocumentClient.java) for full details of the API
+ * See [AerospikeDocumentClient.java](../../../master/ken-tune/aerospike-document-api/src/main/java/com/aerospike/documentAPI/AerospikeDocumentClient.java) for full details of the API
+ * See [AerospikeDocumentClientTest.java](../../../master/ken-tune/aerospike-document-api/src/test/java/com/aerospike/documentAPI/DocumentAPITest.java) for unit tests showing API usage
 
-See [AerospikeDocumentClientTest.java](../../../master/ken-tune/aerospike-document-api/src/test/java/com/aerospike/documentAPI/DocumentAPITest.java) for unit tests showing API usage
