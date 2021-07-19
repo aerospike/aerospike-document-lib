@@ -45,5 +45,55 @@ public class JsonPathMultipleBinsTests extends BaseTestConfig {
         expectedObjectsCombined.put(documentBinName1, expectedObject1);
         expectedObjectsCombined.put(documentBinName2, expectedObject2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
+
+        jsonPath = "$.authentication..device";
+        jsonObject = "Mobile";
+
+        // Modify the devices of all the authentications (login and logout) to "Mobile"
+        documentClient.put(TEST_AEROSPIKE_KEY, bins, jsonPath, jsonObject);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+        modifiedJson1 = JsonPath.parse(events1).set(jsonPath, jsonObject).json();
+        expectedObject1 = JsonPath.read(modifiedJson1, jsonPath);
+        modifiedJson2 = JsonPath.parse(events2).set(jsonPath, jsonObject).json();
+        expectedObject2 = JsonPath.read(modifiedJson2, jsonPath);
+
+        expectedObjectsCombined.clear();
+        expectedObjectsCombined.put(documentBinName1, expectedObject1);
+        expectedObjectsCombined.put(documentBinName2, expectedObject2);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
+
+        jsonPath = "$.authentication..user";
+
+        // Delete the user field from all of the authentications (login and logout)
+        documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+        modifiedJson1 = JsonPath.parse(events1).delete(jsonPath).json();
+        expectedObject1 = JsonPath.read(modifiedJson1, jsonPath);
+        modifiedJson2 = JsonPath.parse(events2).delete(jsonPath).json();
+        expectedObject2 = JsonPath.read(modifiedJson2, jsonPath);
+
+        expectedObjectsCombined.clear();
+        expectedObjectsCombined.put(documentBinName1, expectedObject1);
+        expectedObjectsCombined.put(documentBinName2, expectedObject2);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
+
+        jsonPath = "$.authentication.login[?(@.id > 10)]";
+
+        client.delete(null, TEST_AEROSPIKE_KEY);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
+
+        // All the logins with "id" greater than 10
+        objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+        expectedObject1 = JsonPath.read(events1, jsonPath);
+        expectedObject2 = JsonPath.read(events2, jsonPath);
+
+        expectedObjectsCombined.clear();
+        expectedObjectsCombined.put(documentBinName1, expectedObject1);
+        expectedObjectsCombined.put(documentBinName2, expectedObject2);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
     }
 }
