@@ -22,15 +22,14 @@ public class MultipleBinsTests extends BaseTestConfig {
         Map<String, Object> jsonNodeAsMapEvents2  = JsonConverters.convertJsonNodeToMap(jsonNodeEvents2);
         String documentBinName1 = "events1Bin";
         String documentBinName2 = "events2Bin";
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
 
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
         String jsonPath = "$.authentication.logout.user";
-
-        List<String> bins = new ArrayList<>();
-        bins.add(documentBinName1);
-        bins.add(documentBinName2);
 
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
         Object expectedObject1 = ((Map<?, ?>)((Map<?, ?>)jsonNodeAsMapEvents1.get("authentication")).get("logout")).get("user");
@@ -47,16 +46,15 @@ public class MultipleBinsTests extends BaseTestConfig {
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
         String documentBinName2 = "events2Bin";
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
 
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
         String jsonPath = "$.authentication.logout.device";
         String putValue = "Computer";
-
-        List<String> bins = new ArrayList<>();
-        bins.add(documentBinName1);
-        bins.add(documentBinName2);
 
         documentClient.put(TEST_AEROSPIKE_KEY, bins, jsonPath, putValue);
 
@@ -73,16 +71,15 @@ public class MultipleBinsTests extends BaseTestConfig {
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
         String documentBinName2 = "events2Bin";
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
 
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
         String jsonPath = "$.authentication.logout.ref";
         int putValue = 12;
-
-        List<String> bins = new ArrayList<>();
-        bins.add(documentBinName1);
-        bins.add(documentBinName2);
 
         documentClient.append(TEST_AEROSPIKE_KEY, bins, jsonPath, putValue);
 
@@ -102,15 +99,14 @@ public class MultipleBinsTests extends BaseTestConfig {
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
         String documentBinName2 = "events2Bin";
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
 
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
         String jsonPath = "$.authentication.logout.device";
-
-        List<String> bins = new ArrayList<>();
-        bins.add(documentBinName1);
-        bins.add(documentBinName2);
 
         documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
 

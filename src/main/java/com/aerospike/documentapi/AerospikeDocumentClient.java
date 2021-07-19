@@ -7,7 +7,10 @@ import com.aerospike.client.policy.WritePolicy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Primary object for accessing and mutating documents.
@@ -69,7 +72,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinNames, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            return JsonPathQuery.read(jsonPathObject, result);
+            Map<Object, Object> results = new HashMap<>();
+            for (Object binName : ((Map<?,?>)result).keySet()) {
+                results.put(binName, JsonPathQuery.read(jsonPathObject, ((Map<?, ?>) result).get(binName)));
+            }
+            return results;
         }
         else {
             return result;
@@ -175,8 +182,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
             Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
-            Object queryResult = JsonPathQuery.set(jsonPathObject, result, jsonObject);
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, queryResult, originalJsonPathObject);
+            List<Object> queryResults = new ArrayList<>();
+            for (Object binName : ((Map<?,?>)result).keySet()) {
+                queryResults.add(JsonPathQuery.set(jsonPathObject, ((Map<?, ?>) result).get(binName), jsonObject));
+            }
+            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, queryResults, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, jsonObject, jsonPathObject);
         }
@@ -245,8 +255,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
             Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
-            Object queryResult = JsonPathQuery.append(jsonPathObject, result, jsonObject);
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, queryResult, originalJsonPathObject);
+            List<Object> queryResults = new ArrayList<>();
+            for (Object binName : ((Map<?,?>)result).keySet()) {
+                queryResults.add(JsonPathQuery.append(jsonPathObject, ((Map<?, ?>) result).get(binName), jsonObject));
+            }
+            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, queryResults, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.append(writePolicy, documentKey, documentBinNames, jsonPath, jsonObject, jsonPathObject);
         }
@@ -311,8 +324,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
             Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
-            Object queryResult = JsonPathQuery.delete(jsonPathObject, result);
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, queryResult, originalJsonPathObject);
+            List<Object> queryResults = new ArrayList<>();
+            for (Object binName : ((Map<?,?>)result).keySet()) {
+                queryResults.add(JsonPathQuery.delete(jsonPathObject, ((Map<?, ?>) result).get(binName)));
+            }
+            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, queryResults, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.delete(writePolicy, documentKey, documentBinNames, jsonPath, jsonPathObject);
         }
