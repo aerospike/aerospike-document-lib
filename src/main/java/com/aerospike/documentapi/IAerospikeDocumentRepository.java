@@ -18,7 +18,13 @@ public interface IAerospikeDocumentRepository {
 
     void put(WritePolicy writePolicy, Key documentKey, String documentBinName, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException;
 
+    void put(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException;
+
     void append(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
 
+    void append(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
+
     void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
+
+    void delete(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
 }

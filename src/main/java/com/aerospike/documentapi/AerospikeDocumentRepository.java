@@ -3,6 +3,8 @@ package com.aerospike.documentapi;
 import com.aerospike.client.Record;
 import com.aerospike.client.*;
 import com.aerospike.client.cdt.CTX;
+import com.aerospike.client.cdt.MapOperation;
+import com.aerospike.client.cdt.MapPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
@@ -106,6 +108,32 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
+    public void put(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException {
+        Operation[] operations = new Operation[documentBinNames.size()];
+        // If there are no parts, put the full document
+        if (jsonPathObject.getPathParts().size() == 0) {
+            for (int i = 0; i < documentBinNames.size(); i++) {
+                operations[i] = MapOperation.put(new MapPolicy(), documentBinNames.get(i), Value.get(documentKey), Value.get(jsonObject));
+            }
+            client.operate(writePolicy, documentKey, operations);
+        } else { // else put using contexts
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
+            // We need to treat the last part of the path differently
+            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
+            // Then turn the rest into the contexts representation
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            try {
+                for (int i = 0; i < documentBinNames.size(); i++) {
+                    operations[i] = finalPathPart.toAerospikePutOperation(documentBinNames.get(i), jsonObject, ctxArray);
+                }
+                client.operate(writePolicy, documentKey, operations);
+            } catch (AerospikeException e) {
+                throw DocumentApiException.toDocumentException(e);
+            }
+        }
+    }
+
+    @Override
     public void append(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().size() == 0) {
@@ -126,8 +154,31 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+    public void append(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath, Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+        Operation[] operations = new Operation[documentBinNames.size()];
         // If there are no parts, you can't append
+        if (jsonPathObject.getPathParts().size() == 0) {
+            throw new JsonPathParser.ListException(jsonPath);
+        } else {
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
+            // We need to treat the last part of the path differently
+            PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathPart);
+            // Then turn the rest into the contexts representation
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            try {
+                for (int i = 0; i < documentBinNames.size(); i++) {
+                    operations[i] = finalPathPart.toAerospikeAppendOperation(documentBinNames.get(i), jsonObject, ctxArray);
+                }
+                client.operate(writePolicy, documentKey, operations);
+            } catch (AerospikeException e) {
+                throw DocumentApiException.toDocumentException(e);
+            }
+        }
+    }
+
+    @Override
+    public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+        // If there are no parts, you can't delete
         if (jsonPathObject.getPathParts().size() == 0) {
             throw new JsonPathParser.ListException(jsonPath);
         } else {
@@ -139,6 +190,29 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             try {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeDeleteOperation(documentBinName, ctxArray));
+            } catch (AerospikeException e) {
+                throw DocumentApiException.toDocumentException(e);
+            }
+        }
+    }
+
+    @Override
+    public void delete(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+        Operation[] operations = new Operation[documentBinNames.size()];
+        // If there are no parts, you can't delete
+        if (jsonPathObject.getPathParts().size() == 0) {
+            throw new JsonPathParser.ListException(jsonPath);
+        } else {
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
+            // We need to treat the last part of the path differently
+            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
+            // Then turn the rest into the contexts representation
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            try {
+                for (int i = 0; i < documentBinNames.size(); i++) {
+                    operations[i] = finalPathPart.toAerospikeDeleteOperation(documentBinNames.get(i), ctxArray);
+                }
+                client.operate(writePolicy, documentKey, operations);
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }

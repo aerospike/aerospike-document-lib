@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultipleBinsTests extends BaseTestConfig {
@@ -38,5 +39,84 @@ public class MultipleBinsTests extends BaseTestConfig {
         expectedObjectsCombined.put(documentBinName1, expectedObject1);
         expectedObjectsCombined.put(documentBinName2, expectedObject2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
+    }
+
+    @Test
+    public void testMultiplePutOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
+        JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
+        String documentBinName1 = "events1Bin";
+        String documentBinName2 = "events2Bin";
+
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
+        String jsonPath = "$.authentication.logout.device";
+        String putValue = "Computer";
+
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
+
+        documentClient.put(TEST_AEROSPIKE_KEY, bins, jsonPath, putValue);
+
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        Map<String, Object> expectedObjectsCombined = new HashMap<>();
+        expectedObjectsCombined.put(documentBinName1, putValue);
+        expectedObjectsCombined.put(documentBinName2, putValue);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
+    }
+
+    @Test
+    public void testMultipleAppendOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
+        JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
+        String documentBinName1 = "events1Bin";
+        String documentBinName2 = "events2Bin";
+
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
+        String jsonPath = "$.authentication.logout.ref";
+        int putValue = 12;
+
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
+
+        documentClient.append(TEST_AEROSPIKE_KEY, bins, jsonPath, putValue);
+
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+        List<?> appendedList1 = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, documentBinName1, jsonPath));
+        List<?> appendedList2 = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, documentBinName2, jsonPath));
+        Map<String, Object> expectedObjectsCombined = new HashMap<>();
+        expectedObjectsCombined.put(documentBinName1, appendedList1);
+        expectedObjectsCombined.put(documentBinName2, appendedList2);
+        assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
+    }
+
+    @Test
+    public void testMultipleDeleteOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
+        JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
+        String documentBinName1 = "events1Bin";
+        String documentBinName2 = "events2Bin";
+
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
+        String jsonPath = "$.authentication.logout.device";
+
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
+
+        documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        for (Object value : ((Map<?, ?>)objectFromDB).values()) {
+            assertNull(value);
+        }
     }
 }
