@@ -1,0 +1,43 @@
+{
+  "authentication": {
+    "login": [
+      {
+        "id": 21,
+        "name": "Simba Lion",
+        "location": "Italy",
+        "date": "2.7.2021",
+        "device": "Mobile",
+        "os": "iOS"
+      },
+      {
+        "id": 22,
+        "name": "Sean Cahill",
+        "location": "US",
+        "date": "2.7.2021",
+        "device": "Mobile",
+        "os": "Android"
+      },
+      {
+        "id": 23,
+        "name": "Forrest Gump",
+        "location": "Spain",
+        "date": "2.7.2021",
+        "device": "Computer",
+        "os": "Windows"
+      },
+      {
+        "id": 24,
+        "name": "Patrick St. Claire",
+        "location": "France",
+        "date": "2.7.2021",
+        "device": "Mobile",
+        "os": "iOS"
+      }
+    ],
+    "logout": {
+      "user": "John Snow",
+      "datetime": "2.7.2021"
+    }
+  },
+  "like": 20
+}

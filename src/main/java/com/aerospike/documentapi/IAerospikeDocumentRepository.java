@@ -5,9 +5,14 @@ import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.List;
+import java.util.Map;
+
 public interface IAerospikeDocumentRepository {
 
     Object get(Policy readPolicy, Key documentKey, String documentBinName, JsonPathObject jsonPathObject) throws DocumentApiException;
+
+    Map<String, Object> get(Policy readPolicy, Key documentKey, List<String> documentBinNames, JsonPathObject jsonPathObject) throws DocumentApiException;
 
     void put(WritePolicy writePolicy, Key documentKey, String documentBinName, JsonNode jsonNode);
 

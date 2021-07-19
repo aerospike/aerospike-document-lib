@@ -7,6 +7,8 @@ import com.aerospike.client.policy.WritePolicy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.List;
+
 /**
  * Primary object for accessing and mutating documents.
  */
@@ -44,6 +46,41 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
 
         Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinName, jsonPathObject);
+        if (jsonPathObject.requiresJsonPathQuery()) {
+            return JsonPathQuery.read(jsonPathObject, result);
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
+     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
+     *
+     * @param documentKey An Aerospike Key.
+     * @param documentBinNames A list of bin names
+     * @param jsonPath    A JSON path to get the reference from.
+     * @return Object referenced by jsonPath.
+     */
+    public Object get(Key documentKey, List<String> documentBinNames, String jsonPath) throws JsonPathParser.JsonParseException,
+            DocumentApiException, JsonProcessingException {
+        return get(null, documentKey, documentBinNames, jsonPath);
+    }
+
+    /**
+     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
+     *
+     * @param readPolicy  An Aerospike read policy to use for the get() operation.
+     * @param documentKey An Aerospike Key.
+     * @param documentBinNames A list of bin names
+     * @param jsonPath    A JSON path to get the reference from.
+     * @return Object referenced by jsonPath.
+     */
+    public Object get(Policy readPolicy, Key documentKey, List<String> documentBinNames, String jsonPath) throws JsonPathParser.JsonParseException,
+            DocumentApiException, JsonProcessingException {
+        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
+
+        Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinNames, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
             return JsonPathQuery.read(jsonPathObject, result);
         }

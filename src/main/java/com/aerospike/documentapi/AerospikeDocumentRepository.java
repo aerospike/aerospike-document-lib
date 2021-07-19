@@ -1,14 +1,16 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.*;
 import com.aerospike.client.Record;
+import com.aerospike.client.*;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     private final IAerospikeClient client;
@@ -39,6 +41,43 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             }
             return r.getValue(documentBinName);
         }
+    }
+
+    @Override
+    public Map<String, Object> get(Policy readPolicy, Key documentKey, List<String> documentBinNames, JsonPathObject jsonPathObject) throws DocumentApiException {
+        Map<String, Object> results = new HashMap<>();
+        // If there are no parts, retrieve the full document
+        if (jsonPathObject.getPathParts().size() == 0) {
+            Record record = client.get(readPolicy, documentKey);
+
+            for (String binName : documentBinNames) {
+                results.put(binName, record.bins.get(binName));
+            }
+        } else { // else retrieve using pure contexts
+            List<PathPart> pathPart = jsonPathObject.getPathParts();
+            // We need to treat the last part of the path differently
+            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
+            // Then turn the rest into the contexts representation
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            // Retrieve the part of the document referred to by the JSON path
+            Record r;
+            Operation[] operations = new Operation[documentBinNames.size()];
+            for (int i = 0; i < documentBinNames.size(); i++) {
+                operations[i] = finalPathPart.toAerospikeGetOperation(documentBinNames.get(i), ctxArray);
+            }
+
+            try {
+                WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
+                r = client.operate(writePolicy, documentKey, operations);
+            } catch (AerospikeException e) {
+                throw DocumentApiException.toDocumentException(e);
+            }
+
+            for (Map.Entry<String, Object> entry : r.bins.entrySet()) {
+                results.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return results;
     }
 
     @Override
