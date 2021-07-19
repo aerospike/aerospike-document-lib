@@ -35,7 +35,7 @@
       }
     ],
     "logout": {
-      "user": "Nathan Levy",
+      "name": "Nathan Levy",
       "datetime": "1.7.2021",
       "device": "Tablet",
       "ref": [7,4,2]

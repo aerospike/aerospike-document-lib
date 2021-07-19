@@ -35,7 +35,7 @@
       }
     ],
     "logout": {
-      "user": "John Snow",
+      "name": "John Snow",
       "datetime": "2.7.2021",
       "device": "Mobile",
       "ref": [1,2,3]
