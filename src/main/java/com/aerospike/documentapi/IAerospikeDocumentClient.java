@@ -6,7 +6,7 @@ import com.aerospike.client.policy.WritePolicy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 public interface IAerospikeDocumentClient {
@@ -43,7 +43,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path to get the reference from.
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
-    Map<String, Object> get(Policy readPolicy, Key documentKey, List<String> documentBinNames, String jsonPath)
+    Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -54,7 +54,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path to get the reference from.
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
-    Map<String, Object> get(Key documentKey, List<String> documentBinNames, String jsonPath)
+    Map<String, Object> get(Key documentKey, Collection<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -107,7 +107,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path to put the given JSON object in.
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
-    void put(Key documentKey, List<String> documentBinNames, String jsonPath, Object jsonObject)
+    void put(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -119,7 +119,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path to put the given JSON object in.
      * @param jsonObject  A JSON object to put in the given JSON path.
      */
-    void put(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath, Object jsonObject)
+    void put(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -153,7 +153,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
-    void append(Key documentKey, List<String> documentBinNames, String jsonPath, Object jsonObject)
+    void append(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -165,7 +165,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
      * @param jsonObject  A JSON object to append to the list at the given JSON path.
      */
-    void append(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath, Object jsonObject)
+    void append(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -196,7 +196,7 @@ public interface IAerospikeDocumentClient {
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
      * @param jsonPath    A JSON path for the object deletion.
      */
-    void delete(Key documentKey, List<String> documentBinNames, String jsonPath)
+    void delete(Key documentKey, Collection<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -207,6 +207,6 @@ public interface IAerospikeDocumentClient {
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
      * @param jsonPath    A JSON path for the object deletion.
      */
-    void delete(WritePolicy writePolicy, Key documentKey, List<String> documentBinNames, String jsonPath)
+    void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 }
