@@ -1,0 +1,45 @@
+{
+  "authentication": {
+    "login": [
+      {
+        "id": 1,
+        "name": "John Smith",
+        "location": "US",
+        "date": "1.7.2021",
+        "device": "Computer",
+        "os": "Windows"
+      },
+      {
+        "id": 2,
+        "name": "Jonathan Sidwell",
+        "location": "Israel",
+        "date": "1.7.2021",
+        "device": "Mobile",
+        "os": "Android"
+      },
+      {
+        "id": 3,
+        "name": "Mike Ross",
+        "location": "US",
+        "date": "1.7.2021",
+        "device": "Computer",
+        "os": "MacOS"
+      },
+      {
+        "id": 4,
+        "name": "Jessica Pearson",
+        "location": "France",
+        "date": "1.7.2021",
+        "device": "Computer",
+        "os": "Windows"
+      }
+    ],
+    "logout": {
+      "name": "Nathan Levy",
+      "datetime": "1.7.2021",
+      "device": "Tablet",
+      "ref": [7,4,2]
+    }
+  },
+  "like": 10
+}

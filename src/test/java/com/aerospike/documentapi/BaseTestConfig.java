@@ -25,6 +25,8 @@ public class BaseTestConfig {
     public static IAerospikeClient client;
     public static String documentBinName = "documentBin";
 
+    public static String events1;
+    public static String events2;
     public static String testMaterialJson;
     public static String storeJson;
     public static String tommyLeeJonesJson;
@@ -44,6 +46,8 @@ public class BaseTestConfig {
     }
 
     private static void loadJsonFiles() throws IOException {
+        events1 = DebugUtils.readJSONFromAFile("src/test/resources/events1.json");
+        events2 = DebugUtils.readJSONFromAFile("src/test/resources/events2.json");
         testMaterialJson = DebugUtils.readJSONFromAFile("src/test/resources/jsonTestMaterial.json");
         storeJson = DebugUtils.readJSONFromAFile("src/test/resources/store.json");
         tommyLeeJonesJson = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
