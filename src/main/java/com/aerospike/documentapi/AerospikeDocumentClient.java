@@ -51,8 +51,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinName, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
             return JsonPathQuery.read(jsonPathObject, result);
-        }
-        else {
+        } else {
             return result;
         }
     }
@@ -77,8 +76,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 results.put(binName, JsonPathQuery.read(jsonPathObject, ((Map<?, ?>) result).get(binName)));
             }
             return results;
-        }
-        else {
+        } else {
             return result;
         }
     }
