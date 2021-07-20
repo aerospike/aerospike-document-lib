@@ -63,17 +63,17 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param documentKey An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
      * @param jsonPath    A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
+     * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
-    public Object get(Policy readPolicy, Key documentKey, List<String> documentBinNames, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException, JsonProcessingException {
+    public Map<String, Object> get(Policy readPolicy, Key documentKey, List<String> documentBinNames, String jsonPath)
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
 
-        Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinNames, jsonPathObject);
+        Map<String, Object> result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinNames, jsonPathObject);
         if (jsonPathObject.requiresJsonPathQuery()) {
-            Map<Object, Object> results = new HashMap<>();
-            for (Object binName : ((Map<?,?>)result).keySet()) {
-                results.put(binName, JsonPathQuery.read(jsonPathObject, ((Map<?, ?>) result).get(binName)));
+            Map<String, Object> results = new HashMap<>();
+            for (String binName : result.keySet()) {
+                results.put(binName, JsonPathQuery.read(jsonPathObject, result.get(binName)));
             }
             return results;
         } else {
@@ -87,10 +87,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * @param documentKey An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
      * @param jsonPath    A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
+     * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
-    public Object get(Key documentKey, List<String> documentBinNames, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException, JsonProcessingException {
+    public Map<String, Object> get(Key documentKey, List<String> documentBinNames, String jsonPath)
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
         return get(null, documentKey, documentBinNames, jsonPath);
     }
 

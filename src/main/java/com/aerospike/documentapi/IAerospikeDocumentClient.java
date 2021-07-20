@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IAerospikeDocumentClient {
 
@@ -40,9 +41,9 @@ public interface IAerospikeDocumentClient {
      * @param documentKey An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
      * @param jsonPath    A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
+     * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
-    Object get(Policy readPolicy, Key documentKey, List<String> documentBinNames, String jsonPath)
+    Map<String, Object> get(Policy readPolicy, Key documentKey, List<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
@@ -51,9 +52,9 @@ public interface IAerospikeDocumentClient {
      * @param documentKey An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
      * @param jsonPath    A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
+     * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
-    Object get(Key documentKey, List<String> documentBinNames, String jsonPath)
+    Map<String, Object> get(Key documentKey, List<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 
     /**
