@@ -24,9 +24,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path to get the reference from.
+     * @param jsonPath        A JSON path to get the reference from.
      * @return Object referenced by jsonPath.
      */
     public Object get(Key documentKey, String documentBinName, String jsonPath) throws JsonPathParser.JsonParseException,
@@ -37,14 +37,14 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
      *
-     * @param readPolicy  An Aerospike read policy to use for the get() operation.
-     * @param documentKey An Aerospike Key.
+     * @param readPolicy      An Aerospike read policy to use for the get() operation.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path to get the reference from.
+     * @param jsonPath        A JSON path to get the reference from.
      * @return Object referenced by jsonPath.
      */
-    public Object get(Policy readPolicy, Key documentKey, String documentBinName, String jsonPath) throws JsonPathParser.JsonParseException,
-            DocumentApiException, JsonProcessingException {
+    public Object get(Policy readPolicy, Key documentKey, String documentBinName, String jsonPath)
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
 
         Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinName, jsonPathObject);
@@ -58,10 +58,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
      *
-     * @param readPolicy  An Aerospike read policy to use for the get() operation.
-     * @param documentKey An Aerospike Key.
+     * @param readPolicy       An Aerospike read policy to use for the get() operation.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path to get the reference from.
+     * @param jsonPath         A JSON path to get the reference from.
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
     public Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath)
@@ -83,9 +83,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path to get the reference from.
+     * @param jsonPath         A JSON path to get the reference from.
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
     public Map<String, Object> get(Key documentKey, Collection<String> documentBinNames, String jsonPath)
@@ -96,9 +96,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Put a document.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonNode  A JSON node to put.
+     * @param jsonNode        A JSON node to put.
      */
     public void put(Key documentKey, String documentBinName, JsonNode jsonNode) {
         put(null, documentKey, documentBinName, jsonNode);
@@ -107,10 +107,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Put a document.
      *
-     * @param writePolicy An Aerospike write policy to use for the put() operation.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy     An Aerospike write policy to use for the put() operation.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonNode  A JSON node to put.
+     * @param jsonNode        A JSON node to put.
      */
     public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, JsonNode jsonNode) {
         aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, jsonNode);
@@ -119,27 +119,27 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path to put the given JSON object in.
-     * @param jsonObject  A JSON object to put in the given JSON path.
+     * @param jsonPath        A JSON path to put the given JSON object in.
+     * @param jsonObject      A JSON object to put in the given JSON path.
      */
-    public void put(Key documentKey, String documentBinName, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            DocumentApiException, JsonProcessingException {
+    public void put(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
         put(null, documentKey, documentBinName, jsonPath, jsonObject);
     }
 
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.
      *
-     * @param writePolicy An Aerospike write policy to use for the put() and operate() operations.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy     An Aerospike write policy to use for the put() and operate() operations.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path to put the given JSON object in.
-     * @param jsonObject  A JSON object to put in the given JSON path.
+     * @param jsonPath        A JSON path to put the given JSON object in.
+     * @param jsonObject      A JSON object to put in the given JSON path.
      */
-    public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject) throws JsonPathParser.JsonParseException,
-            DocumentApiException, JsonProcessingException {
+    public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
@@ -154,10 +154,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path to put the given JSON object in.
-     * @param jsonObject  A JSON object to put in the given JSON path.
+     * @param jsonPath         A JSON path to put the given JSON object in.
+     * @param jsonObject       A JSON object to put in the given JSON path.
      */
     public void put(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -167,11 +167,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.
      *
-     * @param writePolicy An Aerospike write policy to use for the put() and operate() operations.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy      An Aerospike write policy to use for the put() and operate() operations.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path to put the given JSON object in.
-     * @param jsonObject  A JSON object to put in the given JSON path.
+     * @param jsonPath         A JSON path to put the given JSON object in.
+     * @param jsonObject       A JSON object to put in the given JSON path.
      */
     public void put(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -192,10 +192,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Append an object to a list in a document specified by a JSON path.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
-     * @param jsonObject  A JSON object to append to the list at the given JSON path.
+     * @param jsonPath        A JSON path that includes a list to append the given JSON object to.
+     * @param jsonObject      A JSON object to append to the list at the given JSON path.
      */
     public void append(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -205,11 +205,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Append an object to a list in a document specified by a JSON path.
      *
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy     An Aerospike write policy to use for the operate() operation.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
-     * @param jsonObject  A JSON object to append to the list at the given JSON path.
+     * @param jsonPath        A JSON path that includes a list to append the given JSON object to.
+     * @param jsonObject      A JSON object to append to the list at the given JSON path.
      */
     public void append(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -227,10 +227,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Append an object to a list in a document specified by a JSON path.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
-     * @param jsonObject  A JSON object to append to the list at the given JSON path.
+     * @param jsonPath         A JSON path that includes a list to append the given JSON object to.
+     * @param jsonObject       A JSON object to append to the list at the given JSON path.
      */
     public void append(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -240,11 +240,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Append an object to a list in a document specified by a JSON path.
      *
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy      An Aerospike write policy to use for the operate() operation.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path that includes a list to append the given JSON object to.
-     * @param jsonObject  A JSON object to append to the list at the given JSON path.
+     * @param jsonPath         A JSON path that includes a list to append the given JSON object to.
+     * @param jsonObject       A JSON object to append to the list at the given JSON path.
      */
     public void append(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -265,9 +265,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Delete an object in a document specified by a JSON path.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path for the object deletion.
+     * @param jsonPath        A JSON path for the object deletion.
      */
     public void delete(Key documentKey, String documentBinName, String jsonPath) throws JsonPathParser.JsonParseException,
             DocumentApiException, JsonProcessingException {
@@ -277,10 +277,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Delete an object in a document specified by a JSON path.
      *
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy     An Aerospike write policy to use for the operate() operation.
+     * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath    A JSON path for the object deletion.
+     * @param jsonPath        A JSON path for the object deletion.
      */
     public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -298,9 +298,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Delete an object in a document specified by a JSON path.
      *
-     * @param documentKey An Aerospike Key.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path for the object deletion.
+     * @param jsonPath         A JSON path for the object deletion.
      */
     public void delete(Key documentKey, Collection<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {
@@ -310,10 +310,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     /**
      * Delete an object in a document specified by a JSON path.
      *
-     * @param writePolicy An Aerospike write policy to use for the operate() operation.
-     * @param documentKey An Aerospike Key.
+     * @param writePolicy      An Aerospike write policy to use for the operate() operation.
+     * @param documentKey      An Aerospike Key.
      * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath    A JSON path for the object deletion.
+     * @param jsonPath         A JSON path for the object deletion.
      */
     public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException {

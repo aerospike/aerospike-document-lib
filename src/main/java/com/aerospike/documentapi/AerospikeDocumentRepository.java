@@ -1,7 +1,12 @@
 package com.aerospike.documentapi;
 
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.Bin;
+import com.aerospike.client.IAerospikeClient;
+import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
-import com.aerospike.client.*;
+import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.cdt.MapPolicy;
@@ -66,7 +71,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
             // Retrieve the part of the document referred to by the JSON path
             Record r;
-            Operation[] operations =  documentBinNames.stream()
+            Operation[] operations = documentBinNames.stream()
                     .map(bn -> finalPathPart.toAerospikeGetOperation(bn, ctxArray)).toArray(Operation[]::new);
 
             try {
