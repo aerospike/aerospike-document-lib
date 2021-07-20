@@ -60,7 +60,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      *
      * @param readPolicy       An Aerospike read policy to use for the get() operation.
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath         A JSON path to get the reference from.
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
@@ -84,7 +84,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
      *
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath         A JSON path to get the reference from.
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
@@ -155,7 +155,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * Put a map representation of a JSON object at a particular path in a JSON document.
      *
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath         A JSON path to put the given JSON object in.
      * @param jsonObject       A JSON object to put in the given JSON path.
      */
@@ -169,7 +169,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      *
      * @param writePolicy      An Aerospike write policy to use for the put() and operate() operations.
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath         A JSON path to put the given JSON object in.
      * @param jsonObject       A JSON object to put in the given JSON path.
      */
@@ -190,11 +190,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     /**
-     * Append an object to a list in a document specified by a JSON path.
+     * Append an object to A collection in a document specified by a JSON path.
      *
      * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath        A JSON path that includes a list to append the given JSON object to.
+     * @param jsonPath        A JSON path that includes A collection to append the given JSON object to.
      * @param jsonObject      A JSON object to append to the list at the given JSON path.
      */
     public void append(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
@@ -203,12 +203,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     /**
-     * Append an object to a list in a document specified by a JSON path.
+     * Append an object to A collection in a document specified by a JSON path.
      *
      * @param writePolicy     An Aerospike write policy to use for the operate() operation.
      * @param documentKey     An Aerospike Key.
      * @param documentBinName The bin name that will store the json.
-     * @param jsonPath        A JSON path that includes a list to append the given JSON object to.
+     * @param jsonPath        A JSON path that includes A collection to append the given JSON object to.
      * @param jsonObject      A JSON object to append to the list at the given JSON path.
      */
     public void append(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
@@ -225,11 +225,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     /**
-     * Append an object to a list in a document specified by a JSON path.
+     * Append an object to A collection in a document specified by a JSON path.
      *
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath         A JSON path that includes a list to append the given JSON object to.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
+     * @param jsonPath         A JSON path that includes A collection to append the given JSON object to.
      * @param jsonObject       A JSON object to append to the list at the given JSON path.
      */
     public void append(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
@@ -238,12 +238,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     /**
-     * Append an object to a list in a document specified by a JSON path.
+     * Append an object to A collection in a document specified by a JSON path.
      *
      * @param writePolicy      An Aerospike write policy to use for the operate() operation.
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
-     * @param jsonPath         A JSON path that includes a list to append the given JSON object to.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
+     * @param jsonPath         A JSON path that includes A collection to append the given JSON object to.
      * @param jsonObject       A JSON object to append to the list at the given JSON path.
      */
     public void append(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
@@ -299,7 +299,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      * Delete an object in a document specified by a JSON path.
      *
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath         A JSON path for the object deletion.
      */
     public void delete(Key documentKey, Collection<String> documentBinNames, String jsonPath)
@@ -312,7 +312,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
      *
      * @param writePolicy      An Aerospike write policy to use for the operate() operation.
      * @param documentKey      An Aerospike Key.
-     * @param documentBinNames A list of bin names that each contains the same structure of a document.
+     * @param documentBinNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath         A JSON path for the object deletion.
      */
     public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath)
