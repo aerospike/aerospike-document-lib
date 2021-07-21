@@ -262,9 +262,8 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().size() == 0) {
-            Map<String, Object> emptyMap = new HashMap<>();
             Operation[] operations = documentBinNames.stream()
-                    .map(bn -> MapOperation.put(new MapPolicy(), bn, Value.get(documentKey), Value.get(emptyMap)))
+                    .map(MapOperation::clear)
                     .toArray(Operation[]::new);
             client.operate(writePolicy, documentKey, operations);
         } else {
