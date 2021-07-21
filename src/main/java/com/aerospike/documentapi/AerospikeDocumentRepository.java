@@ -238,9 +238,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
-        // If there are no parts, you can't delete
+        // If there are no parts, put an empty map in the given bin
         if (jsonPathObject.getPathParts().size() == 0) {
-            throw new JsonPathParser.ListException(jsonPath);
+            Map<String, Object> emptyMap = new HashMap<>();
+            client.put(writePolicy, documentKey, new Bin(documentBinName, emptyMap));
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
@@ -259,9 +260,13 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
-        // If there are no parts, you can't delete
+        // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().size() == 0) {
-            throw new JsonPathParser.ListException(jsonPath);
+            Map<String, Object> emptyMap = new HashMap<>();
+            Operation[] operations = documentBinNames.stream()
+                    .map(bn -> MapOperation.put(new MapPolicy(), bn, Value.get(documentKey), Value.get(emptyMap)))
+                    .toArray(Operation[]::new);
+            client.operate(writePolicy, documentKey, operations);
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
