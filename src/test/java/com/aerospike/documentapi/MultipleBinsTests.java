@@ -134,8 +134,6 @@ public class MultipleBinsTests extends BaseTestConfig {
         documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
         Map<?, ?> objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
-        objectFromDB.values().stream()
-                .map(value -> (Map<?, ?>)value)
-                .forEach(valueMap -> assertTrue(valueMap.isEmpty()));
+        objectFromDB.values().forEach(value -> assertTrue(((Map<?, ?>)value).isEmpty()));
     }
 }
