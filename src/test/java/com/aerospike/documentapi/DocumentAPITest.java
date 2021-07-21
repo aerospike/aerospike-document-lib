@@ -590,16 +590,4 @@ public class DocumentAPITest extends BaseTestConfig {
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         assertTrue(((Map<?, ?>) objectFromDB).isEmpty());
     }
-
-    @Test
-    public void deleteRootElementJSONPathQuery() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
-        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
-        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
-
-        String jsonPath = "$..*";
-        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-        assertTrue(((List<?>) objectFromDB).isEmpty());
-    }
 }
