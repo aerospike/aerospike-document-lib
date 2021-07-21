@@ -6,6 +6,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,5 +88,17 @@ public class JsonPathWildcardTests extends BaseTestConfig {
         Object modifiedJson = JsonPath.parse(storeJson).delete(jsonPath).json();
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
+    }
+
+    @Test
+    public void deleteRootElementJSONPathQuery() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+
+        String jsonPath = "$..*";
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        assertTrue(((List<?>) objectFromDB).isEmpty());
     }
 }

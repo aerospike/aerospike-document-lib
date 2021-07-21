@@ -6,10 +6,8 @@ import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
-import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOperation;
-import com.aerospike.client.cdt.MapPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
@@ -121,7 +119,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().size() == 0) {
             operations = documentBinNames.stream()
-                    .map(bn -> MapOperation.put(new MapPolicy(), bn, Value.get(documentKey), Value.get(jsonObject)))
+                    .map(bn -> {
+                        Bin bin = new Bin(bn, jsonObject);
+                        return Operation.put(bin);
+                    })
                     .toArray(Operation[]::new);
             client.operate(writePolicy, documentKey, operations);
         } else { // else put using contexts
@@ -148,7 +149,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().size() == 0) {
             operations = queryResults.entrySet().stream()
-                    .map(e -> MapOperation.put(new MapPolicy(), e.getKey(), Value.get(documentKey), Value.get(e.getValue())))
+                    .map(e -> {
+                        Bin bin = new Bin(e.getKey(), e.getValue());
+                        return Operation.put(bin);
+                    })
                     .toArray(Operation[]::new);
             client.operate(writePolicy, documentKey, operations);
         } else { // else put using contexts
@@ -238,9 +242,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
-        // If there are no parts, you can't delete
+        // If there are no parts, put an empty map in the given bin
         if (jsonPathObject.getPathParts().size() == 0) {
-            throw new JsonPathParser.ListException(jsonPath);
+            Map<String, Object> emptyMap = new HashMap<>();
+            client.put(writePolicy, documentKey, new Bin(documentBinName, emptyMap));
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
@@ -259,9 +264,12 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
-        // If there are no parts, you can't delete
+        // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().size() == 0) {
-            throw new JsonPathParser.ListException(jsonPath);
+            Operation[] operations = documentBinNames.stream()
+                    .map(MapOperation::clear)
+                    .toArray(Operation[]::new);
+            client.operate(writePolicy, documentKey, operations);
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently

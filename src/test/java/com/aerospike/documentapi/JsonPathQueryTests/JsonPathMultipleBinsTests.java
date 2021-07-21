@@ -96,4 +96,25 @@ public class JsonPathMultipleBinsTests extends BaseTestConfig {
         expectedObjectsCombined.put(documentBinName2, expectedObject2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObjectsCombined));
     }
+
+    @Test
+    public void deleteRootElementMultipleBinsWithJSONPathQuery() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+        JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
+        JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
+        String documentBinName1 = "events1Bin";
+        String documentBinName2 = "events2Bin";
+        List<String> bins = new ArrayList<>();
+        bins.add(documentBinName1);
+        bins.add(documentBinName2);
+
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName1, jsonNodeEvents1);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName2, jsonNodeEvents2);
+
+        String jsonPath = "$..*";
+        documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        Map<?, ?> objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+        objectFromDB.values().forEach(valueList -> assertTrue(((List<?>)valueList).isEmpty()));
+    }
 }
