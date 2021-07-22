@@ -35,7 +35,7 @@ Add the Maven dependency:
 </dependency>
 ```
 
-## Quick Start
+## Overview
 
 Consider the following JSON:
 
@@ -142,7 +142,7 @@ We can find out the name of Jones' best film according to 'Rotten Tomatoes' usin
    documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
 ```
 
-### JSONPath Queries
+## JSONPath Queries
 
 JSONPath is a query language for JSON.
 It supports operators, functions and filters.
@@ -231,16 +231,17 @@ documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);        
 ```
 
-### Multiple document bins
+## Multiple document bins
 
 Starting at version `1.1.0` there is a new feature called multiple document bins.
 
-You can have multiple documents - each stored in a different bin, all documents have the same structure but not the same data,
-an example of a use-case can be storing events, each document contains events for a specific amount of time - for example, a week, and now you 
-have the ability to use Document API operations (including JSONPath queries) on multiple documents (with the same structure) at once
-using a single Aerospike operate() command under the hood which saves boilerplate code and server resources.
+You can have multiple documents - each stored in a different bin, all documents have the same structure but not the same data.
 
-#### How it looks
+Example of a use-case can be storing events, each document contains events for a specific amount of time - for example, a week, and now you 
+have the ability to use Document API operations (including JSONPath queries) on multiple documents (with the same structure) at once
+using a single Aerospike operate() command under the hood which saves server resources boilerplate code.
+
+### How it looks
 
 Consider the following JSON documents:
 
