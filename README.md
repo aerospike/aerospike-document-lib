@@ -35,9 +35,9 @@ Add the Maven dependency:
 </dependency>
 ```
 
-## Quick Start
+## Overview
 
-Consider the following JSON
+Consider the following JSON:
 
 ``` json
 {
@@ -142,7 +142,7 @@ We can find out the name of Jones' best film according to 'Rotten Tomatoes' usin
    documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
 ```
 
-### JSONPath Queries
+## JSONPath Queries
 
 JSONPath is a query language for JSON.
 It supports operators, functions and filters.
@@ -194,7 +194,7 @@ Consider the following JSON document
 ```
 
 #### Examples
-Here are some examples of JSONPath queries
+Here are some examples of JSONPath queries:
 
 ```java
 // All things, both books and bicycles
@@ -229,6 +229,149 @@ String jsonPath = "$.store..price";
 // Delete the price field of every object exists in the store
 documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);        
+```
+
+## Multiple document bins
+
+Starting at version `1.1.0` there is a new feature called multiple document bins.
+
+You can have multiple documents - each stored in a different bin, all documents have the same structure but not the same data.
+
+Example of a use-case can be storing events, each document contains events for a specific amount of time - for example, a week, and now you 
+have the ability to use Document API operations (including JSONPath queries) on multiple documents (with the same structure) at once
+using a single Aerospike operate() command under the hood which saves server resources boilerplate code.
+
+### How it looks
+
+Consider the following JSON documents:
+
+events1.json
+```json
+{
+  "authentication": {
+    "login": [
+      {
+        "id": 1,
+        "name": "John Smith",
+        "location": "US",
+        "date": "1.7.2021",
+        "device": "Computer",
+        "os": "Windows"
+      },
+      {
+        "id": 2,
+        "name": "Jonathan Sidwell",
+        "location": "Israel",
+        "date": "1.7.2021",
+        "device": "Mobile",
+        "os": "Android"
+      },
+      {
+        "id": 3,
+        "name": "Mike Ross",
+        "location": "US",
+        "date": "1.7.2021",
+        "device": "Computer",
+        "os": "MacOS"
+      },
+      {
+        "id": 4,
+        "name": "Jessica Pearson",
+        "location": "France",
+        "date": "1.7.2021",
+        "device": "Computer",
+        "os": "Windows"
+      }
+    ],
+    "logout": {
+      "name": "Nathan Levy",
+      "datetime": "1.7.2021",
+      "device": "Tablet",
+      "ref": [7,4,2]
+    }
+  },
+  "like": 10
+}
+```
+
+events2.json
+```json
+{
+  "authentication": {
+    "login": [
+      {
+        "id": 21,
+        "name": "Simba Lion",
+        "location": "Italy",
+        "date": "2.7.2021",
+        "device": "Mobile",
+        "os": "iOS"
+      },
+      {
+        "id": 22,
+        "name": "Sean Cahill",
+        "location": "US",
+        "date": "2.7.2021",
+        "device": "Mobile",
+        "os": "Android"
+      },
+      {
+        "id": 23,
+        "name": "Forrest Gump",
+        "location": "Spain",
+        "date": "2.7.2021",
+        "device": "Computer",
+        "os": "Windows"
+      },
+      {
+        "id": 24,
+        "name": "Patrick St. Claire",
+        "location": "France",
+        "date": "2.7.2021",
+        "device": "Mobile",
+        "os": "iOS"
+      }
+    ],
+    "logout": {
+      "name": "John Snow",
+      "datetime": "2.7.2021",
+      "device": "Mobile",
+      "ref": [1,2,3]
+    }
+  },
+  "like": 20
+}
+```
+
+We have 2 documents with the same structure but not the same data that represents events.
+
+Defining a bins list.
+```java
+String documentBinName1 = "events1Bin";
+String documentBinName2 = "events2Bin";
+List<String> bins = new ArrayList<>();
+bins.add(documentBinName1);
+bins.add(documentBinName2);
+```
+
+Examples:
+```java
+// The names of the users of all logout events from each document
+String jsonPath = "$.authentication.logout.name";
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+// Modify the devices of all the authentications (login and logout) to "Mobile"
+jsonPath = "$.authentication..device";
+jsonObject = "Mobile";
+documentClient.put(TEST_AEROSPIKE_KEY, bins, jsonPath, jsonObject);
+
+// Delete the user field from all of the authentications (login and logout)
+jsonPath = "$.authentication..user";
+documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
+
+// All the logins with "id" greater than 10
+jsonPath = "$.authentication.login[?(@.id > 10)]";
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 ```
 
 ## References
