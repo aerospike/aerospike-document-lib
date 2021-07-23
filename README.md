@@ -31,7 +31,7 @@ Add the Maven dependency:
 <dependency>
   <groupId>com.aerospike</groupId>
   <artifactId>aerospike-document-api</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
@@ -376,6 +376,5 @@ objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
 ## References
 
- * See [AerospikeDocumentClient.java](../../../master/ken-tune/aerospike-document-api/src/main/java/com/aerospike/documentAPI/AerospikeDocumentClient.java) for full details of the API
- * See [AerospikeDocumentClientTest.java](../../../master/ken-tune/aerospike-document-api/src/test/java/com/aerospike/documentAPI/DocumentAPITest.java) for unit tests showing API usage
+ * See [AerospikeDocumentClient.java](https://github.com/aerospike/aerospike-document-lib/blob/main/src/main/java/com/aerospike/documentapi/AerospikeDocumentClient.java) for full details of the API.
 
