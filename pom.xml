@@ -120,14 +120,14 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven.javadoc.plugin.version}</version>
                 <configuration>
-                    <failOnError>false</failOnError>
                     <doclint>none</doclint>
                     <reportOutputDirectory>${basedir}</reportOutputDirectory>
                     <doctitle>Aerospike Document API</doctitle>
                     <show>public</show>
                     <splitindex>true</splitindex>
                     <bottom>Copyright &#169; 2020&#x2013;{currentYear} Aerospike, Inc. All rights reserved.</bottom>
-                    <sourcepath>${basedir}/src/main</sourcepath>
+                    <sourcepath>${basedir}/src/main/java</sourcepath>
+                    <source>8</source>
                 </configuration>
                 <executions>
                     <execution>
