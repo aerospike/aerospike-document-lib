@@ -18,7 +18,7 @@ JSON documents in the Aerospike database.
  1. [Aerospike Document API](https://medium.com/aerospike-developer-blog/aerospike-document-api-fd8870b4106c?source=friends_link&sk=b733e9fbe5a089ccca4f692e4f429711)
  2. [Aerospike Document API: JSONPath Queries](https://medium.com/aerospike-developer-blog/aerospike-document-api-jsonpath-queries-bd6260b2d076?source=friends_link&sk=d2c75b3beec691a36aa73513945f22a1)
 
-## Javadocs documentation
+## Javadocs Documentation
 
 Latest:
 
@@ -29,12 +29,12 @@ https://www.javadoc.io/doc/com.aerospike/aerospike-document-api/latest/index.htm
 
 https://www.javadoc.io/doc/com.aerospike/aerospike-document-api/1.1.0/index.html
 
-## Build instructions
+## Build Instructions
 ```sh
 mvn clean package
 ```
 
-### Maven dependency
+### Maven Dependency
 
 Add the Maven dependency:
 
@@ -242,7 +242,7 @@ documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);        
 ```
 
-## Multiple document bins
+## Multiple Document Bins
 
 Starting at version `1.1.0` there is a new feature called multiple document bins.
 
