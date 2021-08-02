@@ -11,7 +11,7 @@ JSON documents in the Aerospike database.
 
 ### Documentation
 
-The documentation for this project can be found on [javadoc.io](https://www.javadoc.io/doc/com.aerospike/aerospike-document-api/latest/index.html).
+The documentation for this project can be found on [javadoc.io](https://www.javadoc.io/doc/com.aerospike/aerospike-document-api).
 
 ### Assumptions
 
