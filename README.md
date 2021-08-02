@@ -4,7 +4,7 @@
 [![javadoc](https://javadoc.io/badge2/com.aerospike/aerospike-document-api/javadoc.svg)](https://javadoc.io/doc/com.aerospike/aerospike-document-api)
 
 This project provides an API for accessing and mutating Aerospike
-[Collection Data Type](https://www.aerospike.com/docs/client/java/index.html)(CDT)
+[Collection Data Type](https://www.aerospike.com/docs/client/java/index.html) (CDT)
 objects using a [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
 This effectively provides a document API, with CDT objects used to represent
 JSON documents in the Aerospike database.
