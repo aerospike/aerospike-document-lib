@@ -1,12 +1,17 @@
 # Aerospike Document API
 [![Build project](https://github.com/aerospike/aerospike-document-lib/actions/workflows/build.yml/badge.svg)](https://github.com/aerospike/aerospike-document-lib/actions/workflows/build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.aerospike/aerospike-document-api/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.aerospike/aerospike-document-api/)
+[![javadoc](https://javadoc.io/badge2/com.aerospike/aerospike-document-api/javadoc.svg)](https://javadoc.io/doc/com.aerospike/aerospike-document-api)
 
 This project provides an API for accessing and mutating Aerospike
 [Collection Data Type](https://www.aerospike.com/docs/client/java/index.html)(CDT)
 objects using a [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
 This effectively provides a document API, with CDT objects used to represent
 JSON documents in the Aerospike database.
+
+### Documentation
+
+The documentation for this project can be found on [javadoc.io](https://www.javadoc.io/doc/com.aerospike/aerospike-document-api/latest/index.html).
 
 ### Assumptions
 
@@ -18,23 +23,12 @@ JSON documents in the Aerospike database.
  1. [Aerospike Document API](https://medium.com/aerospike-developer-blog/aerospike-document-api-fd8870b4106c?source=friends_link&sk=b733e9fbe5a089ccca4f692e4f429711)
  2. [Aerospike Document API: JSONPath Queries](https://medium.com/aerospike-developer-blog/aerospike-document-api-jsonpath-queries-bd6260b2d076?source=friends_link&sk=d2c75b3beec691a36aa73513945f22a1)
 
-## Javadocs Documentation
-
-Latest:
-
-https://www.javadoc.io/doc/com.aerospike/aerospike-document-api/latest/index.html
-
-* For a specific version of javadocs change "latest" path to the desired Aerospike Document API version, for example the 
-  link below will point to the javadocs of version 1.1.0:
-
-https://www.javadoc.io/doc/com.aerospike/aerospike-document-api/1.1.0/index.html
-
 ## Build Instructions
 ```sh
 mvn clean package
 ```
 
-### Maven Dependency
+## Maven Dependency
 
 Add the Maven dependency:
 
