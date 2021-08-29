@@ -31,6 +31,7 @@ public class DebugUtils {
 
     /**
      * Read JSON file from a given path and return it as a String.
+     *
      * @param filePath given path of a file containing JSON content.
      * @return JSON content as a String.
      * @throws IOException an IOException will be thrown in case of an error.

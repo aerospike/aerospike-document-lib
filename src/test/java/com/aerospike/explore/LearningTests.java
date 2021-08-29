@@ -54,7 +54,7 @@ public class LearningTests extends BaseTestConfig {
      * JSON string to map.
      */
     @Test
-    public void stringToMap() throws IOException{
+    public void stringToMap() throws IOException {
         JsonNode result = JsonConverters.convertStringToJsonNode(pojoToString(getTestStaffMemberObject()));
         DebugUtils.consoleHeader("Read JSON string into map- show map.toString");
         System.out.println(result);
@@ -65,7 +65,7 @@ public class LearningTests extends BaseTestConfig {
      * Convert POJO to map, save to Aerospike DB and read.
      */
     @Test
-    public void writePOJOToDB() throws IOException{
+    public void writePOJOToDB() throws IOException {
         JsonNode result = JsonConverters.convertStringToJsonNode(pojoToString(getTestStaffMemberObject()));
         putJsonNodeToDB(result, TEST_AEROSPIKE_KEY);
 

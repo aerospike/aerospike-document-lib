@@ -18,8 +18,8 @@ public class MultipleBinsTests extends BaseTestConfig {
     public void testMultipleGetOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
-        Map<String, Object> jsonNodeAsMapEvents1  = JsonConverters.convertJsonNodeToMap(jsonNodeEvents1);
-        Map<String, Object> jsonNodeAsMapEvents2  = JsonConverters.convertJsonNodeToMap(jsonNodeEvents2);
+        Map<String, Object> jsonNodeAsMapEvents1 = JsonConverters.convertJsonNodeToMap(jsonNodeEvents1);
+        Map<String, Object> jsonNodeAsMapEvents2 = JsonConverters.convertJsonNodeToMap(jsonNodeEvents2);
         String documentBinName1 = "events1Bin";
         String documentBinName2 = "events2Bin";
         List<String> bins = new ArrayList<>();
@@ -32,8 +32,8 @@ public class MultipleBinsTests extends BaseTestConfig {
         String jsonPath = "$.authentication.logout.name";
 
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
-        Object expectedObject1 = ((Map<?, ?>)((Map<?, ?>)jsonNodeAsMapEvents1.get("authentication")).get("logout")).get("name");
-        Object expectedObject2 = ((Map<?, ?>)((Map<?, ?>)jsonNodeAsMapEvents2.get("authentication")).get("logout")).get("name");
+        Object expectedObject1 = ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMapEvents1.get("authentication")).get("logout")).get("name");
+        Object expectedObject2 = ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMapEvents2.get("authentication")).get("logout")).get("name");
         Map<String, Object> expectedObjectsCombined = new HashMap<>();
         expectedObjectsCombined.put(documentBinName1, expectedObject1);
         expectedObjectsCombined.put(documentBinName2, expectedObject2);
@@ -85,8 +85,8 @@ public class MultipleBinsTests extends BaseTestConfig {
 
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
-        List<?> appendedList1 = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, documentBinName1, jsonPath));
-        List<?> appendedList2 = ((List<?>)documentClient.get(TEST_AEROSPIKE_KEY, documentBinName2, jsonPath));
+        List<?> appendedList1 = ((List<?>) documentClient.get(TEST_AEROSPIKE_KEY, documentBinName1, jsonPath));
+        List<?> appendedList2 = ((List<?>) documentClient.get(TEST_AEROSPIKE_KEY, documentBinName2, jsonPath));
         Map<String, Object> expectedObjectsCombined = new HashMap<>();
         expectedObjectsCombined.put(documentBinName1, appendedList1);
         expectedObjectsCombined.put(documentBinName2, appendedList2);
@@ -111,7 +111,7 @@ public class MultipleBinsTests extends BaseTestConfig {
         documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
-        for (Object value : ((Map<?, ?>)objectFromDB).values()) {
+        for (Object value : ((Map<?, ?>) objectFromDB).values()) {
             assertNull(value);
         }
     }
@@ -134,6 +134,6 @@ public class MultipleBinsTests extends BaseTestConfig {
         documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
         Map<?, ?> objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
-        objectFromDB.values().forEach(value -> assertTrue(((Map<?, ?>)value).isEmpty()));
+        objectFromDB.values().forEach(value -> assertTrue(((Map<?, ?>) value).isEmpty()));
     }
 }
