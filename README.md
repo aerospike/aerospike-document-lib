@@ -36,7 +36,7 @@ Add the Maven dependency:
 <dependency>
   <groupId>com.aerospike</groupId>
   <artifactId>aerospike-document-api</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```
 
