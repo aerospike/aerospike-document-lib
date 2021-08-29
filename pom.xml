@@ -6,7 +6,7 @@
 
     <groupId>com.aerospike</groupId>
     <artifactId>aerospike-document-api</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 
     <name>Aerospike Document API</name>
     <description>This project provides an API which allows Aerospike CDT (Collection Data Type) objects to be accessed and mutated using JSON like syntax.
@@ -26,8 +26,8 @@
         <maven.javadoc.plugin.version>3.3.0</maven.javadoc.plugin.version>
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <jackson-databind.version>2.12.4</jackson-databind.version>
-        <aerospike-client.version>5.1.5</aerospike-client.version>
+        <jackson-databind.version>2.12.5</jackson-databind.version>
+        <aerospike-client.version>5.1.7</aerospike-client.version>
         <junit-jupiter.version>5.7.2</junit-jupiter.version>
         <json-path.version>2.6.0</json-path.version>
     </properties>
