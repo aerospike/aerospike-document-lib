@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
+
     private final IAerospikeClient client;
 
     AerospikeDocumentRepository(IAerospikeClient client) {

@@ -27,10 +27,12 @@ public class JsonPathParser {
     // Store our representation of the individual path parts
     JsonPathObject jsonPathObject = new JsonPathObject();
 
-    JsonPathParser() {}
+    JsonPathParser() {
+    }
 
     /**
      * Turn json path as string into PathPart recommendation
+     *
      * @param jsonString a given JSON as String
      * @return List<PathPart></PathPart>
      * @throws JsonParseException a JsonParseException will be thrown in case of an error.
@@ -77,6 +79,7 @@ public class JsonPathParser {
      * Utility internal method to process the individual path parts
      * Appends the found path parts to the list of path parts already found
      * Expected form of pathPart is key[index1][index2]
+     *
      * @param pathPart pathPart to Parse.
      * @throws JsonParseException a JsonParseException will be thrown in case of an error.
      */
@@ -111,6 +114,7 @@ public class JsonPathParser {
     /**
      * Given a list of path parts, convert this to the list of contexts you would need
      * to retrieve the JSON path represented by the list of path parts
+     *
      * @param pathParts pathParts list to convert.
      * @return An array of contexts (CTXs).
      */
@@ -135,6 +139,7 @@ public class JsonPathParser {
      */
     public static abstract class JsonParseException extends Exception {
         String jsonString;
+
         JsonParseException(String s) {
             jsonString = s;
         }
@@ -161,8 +166,12 @@ public class JsonPathParser {
     }
 
     public static class ListException extends JsonParseException {
-        ListException(String s) {super(s);}
+        ListException(String s) {
+            super(s);
+        }
 
-        public String toString() {return "You can't append to a document root";}
+        public String toString() {
+            return "You can't append to a document root";
+        }
     }
 }

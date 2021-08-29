@@ -31,7 +31,8 @@ public class JsonConverters {
      * @return The given JSON as a Java Map.
      */
     public static Map<String, Object> convertJsonNodeToMap(JsonNode jsonNode) {
-        return mapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>(){});
+        return mapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {
+        });
     }
 
     /**
@@ -41,7 +42,8 @@ public class JsonConverters {
      * @return The given JSON as a Java List.
      */
     public static List<Object> convertJsonNodeToList(JsonNode jsonNode) {
-        return mapper.convertValue(jsonNode, new TypeReference<List<Object>>(){});
+        return mapper.convertValue(jsonNode, new TypeReference<List<Object>>() {
+        });
     }
 
     /**

@@ -10,11 +10,15 @@ import com.aerospike.client.cdt.ListOperation;
  */
 public abstract class PathPart {
     public abstract CTX toAerospikeContext();
+
     public abstract Operation toAerospikeGetOperation(String binName, CTX[] contexts);
+
     public abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts);
+
     public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) {
         return ListOperation.append(binName, Value.get(object), contexts);
     }
+
     public abstract Operation toAerospikeDeleteOperation(String binName, CTX[] contexts);
 
     public abstract PathPartTypeEnum getType();
