@@ -47,7 +47,12 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
-            return r.getValue(documentBinName);
+
+            if (r != null) {
+                return r.getValue(documentBinName);
+            } else {
+                return null;
+            }
         }
     }
 
@@ -80,8 +85,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                 throw DocumentApiException.toDocumentException(e);
             }
 
-            for (Map.Entry<String, Object> entry : r.bins.entrySet()) {
-                results.put(entry.getKey(), entry.getValue());
+            if (r != null) {
+                for (Map.Entry<String, Object> entry : r.bins.entrySet()) {
+                    results.put(entry.getKey(), entry.getValue());
+                }
             }
         }
         return results;
