@@ -31,7 +31,11 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             throws DocumentApiException {
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().size() == 0) {
-            return client.get(readPolicy, documentKey).getValue(documentBinName);
+            Record record = client.get(readPolicy, documentKey);
+
+            if (record != null) {
+                return record.getValue(documentBinName);
+            }
         } else { // else retrieve using pure contexts
             List<PathPart> pathPart = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
@@ -47,8 +51,12 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
-            return r.getValue(documentBinName);
+
+            if (r != null) {
+                return r.getValue(documentBinName);
+            }
         }
+        return null;
     }
 
     @Override
@@ -59,8 +67,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         if (jsonPathObject.getPathParts().size() == 0) {
             Record record = client.get(readPolicy, documentKey);
 
-            for (String binName : documentBinNames) {
-                results.put(binName, record.bins.get(binName));
+            if (record != null) {
+                for (String binName : documentBinNames) {
+                    results.put(binName, record.bins.get(binName));
+                }
             }
         } else { // else retrieve using pure contexts
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -80,8 +90,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                 throw DocumentApiException.toDocumentException(e);
             }
 
-            for (Map.Entry<String, Object> entry : r.bins.entrySet()) {
-                results.put(entry.getKey(), entry.getValue());
+            if (r != null) {
+                for (Map.Entry<String, Object> entry : r.bins.entrySet()) {
+                    results.put(entry.getKey(), entry.getValue());
+                }
             }
         }
         return results;
