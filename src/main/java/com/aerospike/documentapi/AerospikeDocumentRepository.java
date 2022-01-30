@@ -64,8 +64,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         if (jsonPathObject.getPathParts().size() == 0) {
             Record record = client.get(readPolicy, documentKey);
 
-            for (String binName : documentBinNames) {
-                results.put(binName, record.bins.get(binName));
+            if (record != null) {
+                for (String binName : documentBinNames) {
+                    results.put(binName, record.bins.get(binName));
+                }
             }
         } else { // else retrieve using pure contexts
             List<PathPart> pathPart = jsonPathObject.getPathParts();
