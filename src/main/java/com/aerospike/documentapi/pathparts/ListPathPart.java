@@ -52,7 +52,7 @@ public class ListPathPart extends PathPart {
 
     @Override
     public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) {
-        return ListOperation.insert(binName, listPosition, Value.get(object), contexts);
+        return ListOperation.set(binName, listPosition, Value.get(object), contexts);
     }
 
     @Override
