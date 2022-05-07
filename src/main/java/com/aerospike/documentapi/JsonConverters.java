@@ -8,13 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class JsonConverters {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Given a serialized json object, return it's equivalent representation as a JsonNode.
+     * Given a serialized json object, return its equivalent representation as a JsonNode.
      *
      * @param jsonString A given JSON as a String.
      * @return The given JSON as a JsonNode.
@@ -25,18 +26,18 @@ public class JsonConverters {
     }
 
     /**
-     * Given a serialized JsonNode, return it's equivalent representation as a Java map.
+     * Given a serialized JsonNode, return its equivalent representation as a Java map.
      *
      * @param jsonNode A given JSON as a JsonNode.
      * @return The given JSON as a Java Map.
      */
     public static Map<String, Object> convertJsonNodeToMap(JsonNode jsonNode) {
-        return mapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {
+        return mapper.convertValue(jsonNode, new TypeReference<TreeMap<String, Object>>() {
         });
     }
 
     /**
-     * Given a serialized JsonNode, return it's equivalent representation as a Java list.
+     * Given a serialized JsonNode, return its equivalent representation as a Java list.
      *
      * @param jsonNode A given JSON as a JsonNode.
      * @return The given JSON as a Java List.
