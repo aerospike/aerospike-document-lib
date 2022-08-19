@@ -30,7 +30,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public Object get(Policy readPolicy, Key documentKey, String documentBinName, JsonPathObject jsonPathObject)
             throws DocumentApiException {
         // If there are no parts, retrieve the full document
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             Record record = client.get(readPolicy, documentKey);
 
             if (record != null) {
@@ -64,7 +64,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                                    JsonPathObject jsonPathObject) throws DocumentApiException {
         Map<String, Object> results = new HashMap<>();
         // If there are no parts, retrieve the full document
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             Record record = client.get(readPolicy, documentKey);
 
             if (record != null) {
@@ -91,9 +91,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             }
 
             if (r != null) {
-                for (Map.Entry<String, Object> entry : r.bins.entrySet()) {
-                    results.put(entry.getKey(), entry.getValue());
-                }
+                results.putAll(r.bins);
             }
         }
         return results;
@@ -108,7 +106,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, Object jsonObject,
                     JsonPathObject jsonPathObject) throws DocumentApiException {
         // If there are no parts, put the full document
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             client.put(writePolicy, documentKey, new Bin(documentBinName, jsonObject));
         } else { // else put using contexts
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -130,7 +128,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                     JsonPathObject jsonPathObject) throws DocumentApiException {
         Operation[] operations;
         // If there are no parts, put the full document
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             operations = documentBinNames.stream()
                     .map(bn -> {
                         Bin bin = new Bin(bn, jsonObject);
@@ -160,7 +158,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                     JsonPathObject jsonPathObject) throws DocumentApiException {
         Operation[] operations;
         // If there are no parts, put the full document
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             operations = queryResults.entrySet().stream()
                     .map(e -> {
                         Bin bin = new Bin(e.getKey(), e.getValue());
@@ -189,7 +187,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void append(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, Object jsonObject,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             throw new JsonPathParser.ListException(jsonPath);
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -210,7 +208,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void append(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath,
                        Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             throw new JsonPathParser.ListException(jsonPath);
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -233,7 +231,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void append(WritePolicy writePolicy, Key documentKey, Map<String, Object> queryResults, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             throw new JsonPathParser.ListException(jsonPath);
         } else {
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -256,7 +254,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, put an empty map in the given bin
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             Map<String, Object> emptyMap = new HashMap<>();
             client.put(writePolicy, documentKey, new Bin(documentBinName, emptyMap));
         } else {
@@ -278,7 +276,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, put an empty map in each given bin
-        if (jsonPathObject.getPathParts().size() == 0) {
+        if (jsonPathObject.getPathParts().isEmpty()) {
             Operation[] operations = documentBinNames.stream()
                     .map(MapOperation::clear)
                     .toArray(Operation[]::new);
