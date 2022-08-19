@@ -31,6 +31,7 @@ public class BaseTestConfig {
     public static String storeJson;
     public static String tommyLeeJonesJson;
     public static String topLevelArrayTypeJson;
+    public static String cdtJson;
 
     @BeforeAll
     public static void setupClass() throws IOException {
@@ -52,5 +53,6 @@ public class BaseTestConfig {
         storeJson = DebugUtils.readJSONFromAFile("src/test/resources/store.json");
         tommyLeeJonesJson = DebugUtils.readJSONFromAFile("src/test/resources/tommy-lee-jones.json");
         topLevelArrayTypeJson = DebugUtils.readJSONFromAFile("src/test/resources/topLevelArrayType.json");
+        cdtJson = DebugUtils.readJSONFromAFile("src/test/resources/cdt.json");
     }
 }

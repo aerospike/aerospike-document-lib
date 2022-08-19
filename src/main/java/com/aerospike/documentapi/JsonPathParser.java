@@ -1,11 +1,14 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.cdt.*;
-import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.client.cdt.CTX;
 import com.aerospike.documentapi.pathparts.ListPathPart;
 import com.aerospike.documentapi.pathparts.MapPathPart;
+import com.aerospike.documentapi.pathparts.PathPart;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,12 +25,44 @@ public class JsonPathParser {
     // This pattern to extract index1,index2 ...
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
 
-    private final List<String> jsonPathQueryIndications = new ArrayList<>(Arrays.asList("[*]", "..", "[?"));
+    private final List<String> jsonPathQueryIndications = Arrays.asList(
+            "[*]",
+            "..",
+            "[?",
+            ".min()",
+            ".max()",
+            ".avg()",
+            ".stddev()",
+            ".length()"
+    );
 
     // Store our representation of the individual path parts
     JsonPathObject jsonPathObject = new JsonPathObject();
 
     JsonPathParser() {
+    }
+
+    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
+        return pathParts.get(pathParts.size() - 1);
+    }
+
+    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
+        return pathParts.remove(pathParts.size() - 1);
+    }
+
+    /**
+     * Given a list of path parts, convert this to the list of contexts you would need
+     * to retrieve the JSON path represented by the list of path parts
+     *
+     * @param pathParts pathParts list to convert.
+     * @return An array of contexts (CTXs).
+     */
+    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
+        List<CTX> contextList = new ArrayList<>();
+        for (PathPart pathPart : pathParts) {
+            contextList.add(pathPart.toAerospikeContext());
+        }
+        return contextList.toArray(new CTX[contextList.size()]);
     }
 
     /**
@@ -56,7 +91,8 @@ public class JsonPathParser {
 
                 For example:
                 $.store.book[*].author
-                store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results from Aerospike (key = book, value = nested Json).
+                store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results
+                from Aerospike (key = book, value = nested Json).
             */
             jsonPathObject.setRequiresJsonPathQuery(true);
             String aerospikePathPartsString = jsonString.substring(0, index);
@@ -103,29 +139,6 @@ public class JsonPathParser {
         }
     }
 
-    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
-        return pathParts.get(pathParts.size() - 1);
-    }
-
-    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
-        return pathParts.remove(pathParts.size() - 1);
-    }
-
-    /**
-     * Given a list of path parts, convert this to the list of contexts you would need
-     * to retrieve the JSON path represented by the list of path parts
-     *
-     * @param pathParts pathParts list to convert.
-     * @return An array of contexts (CTXs).
-     */
-    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
-        List<CTX> contextList = new Vector<>();
-        for (PathPart pathPart : pathParts) {
-            contextList.add(pathPart.toAerospikeContext());
-        }
-        return contextList.toArray(new CTX[contextList.size()]);
-    }
-
     private Integer getFirstIndexOfAQueryIndication(String jsonPath) {
         return jsonPathQueryIndications.stream()
                 .map(jsonPath::indexOf)
@@ -137,8 +150,8 @@ public class JsonPathParser {
     /**
      * Different types of json path exception
      */
-    public static abstract class JsonParseException extends Exception {
-        String jsonString;
+    public abstract static class JsonParseException extends Exception {
+        final String jsonString;
 
         JsonParseException(String s) {
             jsonString = s;
@@ -150,6 +163,7 @@ public class JsonPathParser {
             super(s);
         }
 
+        @Override
         public String toString() {
             return jsonString + " should start with a $";
         }
@@ -160,6 +174,7 @@ public class JsonPathParser {
             super(s);
         }
 
+        @Override
         public String toString() {
             return jsonString + " does not match key[number] format";
         }
@@ -170,6 +185,7 @@ public class JsonPathParser {
             super(s);
         }
 
+        @Override
         public String toString() {
             return "You can't append to a document root";
         }
