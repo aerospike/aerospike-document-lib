@@ -1,11 +1,14 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.cdt.*;
-import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.client.cdt.CTX;
 import com.aerospike.documentapi.pathparts.ListPathPart;
 import com.aerospike.documentapi.pathparts.MapPathPart;
+import com.aerospike.documentapi.pathparts.PathPart;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +25,16 @@ public class JsonPathParser {
     // This pattern to extract index1,index2 ...
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
 
-    private final List<String> jsonPathQueryIndications = new ArrayList<>(Arrays.asList("[*]", "..", "[?"));
+    private final List<String> jsonPathQueryIndications = Arrays.asList(
+            "[*]",
+            "..",
+            "[?",
+            ".min()",
+            ".max()",
+            ".avg()",
+            ".stddev()",
+            ".length()"
+    );
 
     // Store our representation of the individual path parts
     JsonPathObject jsonPathObject = new JsonPathObject();
