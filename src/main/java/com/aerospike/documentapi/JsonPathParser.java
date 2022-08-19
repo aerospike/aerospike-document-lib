@@ -1,11 +1,14 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.cdt.*;
-import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.client.cdt.CTX;
 import com.aerospike.documentapi.pathparts.ListPathPart;
 import com.aerospike.documentapi.pathparts.MapPathPart;
+import com.aerospike.documentapi.pathparts.PathPart;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +59,8 @@ public class JsonPathParser {
 
                 For example:
                 $.store.book[*].author
-                store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results from Aerospike (key = book, value = nested Json).
+                store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results
+                from Aerospike (key = book, value = nested Json).
             */
             jsonPathObject.setRequiresJsonPathQuery(true);
             String aerospikePathPartsString = jsonString.substring(0, index);
@@ -119,7 +123,7 @@ public class JsonPathParser {
      * @return An array of contexts (CTXs).
      */
     public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
-        List<CTX> contextList = new Vector<>();
+        List<CTX> contextList = new ArrayList<>();
         for (PathPart pathPart : pathParts) {
             contextList.add(pathPart.toAerospikeContext());
         }
@@ -137,8 +141,8 @@ public class JsonPathParser {
     /**
      * Different types of json path exception
      */
-    public static abstract class JsonParseException extends Exception {
-        String jsonString;
+    public abstract static class JsonParseException extends Exception {
+        final String jsonString;
 
         JsonParseException(String s) {
             jsonString = s;
@@ -150,6 +154,7 @@ public class JsonPathParser {
             super(s);
         }
 
+        @Override
         public String toString() {
             return jsonString + " should start with a $";
         }
@@ -160,6 +165,7 @@ public class JsonPathParser {
             super(s);
         }
 
+        @Override
         public String toString() {
             return jsonString + " does not match key[number] format";
         }
@@ -170,6 +176,7 @@ public class JsonPathParser {
             super(s);
         }
 
+        @Override
         public String toString() {
             return "You can't append to a document root";
         }
