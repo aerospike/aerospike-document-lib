@@ -25,12 +25,44 @@ public class JsonPathParser {
     // This pattern to extract index1,index2 ...
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
 
-    private final List<String> jsonPathQueryIndications = new ArrayList<>(Arrays.asList("[*]", "..", "[?"));
+    private final List<String> jsonPathQueryIndications = Arrays.asList(
+            "[*]",
+            "..",
+            "[?",
+            ".min()",
+            ".max()",
+            ".avg()",
+            ".stddev()",
+            ".length()"
+    );
 
     // Store our representation of the individual path parts
     JsonPathObject jsonPathObject = new JsonPathObject();
 
     JsonPathParser() {
+    }
+
+    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
+        return pathParts.get(pathParts.size() - 1);
+    }
+
+    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
+        return pathParts.remove(pathParts.size() - 1);
+    }
+
+    /**
+     * Given a list of path parts, convert this to the list of contexts you would need
+     * to retrieve the JSON path represented by the list of path parts
+     *
+     * @param pathParts pathParts list to convert.
+     * @return An array of contexts (CTXs).
+     */
+    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
+        List<CTX> contextList = new ArrayList<>();
+        for (PathPart pathPart : pathParts) {
+            contextList.add(pathPart.toAerospikeContext());
+        }
+        return contextList.toArray(new CTX[contextList.size()]);
     }
 
     /**
@@ -105,29 +137,6 @@ public class JsonPathParser {
         } else {
             throw new JsonPathException(pathPart);
         }
-    }
-
-    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
-        return pathParts.get(pathParts.size() - 1);
-    }
-
-    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
-        return pathParts.remove(pathParts.size() - 1);
-    }
-
-    /**
-     * Given a list of path parts, convert this to the list of contexts you would need
-     * to retrieve the JSON path represented by the list of path parts
-     *
-     * @param pathParts pathParts list to convert.
-     * @return An array of contexts (CTXs).
-     */
-    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
-        List<CTX> contextList = new ArrayList<>();
-        for (PathPart pathPart : pathParts) {
-            contextList.add(pathPart.toAerospikeContext());
-        }
-        return contextList.toArray(new CTX[contextList.size()]);
     }
 
     private Integer getFirstIndexOfAQueryIndication(String jsonPath) {
