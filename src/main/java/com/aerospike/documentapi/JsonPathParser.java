@@ -5,10 +5,6 @@ import com.aerospike.documentapi.pathparts.ListPathPart;
 import com.aerospike.documentapi.pathparts.MapPathPart;
 import com.aerospike.documentapi.pathparts.PathPart;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +40,29 @@ public class JsonPathParser {
     JsonPathObject jsonPathObject = new JsonPathObject();
 
     JsonPathParser() {
+    }
+
+    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
+        return pathParts.get(pathParts.size() - 1);
+    }
+
+    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
+        return pathParts.remove(pathParts.size() - 1);
+    }
+
+    /**
+     * Given a list of path parts, convert this to the list of contexts you would need
+     * to retrieve the JSON path represented by the list of path parts
+     *
+     * @param pathParts pathParts list to convert.
+     * @return An array of contexts (CTXs).
+     */
+    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
+        List<CTX> contextList = new ArrayList<>();
+        for (PathPart pathPart : pathParts) {
+            contextList.add(pathPart.toAerospikeContext());
+        }
+        return contextList.toArray(new CTX[contextList.size()]);
     }
 
     /**
@@ -118,29 +137,6 @@ public class JsonPathParser {
         } else {
             throw new JsonPathException(pathPart);
         }
-    }
-
-    public static PathPart extractLastPathPart(List<PathPart> pathParts) {
-        return pathParts.get(pathParts.size() - 1);
-    }
-
-    public static PathPart extractLastPathPartAndModifyList(List<PathPart> pathParts) {
-        return pathParts.remove(pathParts.size() - 1);
-    }
-
-    /**
-     * Given a list of path parts, convert this to the list of contexts you would need
-     * to retrieve the JSON path represented by the list of path parts
-     *
-     * @param pathParts pathParts list to convert.
-     * @return An array of contexts (CTXs).
-     */
-    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
-        List<CTX> contextList = new ArrayList<>();
-        for (PathPart pathPart : pathParts) {
-            contextList.add(pathPart.toAerospikeContext());
-        }
-        return contextList.toArray(new CTX[contextList.size()]);
     }
 
     private Integer getFirstIndexOfAQueryIndication(String jsonPath) {
