@@ -87,7 +87,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
             Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinName, jsonPathObject);
-            Object queryResult = JsonPathQuery.set(jsonPathObject, result, jsonObject);
+            Object queryResult = JsonPathQuery.putOrSet(jsonPathObject, result, jsonObject);
             aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, queryResult, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, jsonObject, jsonPathObject);
@@ -109,7 +109,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
             Map<String, Object> queryResults = new HashMap<>();
             for (String binName : result.keySet()) {
-                queryResults.put(binName, JsonPathQuery.set(jsonPathObject, result.get(binName), jsonObject));
+                queryResults.put(binName, JsonPathQuery.putOrSet(jsonPathObject, result.get(binName), jsonObject));
             }
             aerospikeDocumentRepository.put(writePolicy, documentKey, queryResults, originalJsonPathObject);
         } else {

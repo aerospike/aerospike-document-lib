@@ -17,7 +17,7 @@ public class JsonPathQuery {
         return JsonPath.read(resultJson, jsonPath);
     }
 
-    public static Object set(JsonPathObject jsonPathObject, Object object, Object value) throws JsonProcessingException {
+    public static Object putOrSet(JsonPathObject jsonPathObject, Object object, Object value) throws JsonProcessingException {
         String resultJson = JsonConverters.convertObjectToJsonString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
