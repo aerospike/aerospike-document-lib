@@ -1,21 +1,39 @@
 package com.aerospike.documentapi.JsonPathQueryTests;
 
-import com.aerospike.documentapi.*;
+import com.aerospike.documentapi.AerospikeDocumentClient;
+import com.aerospike.documentapi.BaseTestConfig;
+import com.aerospike.documentapi.JsonConverters;
+import com.aerospike.documentapi.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JsonPathFilterTests extends BaseTestConfig {
+class JsonPathFilterTests extends BaseTestConfig {
+
+    @BeforeEach
+    void setUp() throws IOException {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, "$");
+    }
 
     @Test
-    public void testFilters() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
-        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
+    void testFilters() throws Exception {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
 
         String jsonPath;
         Object objectFromDB;
@@ -44,5 +62,29 @@ public class JsonPathFilterTests extends BaseTestConfig {
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
+    }
+
+    @Test
+    void testPutNonExistingKey() throws Exception {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        String conditionValue = "new";
+        String jsonPath = "$.store.book[?(@.title==\"The Lord of the Rings\")].condition";
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, conditionValue);
+
+        JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        assertArrayEquals(new String[]{conditionValue}, result.toArray());
+    }
+
+    @Test
+    void testPutExistingKey() throws Exception {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        String isbnValue = "0-111-22222-3";
+        String jsonPath = "$.store.book[?(@.title==\"The Lord of the Rings\")].isbn";
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, isbnValue);
+
+        JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        assertArrayEquals(new String[]{isbnValue}, result.toArray());
     }
 }
