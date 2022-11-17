@@ -1,22 +1,17 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.AerospikeException;
-import com.aerospike.client.Bin;
-import com.aerospike.client.IAerospikeClient;
-import com.aerospike.client.Key;
-import com.aerospike.client.Operation;
+import com.aerospike.client.*;
 import com.aerospike.client.Record;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOperation;
+import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.documentapi.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
 
@@ -31,7 +26,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             throws DocumentApiException {
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
-            Record record = client.get(readPolicy, documentKey);
+            Record record = client.get(readPolicy, documentKey, documentBinName);
 
             if (record != null) {
                 return record.getValue(documentBinName);
@@ -65,7 +60,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         Map<String, Object> results = new HashMap<>();
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
-            Record record = client.get(readPolicy, documentKey);
+            Record record = client.get(readPolicy, documentKey, documentBinNames.toArray(new String[0]));
 
             if (record != null) {
                 for (String binName : documentBinNames) {
@@ -251,18 +246,18 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath,
+    public void delete(WritePolicy writePolicy, Key documentKey, String documentBinName,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, put an empty map in the given bin
         if (jsonPathObject.getPathParts().isEmpty()) {
             Map<String, Object> emptyMap = new HashMap<>();
             client.put(writePolicy, documentKey, new Bin(documentBinName, emptyMap));
         } else {
-            List<PathPart> pathPart = jsonPathObject.getPathParts();
+            List<PathPart> pathParts = jsonPathObject.getPathParts();
             // We need to treat the last part of the path differently
-            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
+            PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathParts);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathParts);
             try {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeDeleteOperation(documentBinName, ctxArray));
@@ -273,7 +268,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath,
+    public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames,
                        JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().isEmpty()) {
@@ -295,6 +290,15 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
+        }
+    }
+
+    @Override
+    public boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords) throws DocumentApiException {
+        try {
+            return client.operate(batchPolicy, batchRecords);
+        } catch (AerospikeException e) {
+            throw new DocumentApiException(e);
         }
     }
 }

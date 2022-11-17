@@ -1,15 +1,19 @@
 package com.aerospike.documentapi;
 
+import com.aerospike.client.BatchRecord;
+import com.aerospike.client.Key;
+import com.aerospike.documentapi.batch.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DocumentAPITest extends BaseTestConfig {
 
@@ -244,6 +248,15 @@ public class DocumentAPITest extends BaseTestConfig {
      * Treating a map as if it were a list
      * Treating a list as if it were a map
      */
+
+    /**
+     * Check correct response to erroneous access
+     * <p>
+     * Putting a key into a map that doesn't exist
+     * Putting a value into a list that doesn't exist
+     * Treating a map as if it were a list
+     * Treating a list as if it were a map
+     */
     @Test
     public void testNegativePut() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
@@ -318,7 +331,8 @@ public class DocumentAPITest extends BaseTestConfig {
         // Appending to an array referenced by a key
         jsonPath = "$.example1.key01";
         putValue = 83;
-        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
+//        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
+        documentClient.append(TEST_AEROSPIKE_KEY, Collections.singletonList(documentBinName), jsonPath, putValue);
         appendedList = ((List<?>) documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), putValue));

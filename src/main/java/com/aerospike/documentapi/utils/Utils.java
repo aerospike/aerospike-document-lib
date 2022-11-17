@@ -1,6 +1,7 @@
-package com.aerospike.documentapi;
+package com.aerospike.documentapi.utils;
 
 import com.aerospike.client.Bin;
+import com.aerospike.documentapi.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class Utils {
