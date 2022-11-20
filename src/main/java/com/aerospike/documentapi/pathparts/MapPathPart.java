@@ -52,7 +52,10 @@ public class MapPathPart extends PathPart {
     }
 
     @Override
-    public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) {
+    public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
+        if (object.getClass().isArray()) {
+            throw new IllegalArgumentException("The given object is not of type " + getType());
+        }
         return MapOperation.put(new MapPolicy(), binName, Value.get(key), Value.get(object), contexts);
     }
 

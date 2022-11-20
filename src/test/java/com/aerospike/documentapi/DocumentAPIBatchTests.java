@@ -195,6 +195,40 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     @Test
+    public void testNegativeBatchPutArray() throws IOException, DocumentApiException {
+        // Set up the test document
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // putting a new key into an existing map
+        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
+        // putting a new value into an existing array
+        inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
+
+        List<BatchOperation> batchOpsList;
+        // putting an array
+        int[] putValue = {70};
+
+        // adding similar document bins with different jsonPath strings
+        batchOpsList = createBatchOperations(
+                documentClient,
+                jsonNode,
+                inputsList,
+                putValue,
+                null,
+                false
+        );
+
+        documentClient.batchPerform(batchOpsList);
+
+        // making sure all records contain the resulting record == null and the necessary resulting code
+        // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4
+        batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
+                || batchOp.getBatchRecord().resultCode == -2));
+    }
+
+    @Test
     public void testPositiveBatchAppend() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
@@ -266,6 +300,40 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         Integer[] errorCodes = {4, 12, 26};
         batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
+    }
+
+    @Test
+    public void testNegativeBatchAppendArray() throws IOException, DocumentApiException {
+        // Set up the test document
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // appending to an array referenced by a key
+        inputsList.add(new BatchOperationInput("$.example1.key01", APPEND));
+        // appending to an array referenced by an index
+        inputsList.add(new BatchOperationInput("$.example4.key19[3]", APPEND));
+
+        List<BatchOperation> batchOpsList;
+        // appending an array
+        String[] appendValue = {"70"};
+
+        // adding similar document bins with different jsonPath strings
+        batchOpsList = createBatchOperations(
+                documentClient,
+                jsonNode,
+                inputsList,
+                null,
+                appendValue,
+                false
+        );
+
+        documentClient.batchPerform(batchOpsList);
+
+        // making sure all records contain the resulting record == null and the necessary resulting code
+        // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4
+        batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
+                || batchOp.getBatchRecord().resultCode == -2));
     }
 
     @Test
@@ -564,7 +632,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // reading a map, 1 step
         inputsList.add(new BatchOperationInput("$.example1", GET));
         // putting a value to the existing "key03" in all elements, 2 steps
-//        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
+        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
         // reading previously set "key03", 1 step
         inputsList.add(new BatchOperationInput("$.example2[*].key03", GET));
         // appending a value to the end of "key03" array for every element, 1 step

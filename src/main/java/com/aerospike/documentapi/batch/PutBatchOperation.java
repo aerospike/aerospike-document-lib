@@ -9,6 +9,7 @@ import com.jayway.jsonpath.JsonPathException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PutBatchOperation extends AbstractBatchOperation {
 
@@ -55,14 +56,14 @@ public class PutBatchOperation extends AbstractBatchOperation {
                 // using the original object as the initially parsed one has already been changed within the 1st step
                 final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts());
                 batchOps = firstStepQueryResults().entrySet().stream()
-                        .map(entry -> pathDetails.getFinalPathPart()
-                                .toAerospikePutOperation(entry.getKey(), entry.getValue(), pathDetails.getCtxArray()))
+                        .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
+                        .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
                 final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts());
                 batchOps = binNames.stream()
-                        .map(binName -> pathDetails.getFinalPathPart()
-                                .toAerospikePutOperation(binName, objToPut, pathDetails.getCtxArray()))
+                        .map(binName -> toPutOperation(binName, objToPut, pathDetails))
+                        .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             }
         }
@@ -70,7 +71,7 @@ public class PutBatchOperation extends AbstractBatchOperation {
         if (batchOps.length > 0) {
             batchRecord = new BatchWrite(key, batchOps);
         } else {
-            batchRecord = getErrorBatchRecord();
+            batchRecord = getErrorBatchWriteRecord();
         }
 
         return batchRecord;

@@ -72,7 +72,17 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         return null; // is implemented by some child classes
     }
 
-    protected BatchRecord getErrorBatchRecord() {
+    protected Operation toPutOperation(String binName, Object objToPut, PathDetails pathDetails) {
+        try {
+            return pathDetails.getFinalPathPart()
+                    .toAerospikePutOperation(binName, objToPut, pathDetails.getCtxArray());
+        } catch (IllegalArgumentException e) {
+            errorBinName = binName;
+            return null;
+        }
+    }
+
+    protected BatchRecord getErrorBatchWriteRecord() {
         // empty first step query results will cause AerospikeException for the whole batch
         // from the client as it tries to perform an empty write operation
         Map<String, Object> bins = new HashMap<>();
@@ -84,7 +94,12 @@ public abstract class AbstractBatchOperation implements BatchOperation {
             binNames.forEach(binName -> bins.put(binName, originalJsonPathObject));
         }
 
-        Record record = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
+        Record record;
+        if (batchRecord != null && batchRecord.record != null) {
+            record = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
+        } else {
+            record = new Record(bins, 0, 0);
+        }
 
         return new BatchRecord(key, record, -2, false, true);
     }

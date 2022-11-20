@@ -13,9 +13,12 @@ public abstract class PathPart {
 
     public abstract Operation toAerospikeGetOperation(String binName, CTX[] contexts);
 
-    public abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts);
+    public abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException;
 
-    public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) {
+    public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
+        if (object.getClass().isArray()) {
+            throw new IllegalArgumentException("Unable to append an array");
+        }
         return ListOperation.append(binName, Value.get(object), contexts);
     }
 

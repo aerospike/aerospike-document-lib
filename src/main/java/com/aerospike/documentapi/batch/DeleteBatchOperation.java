@@ -67,7 +67,7 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
         if (batchOps.length > 0) {
             batchRecord = new BatchWrite(key, batchOps);
         } else {
-            batchRecord = getErrorBatchRecord();
+            batchRecord = getErrorBatchWriteRecord();
         }
 
         return batchRecord;

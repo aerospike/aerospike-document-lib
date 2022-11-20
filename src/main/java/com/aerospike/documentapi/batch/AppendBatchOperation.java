@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class AppendBatchOperation extends AbstractBatchOperation {
 
@@ -72,14 +73,14 @@ public class AppendBatchOperation extends AbstractBatchOperation {
                 // using the original object as the initially parsed one has already been changed within the 1st step
                 final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts());
                 batchOps = firstStepQueryResults().entrySet().stream()
-                        .map(entry -> pathDetails.getFinalPathPart()
-                                .toAerospikePutOperation(entry.getKey(), entry.getValue(), pathDetails.getCtxArray()))
+                        .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
+                        .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
                 final PathDetails pathDetails = getPathDetailsForAppend(jsonPathObject.getPathParts()); // needs to be treated without modifying
                 batchOps = binNames.stream()
-                        .map(binName -> pathDetails.getFinalPathPart()
-                                .toAerospikeAppendOperation(binName, objToAppend, pathDetails.getCtxArray()))
+                        .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
+                        .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
 
             }
@@ -88,9 +89,19 @@ public class AppendBatchOperation extends AbstractBatchOperation {
         if (batchOps.length > 0) {
             batchRecord = new BatchWrite(key, batchOps);
         } else {
-            batchRecord = getErrorBatchRecord();
+            batchRecord = getErrorBatchWriteRecord();
         }
 
         return batchRecord;
+    }
+
+    protected Operation toAppendOperation(String binName, Object objToAppend, PathDetails pathDetails) {
+        try {
+            return pathDetails.getFinalPathPart()
+                    .toAerospikeAppendOperation(binName, objToAppend, pathDetails.getCtxArray());
+        } catch (IllegalArgumentException e) {
+            errorBinName = binName;
+            return null;
+        }
     }
 }
