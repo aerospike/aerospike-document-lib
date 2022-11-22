@@ -34,7 +34,7 @@ public class JsonPathQuery {
                 return JsonPath.parse(resultJson).add(arrPath, value).json();
             }
         }
-        // if jsonPath does not exist in json, and it leads to a map
+        // if jsonPath does not exist in json, and it leads to a map element
         String key = jsonPath.substring(jsonPath.lastIndexOf(".") + 1);
         jsonPath = jsonPath.substring(0, jsonPath.lastIndexOf("."));
         return JsonPath.parse(resultJson).put(jsonPath, key, value).json();
