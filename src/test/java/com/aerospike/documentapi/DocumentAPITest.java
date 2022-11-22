@@ -340,8 +340,7 @@ public class DocumentAPITest extends BaseTestConfig {
         // Appending to an array referenced by a key
         jsonPath = "$.example1.key01";
         putValue = 83;
-//        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
-        documentClient.append(TEST_AEROSPIKE_KEY, Collections.singletonList(documentBinName), jsonPath, putValue);
+        documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
         appendedList = ((List<?>) documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath));
         // Check that the last element in the list we appended to is the value we added
         assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), putValue));
