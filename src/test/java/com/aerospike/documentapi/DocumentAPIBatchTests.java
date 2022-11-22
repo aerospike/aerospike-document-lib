@@ -13,6 +13,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.JSONArray;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.DELETE;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.PUT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DocumentAPIBatchTests extends BaseTestConfig {
@@ -133,6 +135,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
         // putting a new value into an existing array
         inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
+        // putting to the existing position
+        inputsList.add(new BatchOperationInput("$.example2[*].key01[3]", PUT));
+        // putting to a new position
+        inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
+        // putting to a new position in a more complex structure
+        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
+        // putting to a new key
+        inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
+        // putting to a new position of the new key
 
         List<BatchOperation> batchOpsList;
         int putValue = 70;
@@ -153,7 +164,14 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         for (BatchOperation batchOp : batchOpsList) {
             Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
             // Check that the last element in the list we appended to is the value we added
-            assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
+
+            assertNotNull(objFromDb);
+
+            if (objFromDb instanceof JSONArray && !((JSONArray) objFromDb).isEmpty()) {
+                assertTrue(TestJsonConverters.jsonEquals(((JSONArray) objFromDb).iterator().next(), putValue));
+            } else {
+                assertTrue(TestJsonConverters.jsonEquals(objFromDb, putValue));
+            }
         }
     }
 

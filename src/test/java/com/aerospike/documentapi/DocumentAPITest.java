@@ -37,7 +37,7 @@ public class DocumentAPITest extends BaseTestConfig {
      * .key1.key2[i][j]
      */
     @Test
-    public void testPositivePathRetrievalMap() throws IOException,
+    public void testPositivePathRetrieval() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
@@ -309,7 +309,7 @@ public class DocumentAPITest extends BaseTestConfig {
         }
 
         jsonPath = "$.example1.key01[3]";
-        int [] putValue2 = {79};
+        int[] putValue2 = {79};
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue2);
             fail("IllegalArgumentException should have been thrown");
@@ -407,7 +407,7 @@ public class DocumentAPITest extends BaseTestConfig {
 
         // Appending an array
         jsonPath = "$.example1.key01";
-        int [] putValue2 = {79};
+        int[] putValue2 = {79};
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue2);
             fail("IllegalArgumentException should have been thrown");
