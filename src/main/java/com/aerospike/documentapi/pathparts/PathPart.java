@@ -17,7 +17,7 @@ public abstract class PathPart {
 
     public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
         if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("Unable to append an array");
+            throw new IllegalArgumentException("Unable to append an array, expecting a list or a map");
         }
         return ListOperation.append(binName, Value.get(object), contexts);
     }
