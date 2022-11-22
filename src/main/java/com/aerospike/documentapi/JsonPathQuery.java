@@ -29,10 +29,12 @@ public class JsonPathQuery {
                 return JsonPath.parse(resultJson).set(jsonPath, value).json();
             } catch (PathNotFoundException e) {
                 // adding the object if it does not exist
+                // add() requires path to an array, so the path to a particular element is omitted
                 String arrPath = jsonPath.substring(0, jsonPath.lastIndexOf('['));
                 return JsonPath.parse(resultJson).add(arrPath, value).json();
             }
         }
+        // if the object does not exist in json, and it is a map
         String key = jsonPath.substring(jsonPath.lastIndexOf(".") + 1);
         jsonPath = jsonPath.substring(0, jsonPath.lastIndexOf("."));
         return JsonPath.parse(resultJson).put(jsonPath, key, value).json();
