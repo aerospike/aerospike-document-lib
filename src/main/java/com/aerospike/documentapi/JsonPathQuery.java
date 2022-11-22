@@ -23,7 +23,7 @@ public class JsonPathQuery {
         String resultJson = JsonConverters.convertObjectToJsonString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
-        // if the object exists in json or if it is an array element
+        // if jsonPath exists or if it leads to an array element
         if (!keys.isEmpty() || jsonPath.charAt(jsonPath.length() - 1) == ']') {
             try {
                 return JsonPath.parse(resultJson).set(jsonPath, value).json();
@@ -34,7 +34,7 @@ public class JsonPathQuery {
                 return JsonPath.parse(resultJson).add(arrPath, value).json();
             }
         }
-        // if the object does not exist in json, and it is a map
+        // if jsonPath does not exist in json, and it leads to a map
         String key = jsonPath.substring(jsonPath.lastIndexOf(".") + 1);
         jsonPath = jsonPath.substring(0, jsonPath.lastIndexOf("."));
         return JsonPath.parse(resultJson).put(jsonPath, key, value).json();
