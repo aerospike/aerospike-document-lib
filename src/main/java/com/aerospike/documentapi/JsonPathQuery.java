@@ -25,19 +25,27 @@ public class JsonPathQuery {
         JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
         // if jsonPath exists or if it leads to an array element
         if (!keys.isEmpty() || jsonPath.charAt(jsonPath.length() - 1) == ']') {
-            try {
-                return JsonPath.parse(resultJson).set(jsonPath, value).json();
-            } catch (PathNotFoundException e) {
-                // adding the path because it does not exist
-                // add() requires path to an array, so the path to a particular element is omitted
-                String arrPath = jsonPath.substring(0, jsonPath.lastIndexOf('['));
-                return JsonPath.parse(resultJson).add(arrPath, value).json();
-            }
+            return setOrAdd(resultJson, jsonPath, value);
         }
         // if jsonPath does not exist in json, and it leads to a map element
+            return put(resultJson, jsonPath, value);
+    }
+
+    private static Object put(String resultJson, String jsonPath, Object value) {
         String key = jsonPath.substring(jsonPath.lastIndexOf(".") + 1);
         jsonPath = jsonPath.substring(0, jsonPath.lastIndexOf("."));
         return JsonPath.parse(resultJson).put(jsonPath, key, value).json();
+    }
+
+    private static Object setOrAdd(String resultJson, String jsonPath, Object value) {
+        try {
+            return JsonPath.parse(resultJson).set(jsonPath, value).json();
+        } catch (PathNotFoundException e) {
+            // adding the path because it does not exist
+            // add() requires path to an array, so the path to a particular element is omitted
+            String arrPath = jsonPath.substring(0, jsonPath.lastIndexOf('['));
+            return JsonPath.parse(resultJson).add(arrPath, value).json();
+        }
     }
 
     public static Object append(JsonPathObject jsonPathObject, Object object, Object value) throws JsonProcessingException, JsonPathException {

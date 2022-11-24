@@ -132,15 +132,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // putting a new key into an existing map
-        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
+//        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
         // putting a new value into an existing array
-        inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
+//        inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
         // putting to the existing position
-        inputsList.add(new BatchOperationInput("$.example2[*].key01[3]", PUT));
+//        inputsList.add(new BatchOperationInput("$.example2[*].key01[3]", PUT));
         // putting to a new position
         inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
         // putting to a new position in a more complex structure
-        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
+//        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
         // putting to a new key
         inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
         // putting to a new position of the new key
