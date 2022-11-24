@@ -123,9 +123,10 @@ public interface IAerospikeDocumentClient {
     /**
      * Perform batch operations.
      *
-     * @param batchOperations A list of batch operations to apply.
+     * @param batchOperations A list of batch operations to apply
+     * @param isParallel Whether batch processing stream operations should run in parallel
      * @return The list of corresponding {@link BatchRecord} results.
      */
-    List<BatchRecord> batchPerform(List<BatchOperation> batchOperations)
+    List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean isParallel)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 }

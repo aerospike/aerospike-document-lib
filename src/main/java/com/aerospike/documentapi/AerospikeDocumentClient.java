@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Primary object for accessing and mutating documents.
@@ -178,11 +179,17 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
     }
 
-    @Override
     public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations) throws DocumentApiException {
+        return batchPerform(batchOperations, false);
+    }
 
+    @Override
+    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean isParallel) throws DocumentApiException {
         // collecting non-empty first step records
-        List<BatchRecord> firstStepRecords = batchOperations.stream().parallel()
+        Stream<BatchOperation> batchOpStream = batchOperations.stream();
+        if (isParallel) batchOpStream = batchOpStream.parallel();
+
+        List<BatchRecord> firstStepRecords = batchOpStream
                 .map(BatchOperation::getBatchRecord)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -193,7 +200,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting non-empty second step records without json parsing error
-        List<BatchRecord> secondStepRecords = batchOperations.stream().parallel()
+        List<BatchRecord> secondStepRecords = batchOpStream
                 .map(BatchOperation::setSecondStepRecordAndGet)
                 .filter(Objects::nonNull)
                 .filter(batchRec -> batchRec.resultCode != -2)
@@ -205,7 +212,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting resulting records
-        return batchOperations.stream()
+        return batchOpStream
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
     }
