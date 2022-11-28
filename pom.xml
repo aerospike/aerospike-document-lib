@@ -27,7 +27,7 @@
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
         <jackson-databind.version>2.13.3</jackson-databind.version>
-        <aerospike-client.version>6.1.1</aerospike-client.version>
+        <aerospike-client.version>6.1.4</aerospike-client.version>
         <junit-jupiter.version>5.9.0</junit-jupiter.version>
         <json-path.version>2.7.0</json-path.version>
     </properties>
@@ -125,7 +125,7 @@
                     <doctitle>Aerospike Document API</doctitle>
                     <show>public</show>
                     <splitindex>true</splitindex>
-                    <bottom>Copyright &#169; 2020&#x2013;{currentYear} Aerospike, Inc. All rights reserved.</bottom>
+                    <bottom>Copyright © 2020–{currentYear} Aerospike, Inc. All rights reserved.</bottom>
                     <sourcepath>${basedir}/src/main/java</sourcepath>
                     <source>1.8</source>
                 </configuration>
