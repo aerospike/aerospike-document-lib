@@ -651,14 +651,16 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         inputsList.add(new BatchOperationInput("$.example1", GET));
         // putting a value to the existing "key03" in all elements, 2 steps
         inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
-        // reading previously set "key03", 1 step
+        // reading previously put "key03", 1 step
         inputsList.add(new BatchOperationInput("$.example2[*].key03", GET));
         // appending a value to the end of "key03" array for every element, 1 step
+//        inputsList.add(new BatchOperationInput("$.example2[*].key03", APPEND));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
         String objToAppend = "87";
-        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
+//        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
+        String[] binNames = {"documentBin0"};
 
         List<BatchRecord> batchRecords;
         List<BatchOperation> batchOpsList;

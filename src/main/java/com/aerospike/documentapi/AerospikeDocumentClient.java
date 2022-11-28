@@ -200,6 +200,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting non-empty second step records without json parsing error
+        batchOpStream = batchOperations.stream();
+        if (isParallel) batchOpStream = batchOpStream.parallel();
         List<BatchRecord> secondStepRecords = batchOpStream
                 .map(BatchOperation::setSecondStepRecordAndGet)
                 .filter(Objects::nonNull)
@@ -212,6 +214,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting resulting records
+        batchOpStream = batchOperations.stream();
+        if (isParallel) batchOpStream = batchOpStream.parallel();
         return batchOpStream
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
