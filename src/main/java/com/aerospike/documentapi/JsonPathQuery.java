@@ -3,7 +3,6 @@ package com.aerospike.documentapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
-import com.jayway.jsonpath.PathNotFoundException;
 import net.minidev.json.JSONArray;
 
 public class JsonPathQuery {
