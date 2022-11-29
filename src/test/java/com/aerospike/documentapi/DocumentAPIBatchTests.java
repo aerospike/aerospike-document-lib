@@ -35,11 +35,19 @@ import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.DELETE;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.PUT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DocumentAPIBatchTests extends BaseTestConfig {
 
+    /**
+     * Check the correct document content retrieval in a batch of single step operations.
+     * <ul>
+     * <li>The whole document.</li>
+     * <li>First level element.</li>
+     * <li>An array element.</li>
+     * <li>A map element.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchGet() throws IOException, DocumentApiException {
         // Load the test document
@@ -54,7 +62,6 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         jsonPathsMap.put("$.example4.key10", ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key10"));
         Iterator<String> iterator = jsonPathsMap.keySet().iterator();
 
-        List<BatchRecord> batchRecords;
         List<BatchOperation> batchOpsList = new ArrayList<>();
 
         // adding similar document bins with different jsonPath strings
@@ -71,7 +78,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
             batchOpsList.add(batchOp);
         });
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
 
         int i = 0;
         for (Map.Entry<String, Object> entry : jsonPathsMap.entrySet()) {
@@ -81,6 +88,19 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check the correct response of retrieving document content in a batch
+     * of single step operations using incorrect path.
+     * <ul>
+     * <li>Non-existing key.</li>
+     * <li>Referencing a map as if it was a list.</li>
+     * <li>Referencing a primitive as if it was a map.</li>
+     * <li>Referencing a primitive as if it was a list.</li>
+     * <li>Referencing a non-existing list item.</li>
+     * <li>Referencing a non-existing map.</li>
+     * <li>Referencing a non-existing list.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchGet() throws IOException, DocumentApiException {
         // Load the test document
@@ -103,10 +123,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // referencing a non-existing list
         inputsList.add(new BatchOperationInput("$.example4.nosuchkey[1]", GET));
 
-        List<BatchOperation> batchOpsList;
-
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -124,6 +142,13 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
     }
 
+    /**
+     * Check a batch of single step PUT operations.
+     * <ul>
+     * <li>Putting a new key into an existing map.</li>
+     * <li>Putting a new value into an existing array.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchPut() throws IOException, DocumentApiException, JsonPathParser.JsonParseException {
         // Set up the test document
@@ -132,24 +157,14 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // putting a new key into an existing map
-//        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
+        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
         // putting a new value into an existing array
-//        inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
-        // putting to the existing position
-//        inputsList.add(new BatchOperationInput("$.example2[*].key01[3]", PUT));
-        // putting to a new position
-        inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
-        // putting to a new position in a more complex structure
-//        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
-        // putting to a new key
-        inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
-        // putting to a new position of the new key
+        inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
 
-        List<BatchOperation> batchOpsList;
         int putValue = 70;
 
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -162,19 +177,77 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         // Check the value put previously
         for (BatchOperation batchOp : batchOpsList) {
-            Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
-            // Check that the last element in the list we appended to is the value we added
+            Object objFromDb = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(),
+                    batchOp.getJsonPath());
+            // Check that the last element in the list we put to is the initial put value
+            assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
+        }
+    }
 
-            assertNotNull(objFromDb);
+    /**
+     * Check a batch of 2-step step PUT operations.
+     * <ul>
+     * <li>Putting to the existing position.</li>
+     * <li>Putting to a new position.</li>
+     * <li>Putting to a new position in a more complex structure.</li>
+     * <li>Putting to a new key.</li>
+     * </ul>
+     */
+    @Test
+    public void testPositiveBatchPutWildcard() throws IOException, DocumentApiException, JsonPathParser.JsonParseException {
+        // Set up the test document
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-            if (objFromDb instanceof JSONArray && !((JSONArray) objFromDb).isEmpty()) {
-                assertTrue(TestJsonConverters.jsonEquals(((JSONArray) objFromDb).iterator().next(), putValue));
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // putting to the existing position
+        inputsList.add(new BatchOperationInput("$.example2[*].key01[3]", PUT));
+        // putting to a new position
+        inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
+        // putting to a new position in a more complex structure
+        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
+        // putting to a new key
+        inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
+
+        int putValue = 70;
+
+        // adding similar document bins with different jsonPath strings
+        List<BatchOperation> batchOpsList = createBatchOperations(
+                documentClient,
+                jsonNode,
+                inputsList,
+                putValue,
+                null,
+                false
+        );
+
+        documentClient.batchPerform(batchOpsList);
+
+        // Check the value put previously
+        for (BatchOperation batchOp : batchOpsList) {
+            Object objFromDb = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(),
+                    batchOp.getJsonPath());
+            if (objFromDb instanceof JSONArray) {
+                for (Object res : (JSONArray) objFromDb) {
+                    assertTrue(res != null && TestJsonConverters.jsonEquals(res, putValue));
+                }
             } else {
-                assertTrue(TestJsonConverters.jsonEquals(objFromDb, putValue));
+                assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
             }
         }
     }
 
+    /**
+     * Check the response to a batch of single step PUT operations with incorrect path.
+     * <ul>
+     * <li>Putting a key into a map that doesn't exist.</li>
+     * <li>Putting to a list that doesn't exist.</li>
+     * <li>Treating a map as if it was a list.</li>
+     * <li>Treating a list as if it was a map.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchPut() throws IOException, DocumentApiException {
         // Set up the test document
@@ -191,11 +264,10 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // treating a list as if it was a map
         inputsList.add(new BatchOperationInput("$.example1[1]", PUT));
 
-        List<BatchOperation> batchOpsList;
         int putValue = 70;
 
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -212,40 +284,13 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 && (batchOp.getBatchRecord().resultCode == 26 || batchOp.getBatchRecord().resultCode == 4)));
     }
 
-    @Test
-    public void testNegativeBatchPutArray() throws IOException, DocumentApiException {
-        // Set up the test document
-        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
-        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-
-        List<BatchOperationInput> inputsList = new ArrayList<>();
-        // putting a new key into an existing map
-        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
-        // putting a new value into an existing array
-        inputsList.add(new BatchOperationInput("$.example1.key01[10]", PUT));
-
-        List<BatchOperation> batchOpsList;
-        // putting an array
-        int[] putValue = {70};
-
-        // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
-                documentClient,
-                jsonNode,
-                inputsList,
-                putValue,
-                null,
-                false
-        );
-
-        documentClient.batchPerform(batchOpsList);
-
-        // making sure all records contain the resulting record == null and the necessary resulting code
-        // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4
-        batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
-                || batchOp.getBatchRecord().resultCode == -2));
-    }
-
+    /**
+     * Check a batch of single step APPEND operations.
+     * <ul>
+     * <li>Appending to an array referenced by a key.</li>
+     * <li>Appending to an array referenced by an index.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchAppend() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
@@ -259,11 +304,10 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // appending to an array referenced by an index
         inputsList.add(new BatchOperationInput("$.example4.key19[3]", APPEND));
 
-        List<BatchOperation> batchOpsList;
         int appendValue = 82;
 
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -274,14 +318,25 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         documentClient.batchPerform(batchOpsList);
 
-        // Check that the last element in the list we appended to is the value we added
         for (BatchOperation batchOp : batchOpsList) {
-            List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+            List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(),
+                    batchOp.getJsonPath());
             // Check that the last element in the list we appended to is the value we added
-            assertTrue(appendedList != null && TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), appendValue));
+            assertTrue(appendedList != null &&
+                    TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), appendValue));
         }
     }
 
+    /**
+     * Check response to a batch of single step APPEND operations using incorrect path.
+     * <ul>
+     * <li>Appending to a list that doesn't exist.</li>
+     * <li>Appending to a key that doesn't exist.</li>
+     * <li>Appending to a map.</li>
+     * <li>Appending to a primitive.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchAppend() throws IOException, DocumentApiException {
         // Load the test document
@@ -298,11 +353,10 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // appending to a primitive
         inputsList.add(new BatchOperationInput("$.example2.key02", APPEND));
 
-        List<BatchOperation> batchOpsList;
         int appendValue = 82;
 
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -320,40 +374,17 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
     }
 
-    @Test
-    public void testNegativeBatchAppendArray() throws IOException, DocumentApiException {
-        // Set up the test document
-        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
-        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-
-        List<BatchOperationInput> inputsList = new ArrayList<>();
-        // appending to an array referenced by a key
-        inputsList.add(new BatchOperationInput("$.example1.key01", APPEND));
-        // appending to an array referenced by an index
-        inputsList.add(new BatchOperationInput("$.example4.key19[3]", APPEND));
-
-        List<BatchOperation> batchOpsList;
-        // appending an array
-        String[] appendValue = {"70"};
-
-        // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
-                documentClient,
-                jsonNode,
-                inputsList,
-                null,
-                appendValue,
-                false
-        );
-
-        documentClient.batchPerform(batchOpsList);
-
-        // making sure all records contain the resulting record == null and the necessary resulting code
-        // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4
-        batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
-                || batchOp.getBatchRecord().resultCode == -2));
-    }
-
+    /**
+     * Check a batch of single step DELETE operations.
+     * <ul>
+     * <li>Deleting a primitive using a map reference.</li>
+     * <li>Deleting a primitive using a list reference.</li>
+     * <li>Deleting a map using a map reference.</li>
+     * <li>Deleting a list using a map reference.</li>
+     * <li>Deleting a map using a list reference.</li>
+     * <li>Deleting a list using a list reference.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchDelete() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
@@ -375,11 +406,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // deleting a list using a list reference
         inputsList.add(new BatchOperationInput("$.example4.key19[4]", DELETE));
 
-        List<BatchOperation> batchOpsList = new ArrayList<>();
-        Object[] originalObjects = new Object[6];
-
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -388,13 +416,18 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
+        Object[] originalObjects = new Object[6];
+
         // reading original objects
         for (BatchOperation batchOp : batchOpsList) {
-            Object originalObject = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+            Object originalObject = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(),
+                    batchOp.getJsonPath());
             originalObjects[batchOpsList.indexOf(batchOp)] = originalObject;
 
             // Check the original object exists
-            assertTrue(originalObject instanceof String || originalObject instanceof Map || originalObject instanceof List);
+            assertTrue(originalObject instanceof String || originalObject instanceof Map
+                    || originalObject instanceof List);
         }
 
         documentClient.batchPerform(batchOpsList);
@@ -412,6 +445,17 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check response to a batch of single step DELETE operations using incorrect path.
+     * <ul>
+     * <li>Deleting a non-existing key in an existing map.</li>
+     * <li>Deleting an out of range element in an existing list.</li>
+     * <li>Deleting a key in a list.</li>
+     * <li>Deleting an index in a map.</li>
+     * <li>Deleting a key in a non-existing map.</li>
+     * <li>Deleting an index in a non-existing list.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchDelete() throws IOException, DocumentApiException {
         // Load the test document
@@ -432,10 +476,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // deleting an index in a non-existing list
         inputsList.add(new BatchOperationInput("$.nolist[1]", DELETE));
 
-        List<BatchOperation> batchOpsList;
-
         // adding similar document bins with different jsonPath strings
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -467,7 +509,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     @Test
-    public void testPositiveBatchDeleteRootElement() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testPositiveBatchDeleteRootElement() throws IOException, JsonPathParser.JsonParseException,
+            DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -484,6 +527,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         assertTrue(((Map<?, ?>) objectFromDB).isEmpty());
     }
 
+    /**
+     * Check a batch of different types single step operations using different keys.
+     * <ul>
+     * <li>Reading the whole json.</li>
+     * <li>Putting a new key into an existing map.</li>
+     * <li>Appending to an array referenced by an index.</li>
+     * <li>Deleting a map entry using a map reference.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchMix() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
@@ -500,16 +552,11 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // deleting a map entry using a map reference
         inputsList.add(new BatchOperationInput("$.example1.key01", DELETE));
 
-        List<BatchRecord> batchRecords;
-        List<BatchOperation> batchOpsList;
-
         int objToPut = 86;
         int objToAppend = 87;
 
-        final Object[] originalObject = new Object[1];
-
         // adding similar document bins with different jsonPath strings and different operations
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -518,7 +565,9 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
+
+        final Object[] originalObject = new Object[1];
 
         Map<String, Object> jsonNodeAsMap = JsonConverters.convertJsonNodeToMap(jsonNode);
         int i = 0;
@@ -531,14 +580,19 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     assertTrue(TestJsonConverters.jsonEquals(batchRecord.record.getValue(binName), jsonNodeAsMap));
                     break;
                 case 1:
-                    Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
-                    // Check that the last element in the list we appended to is the value we added
+                    Object objFromDb = documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
+                    // Check that the last element in the list we put to is the initial put value
                     assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, objToPut));
                     break;
                 case 2:
-                    List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                    List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     // Check that the last element in the list we appended to is the value we added
-                    assertTrue(appendedList != null && TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), objToAppend));
+                    assertTrue(appendedList != null &&
+                            TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), objToAppend));
                     break;
                 case 3:
                     assertTrue(jsonPathDoesNotExist(
@@ -554,8 +608,20 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check a batch of different types 2-step operations using different keys.
+     * <ul>
+     * <li>Reading the whole document, 1 step.</li>
+     * <li>Reading example2, 1 step.</li>
+     * <li>Reading by the keys with values == "", 1 step with post-production.</li>
+     * <li>Putting a value to "key03" in all elements, 2 steps.</li>
+     * <li>Appending a value to the end of "key01" array for every element, 2 steps.</li>
+     * <li>Deleting "key05" from all elements, 2 steps.</li>
+     * </ul>
+     */
     @Test
-    public void testPositiveBatchMix2StepWildcard() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testPositiveBatchMix2StepWildcard() throws IOException, JsonPathParser.JsonParseException,
+            DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -577,11 +643,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         String objToPut = "86";
         int objToAppend = 87;
 
-        List<BatchRecord> batchRecords;
-        List<BatchOperation> batchOpsList = new ArrayList<>();
-
         // adding similar document bins with different jsonPath strings and different operations
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -590,7 +653,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
 
         Object objFromDb, modifiedJson, expectedObject;
         int i = 0;
@@ -610,21 +673,27 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     assertTrue(TestJsonConverters.jsonEquals(batchRecord.record.getValue(binName), expectedObject));
                     break;
                 case 3:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                    objFromDb = documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
                     assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
                 case 4:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                    objFromDb = documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     modifiedJson = JsonPath.parse(testMaterialJson).add(inputsList.get(i).getJsonPath(), objToAppend).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
                     assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
                 case 5:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                    objFromDb = documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     modifiedJson = JsonPath.parse(testMaterialJson).delete(inputsList.get(i).getJsonPath()).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
@@ -636,8 +705,19 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check a batch of different types 2-step operations using the same keys with multiple bins.
+     * <ul>
+     * <li>Reading example2, 1 step.</li>
+     * <li>Reading key06 in all elements of example2, 1 step with post-production.</li>
+     * <li>Reading a map, 1 step.</li>
+     * <li>Putting a value to the existing "key03" in all elements, 2 steps.</li>
+     * <li>Appending a value to the end of "key03" array for every element, 1 step.</li>
+     * </ul>
+     */
     @Test
-    public void testPositiveBatchMix2StepWildcardMultipleBins() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testPositiveBatchMix2StepWildcardMultipleBins() throws IOException, JsonPathParser.JsonParseException,
+            DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -645,26 +725,22 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // reading example2, 1 step
         inputsList.add(new BatchOperationInput("$.example2.*", GET));
-        // reading by the keys with values == "", 1 step with post-production
+        // reading key06 in all elements of example2, 1 step with post-production
         inputsList.add(new BatchOperationInput("$.example2[*].key06", GET));
         // reading a map, 1 step
         inputsList.add(new BatchOperationInput("$.example1", GET));
         // putting a value to the existing "key03" in all elements, 2 steps
         inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
-        // reading previously set "key03", 1 step
-        inputsList.add(new BatchOperationInput("$.example2[*].key03", GET));
         // appending a value to the end of "key03" array for every element, 1 step
+        inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
         String objToAppend = "87";
         String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
 
-        List<BatchRecord> batchRecords;
-        List<BatchOperation> batchOpsList;
-
         // adding similar document bins with different jsonPath strings and different operations
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -674,7 +750,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 binNames
         );
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
 
         Object objFromDb, modifiedJson, expectedObject;
         DocumentContext context = JsonPath.parse(testMaterialJson);
@@ -714,6 +790,12 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check response to a batch of different types 2-step operations using incorrect path.
+     * <ul>
+     * <li>Non-existing first level element.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchMix2StepWildcardIncorrectParts() throws IOException, DocumentApiException {
         // Load the test document
@@ -727,14 +809,11 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         inputsList.add(new BatchOperationInput("$.exampleNonE[*].key03", APPEND));
         inputsList.add(new BatchOperationInput("$.exampleNonE[*].key04", DELETE));
 
-        List<BatchRecord> batchRecords;
-        List<BatchOperation> batchOpsList;
-
         String objToPut = "86";
         int objToAppend = 87;
 
         // adding similar document bins with different jsonPath strings and different operations
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -743,12 +822,18 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
 
         // making sure all records contain the correct negative result code
         batchRecords.forEach(batchRec -> assertEquals(-2, batchRec.resultCode));
     }
 
+    /**
+     * Check response to a batch of different types 2-step operations using incorrect path.
+     * <ul>
+     * <li>Non-existing key with existing first level element.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchMix2StepWildcardIncorrectKeys() throws IOException, DocumentApiException {
         // Load the test document
@@ -765,11 +850,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         inputsList.add(new BatchOperationInput("$.example4[*].keyNonE", APPEND));
         inputsList.add(new BatchOperationInput("$.example4[*].keyNonE", DELETE));
 
-        List<BatchRecord> batchRecords;
-        List<BatchOperation> batchOpsList = new ArrayList<>();
-
         // adding similar document bins with different jsonPath strings and different operations
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -778,14 +860,24 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
 
         // making sure all records contain the correct negative result code
         batchRecords.forEach(batchRec -> assertEquals(-2, batchRec.resultCode));
     }
 
+    /**
+     * Check response to a batch of different types 2-step operations using both correct and incorrect paths.
+     * <ul>
+     * <li>Reading non-existing key of a non-existing first level element.</li>
+     * <li>Putting a value to key03 of every element of example2 using correct path.</li>
+     * <li>Appending to a non-existing key of existing first level element.</li>
+     * <li>Deleting an existing key of non-existing first level element.</li>
+     * </ul>
+     */
     @Test
-    public void testBatchMix2StepWildcardNegativeAndPositive() throws IOException, DocumentApiException, JsonPathParser.JsonParseException {
+    public void testBatchMix2StepWildcardNegativeAndPositive() throws IOException, DocumentApiException,
+            JsonPathParser.JsonParseException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -800,11 +892,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         String objToPut = "86";
         int objToAppend = 87;
 
-        List<BatchRecord> batchRecords;
-        List<BatchOperation> batchOpsList = new ArrayList<>();
-
         // adding similar document bins with different jsonPath strings and different operations
-        batchOpsList = createBatchOperations(
+        List<BatchOperation> batchOpsList = createBatchOperations(
                 documentClient,
                 jsonNode,
                 inputsList,
@@ -813,7 +902,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        batchRecords = documentClient.batchPerform(batchOpsList);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList);
 
         Object objFromDb, modifiedJson, expectedObject;
         int i = 0;
@@ -827,7 +916,9 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     assertEquals(-2, batchRecord.resultCode);
                     break;
                 case 1:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                    objFromDb = documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
@@ -898,7 +989,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
             Key key,
             List<String> binNames,
             BatchOperationInput batchOperationInput)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException, ClassNotFoundException {
         BatchOperation batchOp;
 
         if (batchOperationInput.getJsonValue() != null) {
