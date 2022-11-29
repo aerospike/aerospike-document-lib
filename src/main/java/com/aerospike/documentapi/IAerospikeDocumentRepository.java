@@ -1,11 +1,15 @@
 package com.aerospike.documentapi;
 
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
+import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public interface IAerospikeDocumentRepository {
@@ -28,7 +32,9 @@ public interface IAerospikeDocumentRepository {
 
     void append(WritePolicy writePolicy, Key documentKey, Map<String, Object> queryResults, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
 
-    void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
+    void delete(WritePolicy writePolicy, Key documentKey, String documentBinName, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
 
-    void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
+    void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
+
+    boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords) throws DocumentApiException;
 }

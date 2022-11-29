@@ -39,7 +39,7 @@ public class JsonPathParser {
     // Store our representation of the individual path parts
     JsonPathObject jsonPathObject = new JsonPathObject();
 
-    JsonPathParser() {
+    public JsonPathParser() {
     }
 
     public static PathPart extractLastPathPart(List<PathPart> pathParts) {
@@ -72,7 +72,7 @@ public class JsonPathParser {
      * @return List<PathPart></PathPart>
      * @throws JsonParseException a JsonParseException will be thrown in case of an error.
      */
-    JsonPathObject parse(String jsonString) throws JsonParseException {
+    public JsonPathObject parse(String jsonString) throws JsonParseException {
         if (jsonString.charAt(0) != '$') {
             throw new JsonPrefixException(jsonString);
         }
@@ -122,7 +122,7 @@ public class JsonPathParser {
     private void parsePathPart(String pathPart) throws JsonParseException {
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
         if ((!pathPart.contains("[")) && (!pathPart.contains("]"))) {
-            // ignore * wildcard after a dot, its the same as ending with a .path
+            // ignore * wildcard after a dot, it's the same as ending with a .path
             if (!pathPart.equals("*")) {
                 jsonPathObject.addPathPart(new MapPathPart(pathPart));
             }
@@ -181,7 +181,7 @@ public class JsonPathParser {
     }
 
     public static class ListException extends JsonParseException {
-        ListException(String s) {
+        public ListException(String s) {
             super(s);
         }
 
