@@ -38,6 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DocumentAPIBatchTests extends BaseTestConfig {
 
+    /**
+     * Check the correct document content retrieval in a batch of single step operations.
+     * <ul>
+     * <li>The whole document.</li>
+     * <li>First level element.</li>
+     * <li>An array element.</li>
+     * <li>A map element.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchGet() throws IOException, DocumentApiException {
         // Load the test document
@@ -79,6 +88,19 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check the correct response of retrieving document content in a batch
+     * of single step operations using incorrect path.
+     * <ul>
+     * <li>Non-existing key.</li>
+     * <li>Referencing a map as if it was a list.</li>
+     * <li>Referencing a primitive as if it was a map.</li>
+     * <li>Referencing a primitive as if it was a list.</li>
+     * <li>Referencing a non-existing list item.</li>
+     * <li>Referencing a non-existing map.</li>
+     * <li>Referencing a non-existing list.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchGet() throws IOException, DocumentApiException {
         // Load the test document
@@ -122,6 +144,13 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
     }
 
+    /**
+     * Check a batch of single step PUT operations.
+     * <ul>
+     * <li>Putting a new key into an existing map.</li>
+     * <li>Putting a new value into an existing array.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchPut() throws IOException, DocumentApiException, JsonPathParser.JsonParseException {
         // Set up the test document
@@ -157,6 +186,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check the response to a batch of single step PUT operations with incorrect path.
+     * <ul>
+     * <li>Putting a key into a map that doesn't exist.</li>
+     * <li>Putting to a list that doesn't exist.</li>
+     * <li>Treating a map as if it was a list.</li>
+     * <li>Treating a list as if it was a map.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchPut() throws IOException, DocumentApiException {
         // Set up the test document
@@ -194,6 +232,13 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 && (batchOp.getBatchRecord().resultCode == 26 || batchOp.getBatchRecord().resultCode == 4)));
     }
 
+    /**
+     * Check a batch of single step APPEND operations.
+     * <ul>
+     * <li>Appending to an array referenced by a key.</li>
+     * <li>Appending to an array referenced by an index.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchAppend() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
@@ -230,6 +275,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check response to a batch of single step APPEND operations using incorrect path.
+     * <ul>
+     * <li>Appending to a list that doesn't exist.</li>
+     * <li>Appending to a key that doesn't exist.</li>
+     * <li>Appending to a map.</li>
+     * <li>Appending to a primitive.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchAppend() throws IOException, DocumentApiException {
         // Load the test document
@@ -268,6 +322,17 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
     }
 
+    /**
+     * Check a batch of single step DELETE operations.
+     * <ul>
+     * <li>Deleting a primitive using a map reference.</li>
+     * <li>Deleting a primitive using a list reference.</li>
+     * <li>Deleting a map using a map reference.</li>
+     * <li>Deleting a list using a map reference.</li>
+     * <li>Deleting a map using a list reference.</li>
+     * <li>Deleting a list using a list reference.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchDelete() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
@@ -326,6 +391,17 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check response to a batch of single step DELETE operations using incorrect path.
+     * <ul>
+     * <li>Deleting a non-existing key in an existing map.</li>
+     * <li>Deleting an out of range element in an existing list.</li>
+     * <li>Deleting a key in a list.</li>
+     * <li>Deleting an index in a map.</li>
+     * <li>Deleting a key in a non-existing map.</li>
+     * <li>Deleting an index in a non-existing list.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchDelete() throws IOException, DocumentApiException {
         // Load the test document
@@ -398,6 +474,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         assertTrue(((Map<?, ?>) objectFromDB).isEmpty());
     }
 
+    /**
+     * Check a batch of different types single step operations using different keys.
+     * <ul>
+     * <li>Reading the whole json.</li>
+     * <li>Putting a new key into an existing map.</li>
+     * <li>Appending to an array referenced by an index.</li>
+     * <li>Deleting a map entry using a map reference.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchMix() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
@@ -468,6 +553,17 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check a batch of different types 2-step operations using different keys.
+     * <ul>
+     * <li>Reading the whole document, 1 step.</li>
+     * <li>Reading example2, 1 step.</li>
+     * <li>Reading by the keys with values == "", 1 step with post-production.</li>
+     * <li>Putting a value to "key03" in all elements, 2 steps.</li>
+     * <li>Appending a value to the end of "key01" array for every element, 2 steps.</li>
+     * <li>Deleting "key05" from all elements, 2 steps.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchMix2StepWildcard() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
@@ -550,6 +646,16 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check a batch of different types 2-step operations using the same keys with multiple bins.
+     * <ul>
+     * <li>Reading example2, 1 step.</li>
+     * <li>Reading key06 in all elements of example2, 1 step with post-production.</li>
+     * <li>Reading a map, 1 step.</li>
+     * <li>Putting a value to the existing "key03" in all elements, 2 steps.</li>
+     * <li>Appending a value to the end of "key03" array for every element, 1 step.</li>
+     * </ul>
+     */
     @Test
     public void testPositiveBatchMix2StepWildcardMultipleBins() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
@@ -559,15 +665,14 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // reading example2, 1 step
         inputsList.add(new BatchOperationInput("$.example2.*", GET));
-        // reading by the keys with values == "", 1 step with post-production
+        // reading key06 in all elements of example2, 1 step with post-production
         inputsList.add(new BatchOperationInput("$.example2[*].key06", GET));
         // reading a map, 1 step
         inputsList.add(new BatchOperationInput("$.example1", GET));
         // putting a value to the existing "key03" in all elements, 2 steps
-//        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
-        // reading previously set "key03", 1 step
-        inputsList.add(new BatchOperationInput("$.example2[*].key03", GET));
+        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
         // appending a value to the end of "key03" array for every element, 1 step
+        inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
@@ -628,6 +733,12 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         }
     }
 
+    /**
+     * Check response to a batch of different types 2-step operations using incorrect path.
+     * <ul>
+     * <li>Non-existing first level element.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchMix2StepWildcardIncorrectParts() throws IOException, DocumentApiException {
         // Load the test document
@@ -663,6 +774,12 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         batchRecords.forEach(batchRec -> assertEquals(-2, batchRec.resultCode));
     }
 
+    /**
+     * Check response to a batch of different types 2-step operations using incorrect path.
+     * <ul>
+     * <li>Non-existing key with existing first level element.</li>
+     * </ul>
+     */
     @Test
     public void testNegativeBatchMix2StepWildcardIncorrectKeys() throws IOException, DocumentApiException {
         // Load the test document
@@ -698,6 +815,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         batchRecords.forEach(batchRec -> assertEquals(-2, batchRec.resultCode));
     }
 
+    /**
+     * Check response to a batch of different types 2-step operations using both correct and incorrect paths.
+     * <ul>
+     * <li>Reading non-existing key of a non-existing first level element.</li>
+     * <li>Putting a value to key03 of every element of example2 using correct path.</li>
+     * <li>Appending to a non-existing key of existing first level element.</li>
+     * <li>Deleting an existing key of non-existing first level element.</li>
+     * </ul>
+     */
     @Test
     public void testBatchMix2StepWildcardNegativeAndPositive() throws IOException, DocumentApiException, JsonPathParser.JsonParseException {
         // Load the test document

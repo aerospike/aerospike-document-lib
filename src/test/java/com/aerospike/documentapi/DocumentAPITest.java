@@ -18,23 +18,25 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DocumentAPITest extends BaseTestConfig {
 
     /**
-     * Check that the following paths will correctly retrieve document content when content exists
-     * .
-     * .key1
-     * .key1[i]
-     * .key1.key2
-     * .key1.key2[i]
-     * .key1[i].key2
-     * .key1[i].key2[j]
-     * .key1.key2.key3
-     * .key1.key2.key3[i]
-     * .key1.key2[i].key3
-     * .key1.key2[i].key3[j]
-     * .key1[i].key2.key3
-     * .key1[i].key2.key3[j]
-     * .key1[i].key2[j].key3
-     * .key1[i].key2[j].key3[k]
-     * .key1.key2[i][j]
+     * Check that the following paths will correctly retrieve document content when content exists:
+     * <ul>
+     * <li>.</li>
+     * <li>.key1</li>
+     * <li>.key1[i]</li>
+     * <li>.key1.key2</li>
+     * <li>.key1.key2[i]</li>
+     * <li>.key1[i].key2</li>
+     * <li>.key1[i].key2[j]</li>
+     * <li>.key1.key2.key3</li>
+     * <li>.key1.key2.key3[i]</li>
+     * <li>.key1.key2[i].key3</li>
+     * <li>.key1.key2[i].key3[j]</li>
+     * <li>.key1[i].key2.key3</li>
+     * <li>.key1[i].key2.key3[j]</li>
+     * <li>.key1[i].key2[j].key3</li>
+     * <li>.key1[i].key2[j].key3[k]</li>
+     * <li>.key1.key2[i][j]</li>
+     * </ul>
      */
     @Test
     public void testPositivePathRetrievalMap() throws IOException,
@@ -123,15 +125,16 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Check correct response to all possible types of incorrect path
-     * <p>
-     * Reference a list as if it were a map
-     * Reference a map as if it were a list
-     * Reference a primitive as if it was a map
-     * Reference a primitive as if it was a list
-     * Reference a list item that is not there (out of bounds)
-     * Reference a map that isn't there
-     * Reference a list that isn't there
+     * Check correct response to all possible types of incorrect path:
+     * <ul>
+     * <li>Reference a list as if it were a map.</li>
+     * <li>Reference a map as if it were a list.</li>
+     * <li>Reference a primitive as if it was a map.</li>
+     * <li>Reference a primitive as if it was a list.</li>
+     * <li>Reference a list item that is not there (out of bounds).</li>
+     * <li>Reference a map that isn't there.</li>
+     * <li>Reference a list that isn't there.</li>
+     * </ul>
      */
     @Test
     public void testNegativePathRetrieval() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
@@ -207,10 +210,11 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Make sure 'good' puts give correct result
-     * <p>
-     * Putting a key into an existing map
-     * Putting a value into an existing list
+     * Make sure 'good' puts give correct result.
+     * <ul>
+     * <li>Putting a key into an existing map.</li>
+     * <li>Putting a value into an existing list.</li>
+     * </ul>
      */
     @Test
     public void testPositivePut() throws IOException,
@@ -241,21 +245,13 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Check correct response to erroneous access
-     * <p>
-     * Putting a key into a map that doesn't exist
-     * Putting a value into a list that doesn't exist
-     * Treating a map as if it were a list
-     * Treating a list as if it were a map
-     */
-
-    /**
-     * Check correct response to erroneous access
-     * <p>
-     * Putting a key into a map that doesn't exist
-     * Putting a value into a list that doesn't exist
-     * Treating a map as if it were a list
-     * Treating a list as if it were a map
+     * Check correct response to erroneous access.
+     * <ul>
+     * <li>Putting a key into a map that doesn't exist.</li>
+     * <li>Putting a value into a list that doesn't exist.</li>
+     * <li>Treating a map as if it were a list.</li>
+     * <li>Treating a list as if it were a map.</li>
+     * </ul>
      */
     @Test
     public void testNegativePut() throws IOException,
@@ -310,10 +306,11 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Make sure 'good' appends give correct result
-     * <p>
-     * Appending to a list referenced using a key
-     * Appending to a list referenced by an index
+     * Make sure 'good' appends give correct result.
+     * <ul>
+     * <li>Appending to a list referenced using a key.</li>
+     * <li>Appending to a list referenced by an index.</li>
+     * </ul>
      */
     @Test
     public void testPositiveAppend() throws IOException,
@@ -347,11 +344,12 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Make sure erroneous appends handled correctly
-     * <p>
-     * Appending to a list that doesn't exist
-     * Appending to a map
-     * Appending to a primitive
+     * Make sure erroneous appends handled correctly.
+     * <ul>
+     * <li>Appending to a list that doesn't exist.</li>
+     * <li>Appending to a map.</li>
+     * <li>Appending to a primitive.</li>
+     * </ul>
      */
     @Test
     public void testNegativeAppend() throws IOException,
@@ -399,14 +397,15 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Make sure 'good' deletes give correct result
-     * <p>
-     * Delete a primitive using a map reference
-     * Delete a primitive using a list reference
-     * Delete a map using a map reference
-     * Delete a list using a map reference
-     * Delete a map using a list reference
-     * Delete a list using a list reference
+     * Make sure 'good' deletes give correct result.
+     * <ul>
+     * <li>Delete a primitive using a map reference.</li>
+     * <li>Delete a primitive using a list reference.</li>
+     * <li>Delete a map using a map reference.</li>
+     * <li>Delete a list using a map reference.</li>
+     * <li>Delete a map using a list reference.</li>
+     * <li>Delete a list using a list reference.</li>
+     * </ul>
      */
     @Test
     public void testPositiveDelete() throws IOException,
@@ -489,14 +488,15 @@ public class DocumentAPITest extends BaseTestConfig {
     }
 
     /**
-     * Make sure 'bad' deletes are handled correctly
-     * <p>
-     * Delete a key in an existing map where key does not exist
-     * Delete an out of range element in an existing list
-     * Delete a key in a list
-     * Delete an index in a map
-     * Delete a key in a map that doesn't exist
-     * Delete an index in a list that doesn't exist
+     * Make sure 'bad' deletes are handled correctly.
+     * <ul>
+     * <li>Delete a key in an existing map where key does not exist.</li>
+     * <li>Delete an out of range element in an existing list.</li>
+     * <li>Delete a key in a list.</li>
+     * <li>Delete an index in a map.</li>
+     * <li>Delete a key in a map that doesn't exist.</li>
+     * <li>Delete an index in a list that doesn't exist.</li>
+     * </ul>
      */
     @Test
     public void testNegativeDelete() throws IOException,
@@ -524,7 +524,7 @@ public class DocumentAPITest extends BaseTestConfig {
 
         // Delete an out of range element in an existing list
         jsonPath = "$.example2[3]";
-        // accessing this path throws an error so we know it's not there to start with
+        // accessing this path throws an error, so we know it's not there to start with
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
@@ -572,7 +572,7 @@ public class DocumentAPITest extends BaseTestConfig {
 
         // Delete a key in a map that doesn't exist
         jsonPath = "$.nokey.nokey";
-        // accessing this path throws an error so we know it's not there to start with
+        // accessing this path throws an error, so we know it's not there to start with
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
@@ -588,7 +588,7 @@ public class DocumentAPITest extends BaseTestConfig {
 
         // Delete an index in a list that doesn't exist
         jsonPath = "$.nolist[1]";
-        // accessing this path throws an error so we know it's not there to start with
+        // accessing this path throws an error, so we know it's not there to start with
         try {
             originalObject = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
