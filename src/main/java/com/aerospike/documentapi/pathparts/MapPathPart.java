@@ -53,9 +53,8 @@ public class MapPathPart extends PathPart {
 
     @Override
     public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
-        if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("Unable to put an array, expecting a list or a map");
-        }
+        validateNotArray(object);
+
         return MapOperation.put(new MapPolicy(), binName, Value.get(key), Value.get(object), contexts);
     }
 

@@ -253,15 +253,6 @@ public class DocumentAPITest extends BaseTestConfig {
      * <li>Treating a list as if it were a map.</li>
      * </ul>
      */
-
-    /**
-     * Check correct response to erroneous access
-     * <p>
-     * Putting a key into a map that doesn't exist
-     * Putting a value into a list that doesn't exist
-     * Treating a map as if it were a list
-     * Treating a list as if it were a map
-     */
     @Test
     public void testNegativePut() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {

@@ -52,9 +52,8 @@ public class ListPathPart extends PathPart {
 
     @Override
     public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
-        if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("The given object is not of type " + getType());
-        }
+        validateNotArray(object); // throws IllegalArgumentException
+
         return ListOperation.set(binName, listPosition, Value.get(object), contexts);
     }
 

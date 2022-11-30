@@ -28,7 +28,7 @@ public class JsonPathQuery {
             return setOrAdd(resultJson, jsonPath, value);
         }
         // if jsonPath does not exist in json, and it leads to a map element
-            return put(resultJson, jsonPath, value);
+        return put(resultJson, jsonPath, value);
     }
 
     private static Object put(String resultJson, String jsonPath, Object value) {
