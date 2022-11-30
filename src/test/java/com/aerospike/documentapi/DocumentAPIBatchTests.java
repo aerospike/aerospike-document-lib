@@ -13,6 +13,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.JSONArray;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -179,8 +180,62 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
             Object objFromDb = documentClient.get(batchOp.getKey(),
                     batchOp.getBinNames().iterator().next(),
                     batchOp.getJsonPath());
-            // Check that the last element in the list we appended to is the value we added
+            // Check that the last element in the list we put to is the initial put value
             assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
+        }
+    }
+
+    /**
+     * Check a batch of 2-step step PUT operations.
+     * <ul>
+     * <li>Putting to the existing position.</li>
+     * <li>Putting to a new position.</li>
+     * <li>Putting to a new position in a more complex structure.</li>
+     * <li>Putting to a new key.</li>
+     * </ul>
+     */
+    @Test
+    public void testPositiveBatchPutWildcard() throws IOException, DocumentApiException, JsonPathParser.JsonParseException {
+        // Set up the test document
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // putting to the existing position
+        inputsList.add(new BatchOperationInput("$.example2[*].key01[3]", PUT));
+        // putting to a new position
+        inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
+        // putting to a new position in a more complex structure
+        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
+        // putting to a new key
+        inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
+
+        int putValue = 70;
+
+        // adding similar document bins with different jsonPath strings
+        List<BatchOperation> batchOpsList = createBatchOperations(
+                documentClient,
+                jsonNode,
+                inputsList,
+                putValue,
+                null,
+                false
+        );
+
+        documentClient.batchPerform(batchOpsList);
+
+        // Check the value put previously
+        for (BatchOperation batchOp : batchOpsList) {
+            Object objFromDb = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(),
+                    batchOp.getJsonPath());
+            if (objFromDb instanceof JSONArray) {
+                for (Object res : (JSONArray) objFromDb) {
+                    assertTrue(res != null && TestJsonConverters.jsonEquals(res, putValue));
+                }
+            } else {
+                assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
+            }
         }
     }
 
@@ -263,7 +318,6 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         documentClient.batchPerform(batchOpsList);
 
-        // Check that the last element in the list we appended to is the value we added
         for (BatchOperation batchOp : batchOpsList) {
             List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
                     batchOp.getBinNames().iterator().next(),
@@ -529,7 +583,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     Object objFromDb = documentClient.get(batchOp.getKey(),
                             batchOp.getBinNames().iterator().next(),
                             batchOp.getJsonPath());
-                    // Check that the last element in the list we appended to is the value we added
+                    // Check that the last element in the list we put to is the initial put value
                     assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, objToPut));
                     break;
                 case 2:

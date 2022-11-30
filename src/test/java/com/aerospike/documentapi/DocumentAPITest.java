@@ -39,7 +39,7 @@ public class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositivePathRetrievalMap() throws IOException,
+    public void testPositivePathRetrieval() throws IOException,
             JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
@@ -303,6 +303,15 @@ public class DocumentAPITest extends BaseTestConfig {
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
         } catch (DocumentApiException.KeyNotFoundException ignored) {
         }
+
+        jsonPath = "$.example1.key01[3]";
+        int[] putValue2 = {79};
+        try {
+            documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue2);
+            fail("IllegalArgumentException should have been thrown");
+        } catch (IllegalArgumentException ignored) {
+        }
+
     }
 
     /**
@@ -393,6 +402,15 @@ public class DocumentAPITest extends BaseTestConfig {
             documentClient.append(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue);
             fail("DocumentApiException.ObjectNotFoundException should have been thrown");
         } catch (DocumentApiException.ObjectNotFoundException ignored) {
+        }
+
+        // Appending an array
+        jsonPath = "$.example1.key01";
+        int[] putValue2 = {79};
+        try {
+            documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, putValue2);
+            fail("IllegalArgumentException should have been thrown");
+        } catch (IllegalArgumentException ignored) {
         }
     }
 

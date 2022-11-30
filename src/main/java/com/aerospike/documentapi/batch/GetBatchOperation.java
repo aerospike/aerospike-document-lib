@@ -70,14 +70,14 @@ public class GetBatchOperation extends AbstractBatchOperation {
             // as it should perform only the first step and post-production
             return null;
         } else {
-            batchRecord = getErrorBatchRecord();
+            batchRecord = getErrorBatchWriteRecord();
             return batchRecord;
         }
     }
 
     private BatchRecord batchRecordWithError(String binName) {
         errorBinName = binName;
-        batchRecord = getErrorBatchRecord();
+        batchRecord = getErrorBatchWriteRecord();
         return batchRecord;
     }
 }
