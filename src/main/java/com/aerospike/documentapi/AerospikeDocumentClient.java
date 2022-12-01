@@ -184,15 +184,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
     }
 
-    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations) throws DocumentApiException {
-        return batchPerform(batchOperations, false);
-    }
-
     @Override
-    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean isParallel) throws DocumentApiException {
+    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) throws DocumentApiException {
         // collecting non-empty first step records
         Stream<BatchOperation> batchOpStream = batchOperations.stream();
-        if (isParallel) batchOpStream = batchOpStream.parallel();
+        if (parallel) batchOpStream = batchOpStream.parallel();
 
         List<BatchRecord> firstStepRecords = batchOpStream
                 .map(BatchOperation::getBatchRecord)
@@ -206,7 +202,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         // collecting non-empty second step records without json parsing error
         batchOpStream = batchOperations.stream();
-        if (isParallel) batchOpStream = batchOpStream.parallel();
+        if (parallel) batchOpStream = batchOpStream.parallel();
         List<BatchRecord> secondStepRecords = batchOpStream
                 .map(BatchOperation::setSecondStepRecordAndGet)
                 .filter(Objects::nonNull)
@@ -220,7 +216,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         // collecting resulting records
         batchOpStream = batchOperations.stream();
-        if (isParallel) batchOpStream = batchOpStream.parallel();
+        if (parallel) batchOpStream = batchOpStream.parallel();
         return batchOpStream
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
