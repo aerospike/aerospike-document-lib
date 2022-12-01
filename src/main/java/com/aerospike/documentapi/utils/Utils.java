@@ -19,7 +19,7 @@ public class Utils {
 
     public static void validateNotArray(Object object) throws IllegalArgumentException {
         if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("Putting/appending an array is yet not allowed, consider providing a Collection");
+            throw new IllegalArgumentException("Putting/appending an array is not allowed, consider providing a Collection");
         }
     }
 }
