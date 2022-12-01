@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.pathparts;
+package com.aerospike.documentapi.jsonpath.pathpart;
 
 import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
@@ -6,7 +6,7 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.cdt.MapPolicy;
 import com.aerospike.client.cdt.MapReturnType;
-import com.aerospike.documentapi.utils.Utils;
+import com.aerospike.documentapi.util.Utils;
 
 import java.util.Objects;
 

@@ -1,11 +1,12 @@
-package com.aerospike.documentapi;
+package com.aerospike.documentapi.jsonpath;
 
-import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JsonPathObject {
+
     private final List<PathPart> pathParts;
     private String jsonPathSecondStepQuery;
     private boolean requiresJsonPathQuery;

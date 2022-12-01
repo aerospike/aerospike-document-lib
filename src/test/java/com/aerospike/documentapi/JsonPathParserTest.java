@@ -1,7 +1,9 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.documentapi.pathparts.ListPathPart;
-import com.aerospike.documentapi.pathparts.MapPathPart;
+import com.aerospike.documentapi.jsonpath.JsonPathObject;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.jsonpath.pathpart.ListPathPart;
+import com.aerospike.documentapi.jsonpath.pathpart.MapPathPart;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

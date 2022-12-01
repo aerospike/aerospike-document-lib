@@ -1,9 +1,9 @@
-package com.aerospike.documentapi;
+package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.client.cdt.CTX;
-import com.aerospike.documentapi.pathparts.ListPathPart;
-import com.aerospike.documentapi.pathparts.MapPathPart;
-import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.documentapi.jsonpath.pathpart.ListPathPart;
+import com.aerospike.documentapi.jsonpath.pathpart.MapPathPart;
+import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  * Not useful outside of this package, hence package visibility
  */
 public class JsonPathParser {
+
     static final String JSON_PATH_SEPARATOR = ".";
     static final String DOCUMENT_ROOT_TOKEN = "$";
 

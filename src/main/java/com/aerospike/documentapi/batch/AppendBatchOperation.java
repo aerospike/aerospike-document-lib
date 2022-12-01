@@ -6,9 +6,9 @@ import com.aerospike.client.BatchWrite;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.cdt.CTX;
-import com.aerospike.documentapi.JsonPathParser;
-import com.aerospike.documentapi.JsonPathQuery;
-import com.aerospike.documentapi.pathparts.PathPart;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.jsonpath.JsonPathQuery;
+import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 

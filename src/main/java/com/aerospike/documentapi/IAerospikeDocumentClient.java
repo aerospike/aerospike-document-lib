@@ -4,6 +4,7 @@ import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.documentapi.batch.BatchOperation;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -124,7 +125,7 @@ public interface IAerospikeDocumentClient {
      * Perform batch operations.
      *
      * @param batchOperations A list of batch operations to apply.
-     * @param parallel Whether batch processing stream operations should run in parallel.
+     * @param parallel        Whether batch processing stream operations should run in parallel.
      * @return The list of corresponding {@link BatchRecord} results.
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel)
