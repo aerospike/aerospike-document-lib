@@ -5,6 +5,7 @@ import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.client.cdt.ListReturnType;
+import com.aerospike.documentapi.utils.Utils;
 
 import java.util.Objects;
 
@@ -52,9 +53,8 @@ public class ListPathPart extends PathPart {
 
     @Override
     public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
-        if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("The given object is not of type " + getType());
-        }
+        Utils.validateNotArray(object);
+
         return ListOperation.set(binName, listPosition, Value.get(object), contexts);
     }
 

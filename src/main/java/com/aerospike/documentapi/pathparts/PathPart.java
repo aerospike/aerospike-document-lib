@@ -4,6 +4,7 @@ import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.ListOperation;
+import com.aerospike.documentapi.utils.Utils;
 
 /**
  * AccessPathPart analysis is ultimately used to create CTX (context) objects and operations
@@ -16,9 +17,8 @@ public abstract class PathPart {
     public abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException;
 
     public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
-        if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("Unable to append an array, expecting a list or a map");
-        }
+        Utils.validateNotArray(object);
+
         return ListOperation.append(binName, Value.get(object), contexts);
     }
 

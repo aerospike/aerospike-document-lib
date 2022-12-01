@@ -7,10 +7,15 @@ import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.batch.BatchOperation;
+import com.aerospike.documentapi.policy.DocumentPolicy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,11 +36,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         this.batchPolicy = client.getBatchPolicyDefault();
     }
 
-    public AerospikeDocumentClient(IAerospikeClient client, Policy readPolicy, WritePolicy writePolicy, BatchPolicy batchPolicy) {
+    public AerospikeDocumentClient(IAerospikeClient client, DocumentPolicy documentPolicy) {
         this.aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
-        this.readPolicy = readPolicy;
-        this.writePolicy = writePolicy;
-        this.batchPolicy = batchPolicy;
+        this.readPolicy = documentPolicy.getReadPolicy();
+        this.writePolicy = documentPolicy.getWritePolicy();
+        this.batchPolicy = documentPolicy.getBatchPolicy();
     }
 
     @Override

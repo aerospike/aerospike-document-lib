@@ -6,6 +6,7 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.cdt.MapPolicy;
 import com.aerospike.client.cdt.MapReturnType;
+import com.aerospike.documentapi.utils.Utils;
 
 import java.util.Objects;
 
@@ -53,9 +54,8 @@ public class MapPathPart extends PathPart {
 
     @Override
     public Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
-        if (object.getClass().isArray()) {
-            throw new IllegalArgumentException("Unable to put an array, expecting a list or a map");
-        }
+        Utils.validateNotArray(object);
+
         return MapOperation.put(new MapPolicy(), binName, Value.get(key), Value.get(object), contexts);
     }
 

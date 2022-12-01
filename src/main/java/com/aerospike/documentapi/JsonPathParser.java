@@ -122,7 +122,7 @@ public class JsonPathParser {
     private void parsePathPart(String pathPart) throws JsonParseException {
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
         if ((!pathPart.contains("[")) && (!pathPart.contains("]"))) {
-            // ignore * wildcard after a dot, it`s the same as ending with a .path
+            // ignore * wildcard after a dot, it's the same as ending with a .path
             if (!pathPart.equals("*")) {
                 jsonPathObject.addPathPart(new MapPathPart(pathPart));
             }

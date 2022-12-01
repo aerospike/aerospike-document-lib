@@ -16,4 +16,10 @@ public class Utils {
             return new Bin(binName, JsonConverters.convertJsonNodeToMap(jsonNode));
         }
     }
+
+    public static void validateNotArray(Object object) throws IllegalArgumentException {
+        if (object.getClass().isArray()) {
+            throw new IllegalArgumentException("Putting/appending an array is yet not allowed, consider providing a Collection");
+        }
+    }
 }

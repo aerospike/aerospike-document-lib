@@ -28,7 +28,7 @@ public class JsonPathQuery {
             return setOrAdd(resultJson, jsonPath, value);
         }
         // if jsonPath does not exist in json, and it leads to a map element
-            return put(resultJson, jsonPath, value);
+        return put(resultJson, jsonPath, value);
     }
 
     private static Object put(String resultJson, String jsonPath, Object value) {
@@ -54,7 +54,7 @@ public class JsonPathQuery {
         return JsonPath.parse(resultJson).add(jsonPath, value).json();
     }
 
-    public static Object delete(JsonPathObject jsonPathObject, Object object) throws JsonProcessingException, JsonPathException {
+    public static Object delete(JsonPathObject jsonPathObject, Object object) throws JsonProcessingException {
         String resultJson = JsonConverters.convertObjectToJsonString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         return JsonPath.parse(resultJson).delete(jsonPath).json();

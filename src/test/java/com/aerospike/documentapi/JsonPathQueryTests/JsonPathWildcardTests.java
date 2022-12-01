@@ -82,7 +82,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
 
         // The authors of all books
         String jsonPath = "$.store.book[*].author";
-        // Modify the authors of all books to "J.K. Rowling"
+        // Delete the author field of every book in the store
         documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         Object modifiedJson = JsonPath.parse(storeJson).delete(jsonPath).json();
