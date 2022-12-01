@@ -739,8 +739,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
         String objToAppend = "87";
-//        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
-        String[] binNames = {"documentBin0"};
+        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
 
         // adding similar document bins with different jsonPath strings and different operations
         List<BatchOperation> batchOpsList = createBatchOperations(
