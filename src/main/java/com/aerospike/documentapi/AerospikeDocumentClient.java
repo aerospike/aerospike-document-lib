@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Primary object for accessing and mutating documents.
@@ -184,10 +185,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations) throws DocumentApiException {
-
+    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) throws DocumentApiException {
         // collecting non-empty first step records
-        List<BatchRecord> firstStepRecords = batchOperations.stream().parallel()
+        Stream<BatchOperation> batchOpStream = batchOperations.stream();
+        if (parallel) batchOpStream = batchOpStream.parallel();
+
+        List<BatchRecord> firstStepRecords = batchOpStream
                 .map(BatchOperation::getBatchRecord)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -198,7 +201,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting non-empty second step records without json parsing error
-        List<BatchRecord> secondStepRecords = batchOperations.stream().parallel()
+        batchOpStream = batchOperations.stream();
+        if (parallel) batchOpStream = batchOpStream.parallel();
+        List<BatchRecord> secondStepRecords = batchOpStream
                 .map(BatchOperation::setSecondStepRecordAndGet)
                 .filter(Objects::nonNull)
                 .filter(batchRec -> batchRec.resultCode != -2)
@@ -210,7 +215,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting resulting records
-        return batchOperations.stream()
+        batchOpStream = batchOperations.stream();
+        if (parallel) batchOpStream = batchOpStream.parallel();
+        return batchOpStream
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
     }
