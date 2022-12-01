@@ -4,6 +4,8 @@ import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.exp.Exp;
 import com.aerospike.client.policy.Policy;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 

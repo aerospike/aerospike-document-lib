@@ -1,15 +1,16 @@
-package com.aerospike.documentapi.pathparts;
+package com.aerospike.documentapi.jsonpath.pathpart;
 
 import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.ListOperation;
-import com.aerospike.documentapi.utils.Utils;
+import com.aerospike.documentapi.util.Utils;
 
 /**
  * AccessPathPart analysis is ultimately used to create CTX (context) objects and operations
  */
 public abstract class PathPart {
+
     public abstract CTX toAerospikeContext();
 
     public abstract Operation toAerospikeGetOperation(String binName, CTX[] contexts);

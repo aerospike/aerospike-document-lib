@@ -1,8 +1,8 @@
-package com.aerospike.documentapi.JsonPathQueryTests;
+package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.documentapi.AerospikeDocumentClient;
 import com.aerospike.documentapi.BaseTestConfig;
-import com.aerospike.documentapi.JsonConverters;
+import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;

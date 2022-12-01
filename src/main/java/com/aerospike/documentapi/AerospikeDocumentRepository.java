@@ -7,8 +7,10 @@ import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentapi.pathparts.PathPart;
-import com.aerospike.documentapi.utils.Utils;
+import com.aerospike.documentapi.jsonpath.JsonPathObject;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.util.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.*;

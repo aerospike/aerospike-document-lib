@@ -7,6 +7,8 @@ import com.aerospike.documentapi.batch.BatchOperation;
 import com.aerospike.documentapi.batch.DeleteBatchOperation;
 import com.aerospike.documentapi.batch.GetBatchOperation;
 import com.aerospike.documentapi.batch.PutBatchOperation;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.DocumentContext;

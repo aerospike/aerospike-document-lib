@@ -5,7 +5,7 @@ import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
-import com.aerospike.documentapi.JsonPathQuery;
+import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;

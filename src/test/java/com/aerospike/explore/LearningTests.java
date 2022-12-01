@@ -1,11 +1,16 @@
 package com.aerospike.explore;
 
-import com.aerospike.client.*;
+import com.aerospike.client.Key;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentapi.*;
-import com.aerospike.documentapi.utils.Utils;
+import com.aerospike.documentapi.AerospikeDocumentClient;
+import com.aerospike.documentapi.BaseTestConfig;
+import com.aerospike.documentapi.DocumentApiException;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.util.JsonConverters;
+import com.aerospike.documentapi.util.Utils;
+import com.aerospike.documentapi.util.DebugUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,12 +18,64 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * These are not really tests - just code I've written to work out how to do various things
  */
 public class LearningTests extends BaseTestConfig {
+
+    private static StaffMember getTestStaffMemberObject() {
+        StaffMember staff = new StaffMember();
+
+        staff.setName("mkyong");
+        staff.setAge(38);
+        staff.setPosition(new String[]{"Founder", "CTO", "Writer"});
+        Map<String, BigDecimal> salary = new HashMap<String, BigDecimal>() {{
+            put("2010", new BigDecimal(10000));
+            put("2012", new BigDecimal(12000));
+            put("2018", new BigDecimal(14000));
+        }};
+        staff.setSalary(salary);
+        staff.setSkills(Arrays.asList("java", "python", "node", "kotlin"));
+
+        return staff;
+    }
+
+    private static void putJsonNodeToDB(JsonNode jsonNode, Key key) {
+        client.put(null, key, Utils.createBinByJsonNodeType(JSON_EXAMPLE_BIN, jsonNode));
+    }
+
+    private static Map<?, ?> getMapFromDB(Key key) {
+        Record r = client.get(new Policy(), key);
+        return r.getMap(JSON_EXAMPLE_BIN);
+    }
+
+    private static void deleteKey(Key key) {
+        client.delete(getWritePolicy(), key);
+    }
+
+    private static WritePolicy getWritePolicy() {
+        WritePolicy writePolicy = new WritePolicy();
+        //writePolicy.durableDelete = true;
+        return writePolicy;
+    }
+
+    private static String pojoToString(TestPOJO p) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        // Java objects to JSON string - compact-print
+        return mapper.writeValueAsString(p);
+    }
+
+    private static String pojoToPrettyString(TestPOJO p) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        // Java objects to JSON string - compact-print
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p);
+    }
 
     /**
      * Read json from file & output to console
@@ -92,60 +149,14 @@ public class LearningTests extends BaseTestConfig {
         _2019Films.add("Ad Astra");
         documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019", _2019Films);
 
-        documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films", "Rolling Thunder");
-        documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films", "The Three Burials Of Melquiades Estrada");
+        documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films",
+                "Rolling Thunder");
+        documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films",
+                "The Three Burials Of Melquiades Estrada");
         documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
 
         System.out.println(documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]"));
         System.out.println(documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[5]"));
         System.out.println(documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019"));
-    }
-
-    private static StaffMember getTestStaffMemberObject() {
-        StaffMember staff = new StaffMember();
-
-        staff.setName("mkyong");
-        staff.setAge(38);
-        staff.setPosition(new String[]{"Founder", "CTO", "Writer"});
-        Map<String, BigDecimal> salary = new HashMap<String, BigDecimal>() {{
-            put("2010", new BigDecimal(10000));
-            put("2012", new BigDecimal(12000));
-            put("2018", new BigDecimal(14000));
-        }};
-        staff.setSalary(salary);
-        staff.setSkills(Arrays.asList("java", "python", "node", "kotlin"));
-
-        return staff;
-    }
-
-    private static void putJsonNodeToDB(JsonNode jsonNode, Key key) {
-        client.put(null, key, Utils.createBinByJsonNodeType(JSON_EXAMPLE_BIN, jsonNode));
-    }
-
-    private static Map<?, ?> getMapFromDB(Key key) {
-        Record r = client.get(new Policy(), key);
-        return r.getMap(JSON_EXAMPLE_BIN);
-    }
-
-    private static void deleteKey(Key key) {
-        client.delete(getWritePolicy(), key);
-    }
-
-    private static WritePolicy getWritePolicy() {
-        WritePolicy writePolicy = new WritePolicy();
-        //writePolicy.durableDelete = true;
-        return writePolicy;
-    }
-
-    private static String pojoToString(TestPOJO p) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        // Java objects to JSON string - compact-print
-        return mapper.writeValueAsString(p);
-    }
-
-    private static String pojoToPrettyString(TestPOJO p) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        // Java objects to JSON string - compact-print
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p);
     }
 }

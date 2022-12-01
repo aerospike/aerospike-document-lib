@@ -1,17 +1,12 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.BatchRecord;
-import com.aerospike.client.Key;
-import com.aerospike.documentapi.batch.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 

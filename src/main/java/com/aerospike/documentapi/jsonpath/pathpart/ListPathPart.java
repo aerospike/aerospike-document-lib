@@ -1,11 +1,11 @@
-package com.aerospike.documentapi.pathparts;
+package com.aerospike.documentapi.jsonpath.pathpart;
 
 import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.client.cdt.ListReturnType;
-import com.aerospike.documentapi.utils.Utils;
+import com.aerospike.documentapi.util.Utils;
 
 import java.util.Objects;
 

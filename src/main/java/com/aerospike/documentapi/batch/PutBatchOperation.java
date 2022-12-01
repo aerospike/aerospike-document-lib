@@ -2,7 +2,7 @@ package com.aerospike.documentapi.batch;
 
 import com.aerospike.client.*;
 import com.aerospike.client.cdt.MapOperation;
-import com.aerospike.documentapi.JsonPathQuery;
+import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 

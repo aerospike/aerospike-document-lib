@@ -1,5 +1,6 @@
-package com.aerospike.documentapi;
+package com.aerospike.documentapi.jsonpath;
 
+import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
