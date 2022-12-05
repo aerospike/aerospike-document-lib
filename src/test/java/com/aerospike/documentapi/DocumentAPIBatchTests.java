@@ -726,20 +726,28 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // reading example2, 1 step
-        inputsList.add(new BatchOperationInput("$.example2.*", GET));
+//        inputsList.add(new BatchOperationInput("$.example2.*", GET));
         // reading key06 in all elements of example2, 1 step with post-production
-        inputsList.add(new BatchOperationInput("$.example2[*].key06", GET));
+//        inputsList.add(new BatchOperationInput("$.example2[*].key06", GET));
         // reading a map, 1 step
-        inputsList.add(new BatchOperationInput("$.example1", GET));
+//        inputsList.add(new BatchOperationInput("$.example1", GET));
         // putting a value to the existing "key03" in all elements, 2 steps
-        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
-        // appending a value to the end of "key03" array for every element, 1 step
+        // putting a value to the existing "key03" in all elements, 1 step
         inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND));
+        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
+        inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND)); // end of the 1st sublist of ops
+        // appending a value to the end of "key03" array for every element, 2 steps
+        inputsList.add(new BatchOperationInput("$.example2[*].key03", APPEND));
+        inputsList.add(new BatchOperationInput("$.example2[1].key01", APPEND)); // end of the 2nd sublist of ops
+        inputsList.add(new BatchOperationInput("$.example2[*].key03", DELETE));
+        inputsList.add(new BatchOperationInput("$.example2[1].key01", APPEND)); // end of the 3rd sublist of ops
+//        inputsList.add(new BatchOperationInput("$.example2[*].key01", APPEND));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
         String objToAppend = "87";
-        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
+//        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
+        String[] binNames = {"documentBin0"};
 
         // adding similar document bins with different jsonPath strings and different operations
         List<BatchOperation> batchOpsList = createBatchOperations(
