@@ -14,6 +14,7 @@ import com.aerospike.documentapi.policy.DocumentPolicy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -189,13 +190,24 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
     @Override
     public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) throws DocumentApiException {
-        // if there are repeating keys
-        validateTwoStepOps(batchOperations);
+        Map<Key, List<BatchOperation>> opsByKey = getBatchOpStream(batchOperations, true)
+                .collect(Collectors.groupingBy(BatchOperation::getKey));
+        Map<Key, List<BatchOperation>> sameKeyGroups = opsByKey.entrySet().parallelStream()
+                .filter(entry -> entry.getValue().size() > 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        List<BatchRecord> firstStepRecords = getBatchOpStream(batchOperations, parallel)
-                .map(BatchOperation::getBatchRecord)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<BatchRecord> firstStepRecords = new ArrayList<>();
+        for (BatchOperation batchOp : batchOperations) {
+            BatchRecord batchRecord = batchOp.getBatchRecord();
+
+            if (batchRecord != null) {
+                if (sameKeyGroups.containsKey(batchRecord.key)) {
+                    throw new IllegalArgumentException("2-step operations with repeating keys are not allowed in a batch");
+                } else {
+                    firstStepRecords.add(batchRecord);
+                }
+            }
+        }
 
         // performing first step operations
         if (!firstStepRecords.isEmpty()) {
@@ -218,27 +230,6 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         return getBatchOpStream(batchOperations, parallel)
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
-    }
-
-    private void validateTwoStepOps(List<BatchOperation> batchOperations) {
-        Map<Key, List<BatchOperation>> opsByKey = getBatchOpStream(batchOperations, true)
-                .collect(Collectors.groupingBy(BatchOperation::getKey));
-
-        opsByKey.values().stream()
-                .filter(list -> list.size() > 1) // have repeating keys
-                .filter(this::checkForTwoStepOps) // have both 1st and 2nd steps
-                .forEach(list -> {
-                    throw new IllegalArgumentException("2-step operations with repeating keys are not allowed in a batch");
-                });
-    }
-
-    private boolean checkForTwoStepOps(List<BatchOperation> list) {
-        boolean res = false;
-
-        for (BatchOperation batchOp : list) {
-            if (batchOp.getBatchRecord() != null) res = true;
-        }
-        return res;
     }
 
     private Stream<BatchOperation> getBatchOpStream(List<BatchOperation> batchOperations, boolean parallel) {

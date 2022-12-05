@@ -710,38 +710,31 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     /**
      * Check a batch of different types 2-step operations using the same keys with multiple bins.
      * <ul>
-     * <li>Reading example2, 1 step.</li>
-     * <li>Reading key06 in all elements of example2, 1 step with post-production.</li>
-     * <li>Reading a map, 1 step.</li>
-     * <li>Putting a value to the existing "key03" in all elements, 2 steps.</li>
-     * <li>Appending a value to the end of "key03" array for every element, 1 step.</li>
+     * <li>Putting a value to the existing "key03" in element 0, 1 step.</li>
+     * <li>Appending a value to the end of "key03" array for element 0, 1 step.</li>
+     * <li>Putting a value to the existing "key03" in element 1, 1 step.</li>
+     * <li>Appending a value to the end of "key03" array for element 1, 1 step.</li>
+     * <li>Deleting "key03" for element 1, 1 step.</li>
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix2StepWildcardMultipleBins() throws IOException, JsonPathParser.JsonParseException,
+    public void testPositiveBatchMixSameKeys1StepMultipleBins() throws IOException, JsonPathParser.JsonParseException,
             DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
-        // reading example2, 1 step
-//        inputsList.add(new BatchOperationInput("$.example2.*", GET));
-        // reading key06 in all elements of example2, 1 step with post-production
-//        inputsList.add(new BatchOperationInput("$.example2[*].key06", GET));
-        // reading a map, 1 step
-//        inputsList.add(new BatchOperationInput("$.example1", GET));
-        // putting a value to the existing "key03" in all elements, 2 steps
-        // putting a value to the existing "key03" in all elements, 1 step
+        // putting a value to the existing "key03" in element 0, 1 step
+        inputsList.add(new BatchOperationInput("$.example2[0].key01", PUT));
+        // appending a value to the end of "key03" array for element 0, 1 step
         inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND));
-        inputsList.add(new BatchOperationInput("$.example2[*].key03", PUT));
-        inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND)); // end of the 1st sublist of ops
-        // appending a value to the end of "key03" array for every element, 2 steps
-        inputsList.add(new BatchOperationInput("$.example2[*].key03", APPEND));
-        inputsList.add(new BatchOperationInput("$.example2[1].key01", APPEND)); // end of the 2nd sublist of ops
-        inputsList.add(new BatchOperationInput("$.example2[*].key03", DELETE));
-        inputsList.add(new BatchOperationInput("$.example2[1].key01", APPEND)); // end of the 3rd sublist of ops
-//        inputsList.add(new BatchOperationInput("$.example2[*].key01", APPEND));
+        // putting a value to the existing "key03" in element 1, 1 step
+        inputsList.add(new BatchOperationInput("$.example2[1].key01", PUT));
+        // appending a value to the end of "key03" array for element 1, 1 step
+        inputsList.add(new BatchOperationInput("$.example2[1].key01", APPEND));
+        // deleting "key03" for element 1, 1 step
+        inputsList.add(new BatchOperationInput("$.example2[0].key05", DELETE));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
