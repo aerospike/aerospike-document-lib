@@ -123,8 +123,9 @@ public interface IAerospikeDocumentClient {
 
     /**
      * Perform batch operations.
-     * Operations order is preserved only for the operations with different keys.
-     * The order of operations with the same keys is not guaranteed, some of them might get omitted.
+     * <p>Operations order is preserved only for the operations with different keys.</p>
+     * <p>The order of operations with the same keys is not guaranteed, some of them might get omitted.</p>
+     * <p>Two-step operations with the same keys are not allowed in a batch.</p>
      *
      * @param batchOperations A list of batch operations to apply.
      * @param parallel        Whether batch processing stream operations should run in parallel.
