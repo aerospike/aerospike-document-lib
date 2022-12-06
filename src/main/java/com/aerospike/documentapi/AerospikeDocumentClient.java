@@ -194,15 +194,13 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         // validating and collecting first step operations
         List<BatchRecord> firstStepRecords = new ArrayList<>();
-        for (BatchOperation batchOp : batchOperations) {
-            BatchRecord batchRecord = batchOp.getBatchRecord();
-
-            if (batchRecord != null) {
-                validateTwoStepOpKey(sameKeyGroups, batchRecord.key);
-
-                firstStepRecords.add(batchRecord);
-            }
-        }
+        getBatchOpStream(batchOperations, parallel)
+                .map(BatchOperation::getBatchRecord)
+                .filter(Objects::nonNull)
+                .forEach(batchRecord -> {
+                    validateTwoStepOpKey(sameKeyGroups, batchRecord.key);
+                    firstStepRecords.add(batchRecord);
+                });
 
         // performing first step operations
         if (!firstStepRecords.isEmpty()) {
@@ -244,6 +242,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     private void validateTwoStepOpKey(Map<Key, List<BatchOperation>> sameKeyGroups, Key key) throws IllegalArgumentException {
+        if (sameKeyGroups.isEmpty()) return;
+
         if (sameKeyGroups.containsKey(key)) {
             throw new IllegalArgumentException("2-step operations with repeating keys are not allowed in a batch");
         }

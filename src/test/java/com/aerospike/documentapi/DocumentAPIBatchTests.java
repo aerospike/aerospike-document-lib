@@ -708,39 +708,35 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     /**
-     * Check a batch of different types 2-step operations using the same keys with multiple bins.
+     * Check a batch of different types 2-step operations for multiple bins using different keys.
      * <ul>
-     * <li>Putting a value to the existing "key03" in element 0, 1 step.</li>
-     * <li>Appending a value to the end of "key03" array for element 0, 1 step.</li>
-     * <li>Putting a value to the existing "key03" in element 1, 1 step.</li>
-     * <li>Appending a value to the end of "key03" array for element 1, 1 step.</li>
-     * <li>Deleting "key03" for element 1, 1 step.</li>
+     * <li>Reading key07 in every element of example2, 1 step with post-production</li>
+     * <li>Putting to the existing "key03" in every element of example2, 2 steps.</li>
+     * <li>Appending to the end of existing "key01" array for every element of example2, 2 steps.</li>
+     * <li>Deleting "key05" for every element of example2, 2 steps.</li>
      * </ul>
      */
     @Test
-    public void testPositiveBatchMixSameKeys1StepMultipleBins() throws IOException, JsonPathParser.JsonParseException,
+    public void testPositiveBatchMix2StepWildcardMultipleBins() throws IOException, JsonPathParser.JsonParseException,
             DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
-        // putting a value to the existing "key03" in element 0, 1 step
+        // reading key07 in every element of example2, 1 step with post-production
+        inputsList.add(new BatchOperationInput("$.example2[*].key07", GET));
+        // putting a value to the existing "key03", 2 steps
         inputsList.add(new BatchOperationInput("$.example2[0].key03", PUT));
-        // appending a value to the end of "key03" array for element 0, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[0].key03", APPEND));
-        // putting a value to the existing "key03" in element 1, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[1].key03", PUT));
-        // appending a value to the end of "key03" array for element 1, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[1].key03", APPEND));
-        // deleting "key03" for element 1, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[1].key05", DELETE));
+        // appending a value to the end of "key03" array for element 1, 2 steps
+        inputsList.add(new BatchOperationInput("$.example2[*].key01", APPEND));
+        // deleting "key05" for every element of example2, 2 steps
+        inputsList.add(new BatchOperationInput("$.example2[*].key05", DELETE));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");
         String objToAppend = "87";
-//        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
-        String[] binNames = {"documentBin0"};
+        String[] binNames = {"documentBin0", "documentBin1", "documentBin2", "documentBin3", "documentBin4"};
 
         // adding similar document bins with different jsonPath strings and different operations
         List<BatchOperation> batchOpsList = createBatchOperations(
@@ -749,11 +745,11 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 inputsList,
                 objToPut,
                 objToAppend,
-                true,
+                false,
                 binNames
         );
 
-        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, false);
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
 
         Object objFromDb, modifiedJson, expectedObject;
         DocumentContext context = JsonPath.parse(testMaterialJson);
