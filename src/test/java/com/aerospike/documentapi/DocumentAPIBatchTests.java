@@ -726,15 +726,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // putting a value to the existing "key03" in element 0, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[0].key01", PUT));
+        inputsList.add(new BatchOperationInput("$.example2[0].key03", PUT));
         // appending a value to the end of "key03" array for element 0, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[0].key01", APPEND));
+        inputsList.add(new BatchOperationInput("$.example2[0].key03", APPEND));
         // putting a value to the existing "key03" in element 1, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[1].key01", PUT));
+        inputsList.add(new BatchOperationInput("$.example2[1].key03", PUT));
         // appending a value to the end of "key03" array for element 1, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[1].key01", APPEND));
+        inputsList.add(new BatchOperationInput("$.example2[1].key03", APPEND));
         // deleting "key03" for element 1, 1 step
-        inputsList.add(new BatchOperationInput("$.example2[0].key05", DELETE));
+        inputsList.add(new BatchOperationInput("$.example2[1].key05", DELETE));
 
         List<String> objToPut = new ArrayList<>();
         objToPut.add("86");

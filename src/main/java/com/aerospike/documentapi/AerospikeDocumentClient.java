@@ -190,22 +190,17 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
     @Override
     public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) throws DocumentApiException {
-        Map<Key, List<BatchOperation>> opsByKey = getBatchOpStream(batchOperations, true)
-                .collect(Collectors.groupingBy(BatchOperation::getKey));
-        Map<Key, List<BatchOperation>> sameKeyGroups = opsByKey.entrySet().parallelStream()
-                .filter(entry -> entry.getValue().size() > 1)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<Key, List<BatchOperation>> sameKeyGroups = groupByKeys(batchOperations);
 
+        // validating and collecting first step operations
         List<BatchRecord> firstStepRecords = new ArrayList<>();
         for (BatchOperation batchOp : batchOperations) {
             BatchRecord batchRecord = batchOp.getBatchRecord();
 
             if (batchRecord != null) {
-                if (sameKeyGroups.containsKey(batchRecord.key)) {
-                    throw new IllegalArgumentException("2-step operations with repeating keys are not allowed in a batch");
-                } else {
-                    firstStepRecords.add(batchRecord);
-                }
+                validateTwoStepOpKey(sameKeyGroups, batchRecord.key);
+
+                firstStepRecords.add(batchRecord);
             }
         }
 
@@ -232,10 +227,25 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 .collect(Collectors.toList());
     }
 
+    private Map<Key, List<BatchOperation>> groupByKeys(List<BatchOperation> batchOperations) {
+        Map<Key, List<BatchOperation>> opsByKey = getBatchOpStream(batchOperations, true)
+                .collect(Collectors.groupingBy(BatchOperation::getKey));
+
+        return opsByKey.entrySet().parallelStream()
+                .filter(entry -> entry.getValue().size() > 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private Stream<BatchOperation> getBatchOpStream(List<BatchOperation> batchOperations, boolean parallel) {
         Stream<BatchOperation> batchOpStream = batchOperations.stream();
         if (parallel) batchOpStream = batchOpStream.parallel();
 
         return batchOpStream;
+    }
+
+    private void validateTwoStepOpKey(Map<Key, List<BatchOperation>> sameKeyGroups, Key key) throws IllegalArgumentException {
+        if (sameKeyGroups.containsKey(key)) {
+            throw new IllegalArgumentException("2-step operations with repeating keys are not allowed in a batch");
+        }
     }
 }
