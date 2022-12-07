@@ -379,6 +379,91 @@ jsonPath = "$.authentication.login[?(@.id > 10)]";
 objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 ```
 
+## Batch operations
+
+Starting at version `2.0.0` there is support for batch operations.
+
+You can now send operations (GET, PUT, APPEND, DELETE) in batches using json path or JSONPath query
+for single and multiple bins.
+
+Keys related limitations:
+
+- Operations order in a batch is preserved only for the operations with different keys.
+- JSONPath queries operations are allowed in a batch only if they don't have repeating keys.
+
+A use-case example can be sending a batch of operations at once to update bins storing events, 
+or append values for single bins storing analytics, when many steps of the same kind need to be executed in sequence.
+
+### Using batch operations
+
+Here is a basic example of using batch operations:
+
+```java
+// Insert
+BatchOperation operation1 = new PutBatchOperation(
+    key1, 
+    Collections.singletonList(documentBinName),
+    "$.selected_filmography.2019",
+    "Ad Astra"
+);
+
+// Update
+BatchOperation operation2 = new PutBatchOperation(
+    key2,
+    Collections.singletonList(documentBinName),
+    "$.imdb_rank.rank",
+    45
+);
+
+// Append
+BatchOperation operation3 = new AppendBatchOperation(
+    key3,
+    Collections.singletonList(documentBinName),
+    "$.best_films_ranked[0].films",
+    "Men In Black"
+);
+
+// Delete
+BatchOperation operation4 = new DeleteBatchOperation(
+    key4,
+    Collections.singletonList(documentBinName),
+    "$.best_films_ranked[1]"
+);
+
+// Get
+BatchOperation operation5 = new GetBatchOperation(
+    key5,
+    Collections.singletonList(documentBinName),
+    "$.best_films_ranked[0].films[0]"
+);
+
+// Update using JSONPath query
+BatchOperation operation6 = new PutBatchOperation(
+    key6,
+    Collections.singletonList(documentBinName2),
+    "$.authentication..device",
+    "Mobile"
+);
+
+// Get from multiple similarly structured bins
+String binName1 = "events1Bin";
+String binName2 = "events2Bin";
+List<String> bins = new ArrayList<>();
+bins.add(binName1);
+bins.add(binName2);
+BatchOperation operation7 = new GetBatchOperation(
+    key7,
+    bins,
+    "$.authentication.logout.name"
+);
+
+// Collecting operations
+List<BatchOperation> batchOpsList = new ArrayList<>();
+batchOpsList.add(operation1, operation2, operation3, operation4, operation5, operation6, operation7);
+documentClient.batchPerform(batchOpsList, true);
+```
+
+
 ## References
 
  * See [AerospikeDocumentClient.java](https://github.com/aerospike/aerospike-document-lib/blob/main/src/main/java/com/aerospike/documentapi/AerospikeDocumentClient.java) for full details of the API.
