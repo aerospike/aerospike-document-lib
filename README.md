@@ -383,7 +383,7 @@ objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
 Starting at version `2.0.0` there is support for batch operations.
 
-You can now send operations (GET, PUT, APPEND, DELETE) in batches using JSONPath string or query
+You can now send operations (GET, PUT, APPEND, DELETE) in batches using json path or JSONPath query
 for single and multiple bins.
 
 Keys related limitations:
@@ -391,8 +391,8 @@ Keys related limitations:
 - Operations order in a batch is preserved only for the operations with different keys.
 - JSONPath queries operations are allowed in a batch only if they don`t have repeating keys.
 
-A use-case example can be adding multiple operations to a batch and sending it at once to update bins storing events, 
-or append values for single bins, thus saving server resources and reducing boilerplate code.
+A use-case example can be sending a batch of operations at once to update bins storing events, 
+or append values for single bins storing analytics, where many steps of the same kind need to be executed in sequence.
 
 ### Using batch operations
 
