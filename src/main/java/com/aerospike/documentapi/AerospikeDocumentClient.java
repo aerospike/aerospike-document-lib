@@ -189,13 +189,13 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
     @Override
     public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) throws DocumentApiException {
-        // collecting non-empty first step records
-        Stream<BatchOperation> batchOpStream = batchOperations.stream();
-        if (parallel) batchOpStream = batchOpStream.parallel();
+        Map<Key, List<BatchOperation>> sameKeyGroups = groupByKeys(batchOperations);
 
-        List<BatchRecord> firstStepRecords = batchOpStream
+        // validating and collecting first step operations
+        List<BatchRecord> firstStepRecords = getBatchOpStream(batchOperations, parallel)
                 .map(BatchOperation::getBatchRecord)
                 .filter(Objects::nonNull)
+                .map(batchRecord -> validateAndReturn(sameKeyGroups, batchRecord))
                 .collect(Collectors.toList());
 
         // performing first step operations
@@ -204,9 +204,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting non-empty second step records without json parsing error
-        batchOpStream = batchOperations.stream();
-        if (parallel) batchOpStream = batchOpStream.parallel();
-        List<BatchRecord> secondStepRecords = batchOpStream
+        List<BatchRecord> secondStepRecords = getBatchOpStream(batchOperations, parallel)
                 .map(BatchOperation::setSecondStepRecordAndGet)
                 .filter(Objects::nonNull)
                 .filter(batchRec -> batchRec.resultCode != -2)
@@ -218,10 +216,31 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         }
 
         // collecting resulting records
-        batchOpStream = batchOperations.stream();
-        if (parallel) batchOpStream = batchOpStream.parallel();
-        return batchOpStream
+        return getBatchOpStream(batchOperations, parallel)
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
+    }
+
+    private Map<Key, List<BatchOperation>> groupByKeys(List<BatchOperation> batchOperations) {
+        Map<Key, List<BatchOperation>> opsByKey = getBatchOpStream(batchOperations, true)
+                .collect(Collectors.groupingBy(BatchOperation::getKey));
+
+        return opsByKey.entrySet().parallelStream()
+                .filter(entry -> entry.getValue().size() > 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private Stream<BatchOperation> getBatchOpStream(List<BatchOperation> batchOperations, boolean parallel) {
+        Stream<BatchOperation> batchOpStream = batchOperations.stream();
+        if (parallel) batchOpStream = batchOpStream.parallel();
+
+        return batchOpStream;
+    }
+
+    private BatchRecord validateAndReturn(Map<Key, List<BatchOperation>> sameKeyGroups, BatchRecord batchRecord) {
+        if (sameKeyGroups.containsKey(batchRecord.key)) {
+            throw new IllegalArgumentException("Multiple two-step operations with the same key are not allowed");
+        }
+        return batchRecord;
     }
 }
