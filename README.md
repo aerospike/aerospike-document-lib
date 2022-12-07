@@ -392,7 +392,7 @@ Keys related limitations:
 - JSONPath queries operations are allowed in a batch only if they don't have repeating keys.
 
 A use-case example can be sending a batch of operations at once to update bins storing events, 
-or append values for single bins storing analytics, where many steps of the same kind need to be executed in sequence.
+or append values for single bins storing analytics, when many steps of the same kind need to be executed in sequence.
 
 ### Using batch operations
 
