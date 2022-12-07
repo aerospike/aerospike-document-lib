@@ -130,7 +130,8 @@ public interface IAerospikeDocumentClient {
      * @param batchOperations A list of batch operations to apply.
      * @param parallel        Whether batch processing stream operations should run in parallel.
      * @return The list of corresponding {@link BatchRecord} results.
+     * @throws IllegalArgumentException if the batch has multiple two-step operations with the same key.
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException, IllegalArgumentException;
+            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
 }
