@@ -14,7 +14,6 @@ import com.aerospike.documentapi.policy.DocumentPolicy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -193,14 +192,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         Map<Key, List<BatchOperation>> sameKeyGroups = groupByKeys(batchOperations);
 
         // validating and collecting first step operations
-        List<BatchRecord> firstStepRecords = new ArrayList<>();
-        getBatchOpStream(batchOperations, parallel)
+        List<BatchRecord> firstStepRecords = getBatchOpStream(batchOperations, parallel)
                 .map(BatchOperation::getBatchRecord)
                 .filter(Objects::nonNull)
-                .forEach(batchRecord -> {
-                    validateTwoStepOpKey(sameKeyGroups, batchRecord.key);
-                    firstStepRecords.add(batchRecord);
-                });
+                .map(batchRecord -> validateAndReturn(sameKeyGroups, batchRecord))
+                .collect(Collectors.toList());
 
         // performing first step operations
         if (!firstStepRecords.isEmpty()) {
@@ -241,11 +237,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         return batchOpStream;
     }
 
-    private void validateTwoStepOpKey(Map<Key, List<BatchOperation>> sameKeyGroups, Key key) throws IllegalArgumentException {
-        if (sameKeyGroups.isEmpty()) return;
-
-        if (sameKeyGroups.containsKey(key)) {
-            throw new IllegalArgumentException("2-step operations with repeating keys are not allowed in a batch");
+    private BatchRecord validateAndReturn(Map<Key, List<BatchOperation>> sameKeyGroups, BatchRecord batchRecord) {
+        if (sameKeyGroups.containsKey(batchRecord.key)) {
+            throw new IllegalArgumentException("Multiple two-step operations with the same key are not allowed");
         }
+        return batchRecord;
     }
 }

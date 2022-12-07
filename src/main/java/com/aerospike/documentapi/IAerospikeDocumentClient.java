@@ -124,12 +124,13 @@ public interface IAerospikeDocumentClient {
     /**
      * Perform batch operations.
      * <p>Operations order is preserved only for the operations with different keys.</p>
-     * <p>The order of operations with the same keys is not guaranteed, some of them might get omitted.</p>
-     * <p>Two-step operations with the same keys are not allowed in a batch.</p>
+     * <p>The order and consistency of one-step (JSON path) operations with the same keys is not guaranteed.</p>
+     * <p>Two-step (JSONPath query) operations with the same keys are not allowed in a batch.</p>
      *
      * @param batchOperations A list of batch operations to apply.
      * @param parallel        Whether batch processing stream operations should run in parallel.
      * @return The list of corresponding {@link BatchRecord} results.
+     * @throws IllegalArgumentException if the batch has multiple two-step operations with the same key.
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel)
             throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
