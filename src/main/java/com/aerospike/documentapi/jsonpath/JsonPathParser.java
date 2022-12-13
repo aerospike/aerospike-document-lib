@@ -5,7 +5,6 @@ import com.aerospike.documentapi.jsonpath.pathpart.ListPathPart;
 import com.aerospike.documentapi.jsonpath.pathpart.MapPathPart;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -13,8 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for parsing JSON paths
- * Not useful outside of this package, hence package visibility
+ * Utility class for parsing JSONPath strings.
  */
 public class JsonPathParser {
 
@@ -38,9 +36,10 @@ public class JsonPathParser {
     );
 
     // Store our representation of the individual path parts
-    JsonPathObject jsonPathObject = new JsonPathObject();
+    private final JsonPathObject jsonPathObject;
 
     public JsonPathParser() {
+        this.jsonPathObject = new JsonPathObject();
     }
 
     public static PathPart extractLastPathPart(List<PathPart> pathParts) {
@@ -53,47 +52,41 @@ public class JsonPathParser {
 
     /**
      * Given a list of path parts, convert this to the list of contexts you would need
-     * to retrieve the JSON path represented by the list of path parts
+     * to retrieve the JSON path represented by the list of path parts.
      *
      * @param pathParts pathParts list to convert.
      * @return An array of contexts (CTXs).
      */
-    public static CTX[] pathPartsToContextsArray(List<PathPart> pathParts) {
-        List<CTX> contextList = new ArrayList<>();
-        for (PathPart pathPart : pathParts) {
-            contextList.add(pathPart.toAerospikeContext());
-        }
-        return contextList.toArray(new CTX[contextList.size()]);
+    public static CTX[] pathPartsToContextArray(List<PathPart> pathParts) {
+        return pathParts.stream()
+                .map(PathPart::toAerospikeContext)
+                .toArray(CTX[]::new);
     }
 
     /**
-     * Turn json path as string into PathPart recommendation
+     * Parse a JSON path string into a {@link JsonPathObject} object.
      *
-     * @param jsonString a given JSON as String
-     * @return List<PathPart></PathPart>
-     * @throws JsonParseException a JsonParseException will be thrown in case of an error.
+     * @param jsonString the given JSON path string.
+     * @return the {@link JsonPathObject} object.
+     * @throws JsonParseException if fails to parse the JSON path string.
      */
     public JsonPathObject parse(String jsonString) throws JsonParseException {
-        if (jsonString.charAt(0) != '$') {
-            throw new JsonPrefixException(jsonString);
-        }
-        StringTokenizer tokenizer = new StringTokenizer(jsonString, JSON_PATH_SEPARATOR);
-        if (!tokenizer.nextToken().equals(DOCUMENT_ROOT_TOKEN)) {
-            throw new JsonPrefixException(jsonString);
-        }
+        validateJsonPath(jsonString);
 
+        StringTokenizer tokenizer = new StringTokenizer(jsonString, JSON_PATH_SEPARATOR);
         Integer index = getFirstIndexOfAQueryIndication(jsonString);
         // Query is required
         if (index != null) {
             /*
-                Split the jsonString into 2 parts:
-                    1. A string of path parts before a query operator to fetch the smallest Json possible from Aerospike.
-                    2. A string of the remaining JsonPath to later use for executing a JsonPath query on the fetched Json from Aerospike.
+            Split the jsonString into 2 parts:
+                1. A string of path parts before a query operator to fetch the smallest Json possible from Aerospike.
+                2. A string of the remaining JsonPath to later use for executing a JsonPath query on the fetched Json
+                   from Aerospike.
 
-                For example:
-                $.store.book[*].author
-                store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the fetched results
-                from Aerospike (key = book, value = nested Json).
+            For example:
+            $.store.book[*].author
+            store.book will be fetched from Aerospike and a JsonPath book[*].author query will be executed on the
+            fetched results from Aerospike (key = book, value = nested Json).
             */
             jsonPathObject.setRequiresJsonPathQuery(true);
             String aerospikePathPartsString = jsonString.substring(0, index);
@@ -113,23 +106,25 @@ public class JsonPathParser {
     }
 
     /**
-     * Utility internal method to process the individual path parts
-     * Appends the found path parts to the list of path parts already found
+     * An internal method to process the individual path parts.
+     * Appends the found path parts to the list of path parts already found.
      * Expected form of pathPart is key[index1][index2]
      *
-     * @param pathPart pathPart to Parse.
-     * @throws JsonParseException a JsonParseException will be thrown in case of an error.
+     * @param pathPart pathPart to parse.
+     * @throws JsonParseException if fails to parse the pathPart string.
      */
     private void parsePathPart(String pathPart) throws JsonParseException {
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
         if ((!pathPart.contains("[")) && (!pathPart.contains("]"))) {
             // ignore * wildcard after a dot, it's the same as ending with a .path
-            if (!pathPart.equals("*")) {
+            if (!pathPart.equals("*") && !pathPart.equals(DOCUMENT_ROOT_TOKEN)) {
                 jsonPathObject.addPathPart(new MapPathPart(pathPart));
             }
         } else if (keyMatcher.find()) {
             String key = keyMatcher.group(1);
-            jsonPathObject.addPathPart(new MapPathPart(key));
+            if (!key.equals(DOCUMENT_ROOT_TOKEN)) {
+                jsonPathObject.addPathPart(new MapPathPart(key));
+            }
             Matcher indexMatcher = INDEX_PATTERN.matcher(pathPart);
 
             while (indexMatcher.find()) {
@@ -148,9 +143,18 @@ public class JsonPathParser {
                 .orElse(null); // in case there no match for a query indication
     }
 
-    /**
-     * Different types of json path exception
+    private void validateJsonPath(String jsonString) throws JsonParseException {
+        if (!jsonString.equals(DOCUMENT_ROOT_TOKEN)
+                && !jsonString.startsWith("$.")
+                && !jsonString.startsWith("$[")) {
+            throw new JsonPrefixException(jsonString);
+        }
+    }
+
+    /*
+     * Different types of json path exceptions
      */
+
     public abstract static class JsonParseException extends Exception {
         final String jsonString;
 

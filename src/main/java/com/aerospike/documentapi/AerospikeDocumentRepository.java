@@ -38,7 +38,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             // Retrieve the part of the document referred to by the JSON path
             Record r;
             try {
@@ -74,7 +74,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             // Retrieve the part of the document referred to by the JSON path
             Record r;
             Operation[] operations = documentBinNames.stream()
@@ -110,7 +110,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikePutOperation(documentBinName, jsonObject, ctxArray));
@@ -138,7 +138,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 operations = documentBinNames.stream()
                         .map(bn -> finalPathPart.toAerospikePutOperation(bn, jsonObject, ctxArray))
@@ -168,7 +168,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 operations = queryResults.entrySet().stream()
                         .map(e -> finalPathPart.toAerospikePutOperation(e.getKey(), e.getValue(), ctxArray))
@@ -191,7 +191,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeAppendOperation(documentBinName, jsonObject, ctxArray));
@@ -212,7 +212,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 Operation[] operations = documentBinNames.stream()
                         .map(bn -> finalPathPart.toAerospikeAppendOperation(bn, jsonObject, ctxArray))
@@ -235,7 +235,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 Operation[] operations = queryResults.entrySet().stream()
                         .map(e -> finalPathPart.toAerospikeAppendOperation(e.getKey(), e.getValue(), ctxArray))
@@ -259,7 +259,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathParts);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathParts);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathParts);
             try {
                 client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeDeleteOperation(documentBinName, ctxArray));
@@ -283,7 +283,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // We need to treat the last part of the path differently
             PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathPart);
             // Then turn the rest into the contexts representation
-            CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathPart);
+            CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             try {
                 Operation[] operations = documentBinNames.stream()
                         .map(bn -> finalPathPart.toAerospikeDeleteOperation(bn, ctxArray))

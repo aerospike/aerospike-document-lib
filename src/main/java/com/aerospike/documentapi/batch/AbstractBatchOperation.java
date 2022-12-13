@@ -63,7 +63,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         // We need to treat the last part of the path differently
         PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathParts);
         // Then turn the rest into the contexts representation
-        CTX[] ctxArray = JsonPathParser.pathPartsToContextsArray(pathParts);
+        CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathParts);
 
         return new PathDetails(finalPathPart, ctxArray);
     }
