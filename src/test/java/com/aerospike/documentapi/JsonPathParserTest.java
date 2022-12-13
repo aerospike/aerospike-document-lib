@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class JsonPathParserTest {
+class JsonPathParserTest {
 
     /**
      * Check that a parse error is thrown if json path does not start with a $.
      */
     @Test
-    public void throwErrorIfNotDollarStart() {
+    void throwErrorIfNotDollarStart() {
         String testPath = ".this.that";
         JsonPathParser parser = new JsonPathParser();
         try {
@@ -29,7 +29,7 @@ public class JsonPathParserTest {
      * Check that a parse error is thrown if json path does not start with a $.
      */
     @Test
-    public void throwErrorIfNotDollarDotStart() {
+    void throwErrorIfNotDollarDotStart() {
         String testPath = "$x.this.that";
         JsonPathParser parser = new JsonPathParser();
         try {
@@ -43,7 +43,7 @@ public class JsonPathParserTest {
      * Check that an error is not thrown if json path starts with a $.
      */
     @Test
-    public void noThrowErrorIfNotDollarStart() {
+    void noThrowErrorIfNotDollarStart() {
         String testPath = "$.this.that";
         JsonPathParser parser = new JsonPathParser();
         try {
@@ -54,10 +54,27 @@ public class JsonPathParserTest {
     }
 
     /**
+     * Verify that $[1] is parsed correctly.
+     */
+    @Test
+    void parsesRootListPath() {
+        String testPath = "$[1]";
+        JsonPathParser parser = new JsonPathParser();
+        JsonPathObject jsonPathObject = new JsonPathObject();
+        try {
+            jsonPathObject = parser.parse(testPath);
+        } catch (JsonPathParser.JsonParseException e) {
+            fail("Should not be here, parser should not have thrown error");
+        }
+        assertEquals(1, jsonPathObject.getPathParts().size());
+        assertEquals(new ListPathPart(1), jsonPathObject.getPathParts().get(0));
+    }
+
+    /**
      * Verify that $.key is parsed correctly.
      */
     @Test
-    public void parsesGoodPath1() {
+    void parsesGoodPath1() {
         String testPath = "$.key";
         JsonPathParser parser = new JsonPathParser();
         JsonPathObject jsonPathObject = new JsonPathObject();
@@ -74,7 +91,7 @@ public class JsonPathParserTest {
      * Verify that $.key[2] is parsed correctly.
      */
     @Test
-    public void parsesGoodPath2() {
+    void parsesGoodPath2() {
         String testPath = "$.key[2]";
         JsonPathParser parser = new JsonPathParser();
         JsonPathObject jsonPathObject = new JsonPathObject();
@@ -92,7 +109,7 @@ public class JsonPathParserTest {
      * Verify that $.key[1][2] is parsed correctly.
      */
     @Test
-    public void parsesGoodPath3() {
+    void parsesGoodPath3() {
         String testPath = "$.key[1][2]";
         JsonPathParser parser = new JsonPathParser();
         JsonPathObject jsonPathObject = new JsonPathObject();
@@ -111,7 +128,7 @@ public class JsonPathParserTest {
      * Check that we fail parsing $.key[.
      */
     @Test
-    public void parseFailsBadPath1() {
+    void parseFailsBadPath1() {
         String testPath = "$.key[";
         JsonPathParser parser = new JsonPathParser();
         try {
@@ -125,7 +142,7 @@ public class JsonPathParserTest {
      * Check that we fail parsing $.key[].
      */
     @Test
-    public void parseFailsBadPath2() {
+    void parseFailsBadPath2() {
         String testPath = "$.key[]";
         JsonPathParser parser = new JsonPathParser();
         try {
@@ -139,7 +156,7 @@ public class JsonPathParserTest {
      * Check that we fail parsing $.key[a].
      */
     @Test
-    public void parseFailsBadPath3() {
+    void parseFailsBadPath3() {
         String testPath = "$.key[a]";
         JsonPathParser parser = new JsonPathParser();
         try {
@@ -153,7 +170,7 @@ public class JsonPathParserTest {
      * Check we fail if parsing $.key].
      */
     @Test
-    public void parseFailsBadPath4() {
+    void parseFailsBadPath4() {
         String testPath = "$.key]";
         JsonPathParser parser = new JsonPathParser();
         try {
