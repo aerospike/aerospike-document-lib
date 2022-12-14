@@ -1,13 +1,17 @@
 package com.aerospike.documentapi.batch;
 
-import com.aerospike.client.*;
+import com.aerospike.client.BatchRecord;
+import com.aerospike.client.BatchWrite;
+import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
 import com.aerospike.client.cdt.MapOperation;
+import com.aerospike.client.policy.BatchWritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
+import com.aerospike.documentapi.util.Lut;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 public class DeleteBatchOperation extends AbstractBatchOperation {
@@ -17,25 +21,9 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
     }
 
     @Override
-    protected Map<String, Object> firstStepQueryResults() {
-        Map<String, Object> resultingMap = new HashMap<>();
-
-        if (batchRecord.record != null && batchRecord.record.bins != null) {
-            for (Map.Entry<String, Object> entry : batchRecord.record.bins.entrySet()) {
-                Object res;
-
-                try {
-                    res = JsonPathQuery.delete(jsonPathObject, entry.getValue());
-                } catch (JsonProcessingException | JsonPathException e) {
-                    errorBinName = entry.getKey();
-                    return new HashMap<>();
-                }
-
-                resultingMap.put(entry.getKey(), res);
-            }
-        }
-
-        return resultingMap;
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry)
+            throws JsonProcessingException, JsonPathException {
+        return JsonPathQuery.delete(jsonPathObject, entry.getValue());
     }
 
     @Override
@@ -65,7 +53,11 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
         }
 
         if (batchOps.length > 0) {
-            batchRecord = new BatchWrite(key, batchOps);
+            batchRecord = new BatchWrite(
+                    getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
+                    key,
+                    batchOps
+            );
         } else {
             batchRecord = getErrorBatchWriteRecord();
         }

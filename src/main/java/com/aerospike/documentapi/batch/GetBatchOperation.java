@@ -11,6 +11,7 @@ import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +39,11 @@ public class GetBatchOperation extends AbstractBatchOperation {
         }
 
         return batchRecord;
+    }
+
+    @Override
+    protected Collection<Operation> readOperations() {
+        return Collections.emptyList();
     }
 
     private BatchRecord processQueryResults() {

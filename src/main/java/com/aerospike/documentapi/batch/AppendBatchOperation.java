@@ -6,14 +6,15 @@ import com.aerospike.client.BatchWrite;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.cdt.CTX;
+import com.aerospike.client.policy.BatchWritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.util.Lut;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,25 +38,9 @@ public class AppendBatchOperation extends AbstractBatchOperation {
     }
 
     @Override
-    protected Map<String, Object> firstStepQueryResults() {
-        Map<String, Object> resultingMap = new HashMap<>();
-
-        if (batchRecord.record != null && batchRecord.record.bins != null) {
-            for (Map.Entry<String, Object> entry : batchRecord.record.bins.entrySet()) {
-                Object res;
-
-                try {
-                    res = JsonPathQuery.append(jsonPathObject, entry.getValue(), objToAppend);
-                } catch (JsonProcessingException | JsonPathException e) {
-                    errorBinName = entry.getKey();
-                    return new HashMap<>();
-                }
-
-                resultingMap.put(entry.getKey(), res);
-            }
-        }
-
-        return resultingMap;
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry)
+            throws JsonProcessingException, JsonPathException {
+        return JsonPathQuery.append(jsonPathObject, entry.getValue(), objToAppend);
     }
 
     public BatchRecord setSecondStepRecordAndGet() {
@@ -82,12 +67,15 @@ public class AppendBatchOperation extends AbstractBatchOperation {
                         .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
                         .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
-
             }
         }
 
         if (batchOps.length > 0) {
-            batchRecord = new BatchWrite(key, batchOps);
+            batchRecord = new BatchWrite(
+                    getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
+                    key,
+                    batchOps
+            );
         } else {
             batchRecord = getErrorBatchWriteRecord();
         }
