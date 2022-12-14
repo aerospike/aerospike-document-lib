@@ -1,6 +1,11 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.*;
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.BatchRecord;
+import com.aerospike.client.Bin;
+import com.aerospike.client.IAerospikeClient;
+import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOperation;
@@ -10,10 +15,16 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.util.Lut;
 import com.aerospike.documentapi.util.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
 
@@ -28,10 +39,9 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             throws DocumentApiException {
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
-            Record record = client.get(readPolicy, documentKey, documentBinName);
-
-            if (record != null) {
-                return record.getValue(documentBinName);
+            Record rec = client.get(readPolicy, documentKey, documentBinName);
+            if (rec != null) {
+                return rec.getValue(documentBinName);
             }
         } else { // else retrieve using pure contexts
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -40,17 +50,16 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // Then turn the rest into the contexts representation
             CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             // Retrieve the part of the document referred to by the JSON path
-            Record r;
+            Record rec;
             try {
                 WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
-                r = client.operate(writePolicy, documentKey,
+                rec = client.operate(writePolicy, documentKey,
                         finalPathPart.toAerospikeGetOperation(documentBinName, ctxArray));
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
-
-            if (r != null) {
-                return r.getValue(documentBinName);
+            if (rec != null) {
+                return rec.getValue(documentBinName);
             }
         }
         return null;
@@ -59,15 +68,26 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames,
                                    JsonPathObject jsonPathObject) throws DocumentApiException {
+        return get(readPolicy, documentKey, documentBinNames, jsonPathObject, false);
+    }
+
+    @Override
+    public Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames,
+                                   JsonPathObject jsonPathObject, boolean withLut) throws DocumentApiException {
         Map<String, Object> results = new HashMap<>();
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
-            Record record = client.get(readPolicy, documentKey, documentBinNames.toArray(new String[0]));
-
-            if (record != null) {
-                for (String binName : documentBinNames) {
-                    results.put(binName, record.bins.get(binName));
-                }
+            List<Operation> operations = new ArrayList<>();
+            for (String binName : documentBinNames) {
+                operations.add(Operation.get(binName));
+            }
+            if (withLut) {
+                operations.add(Lut.LUT_READ_OP);
+            }
+            WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
+            Record rec = client.operate(writePolicy, documentKey, operations.toArray(new Operation[0]));
+            if (rec != null) {
+                results.putAll(rec.bins);
             }
         } else { // else retrieve using pure contexts
             List<PathPart> pathPart = jsonPathObject.getPathParts();
@@ -76,19 +96,21 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             // Then turn the rest into the contexts representation
             CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathPart);
             // Retrieve the part of the document referred to by the JSON path
-            Record r;
-            Operation[] operations = documentBinNames.stream()
-                    .map(bn -> finalPathPart.toAerospikeGetOperation(bn, ctxArray)).toArray(Operation[]::new);
-
+            Record rec;
+            List<Operation> operations = documentBinNames.stream()
+                    .map(bn -> finalPathPart.toAerospikeGetOperation(bn, ctxArray))
+                    .collect(Collectors.toList());
+            if (withLut) {
+                operations.add(Lut.LUT_READ_OP);
+            }
             try {
                 WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
-                r = client.operate(writePolicy, documentKey, operations);
+                rec = client.operate(writePolicy, documentKey, operations.toArray(new Operation[0]));
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
-
-            if (r != null) {
-                results.putAll(r.bins);
+            if (rec != null) {
+                results.putAll(rec.bins);
             }
         }
         return results;

@@ -11,10 +11,12 @@ import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.policy.DocumentPolicy;
+import com.aerospike.documentapi.util.Lut;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,9 +102,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinName, jsonPathObject);
-            Object queryResult = JsonPathQuery.putOrSet(jsonPathObject, result, jsonObject);
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, queryResult, originalJsonPathObject);
+            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
+                    Collections.singletonList(documentBinName), jsonPathObject, true);
+            Object queryResult = JsonPathQuery.putOrSet(jsonPathObject, result.get(documentBinName), jsonObject);
+            aerospikeDocumentRepository.put(Lut.setLutPolicy(new WritePolicy(writePolicy), (long) result.get(Lut.LUT_BIN)),
+                    documentKey, documentBinName, queryResult, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, jsonObject, jsonPathObject);
         }
@@ -114,12 +118,15 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
+            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
+                    documentBinNames, jsonPathObject, true);
             Map<String, Object> queryResults = new HashMap<>();
             for (String binName : result.keySet()) {
+                if (binName.equals(Lut.LUT_BIN)) continue;
                 queryResults.put(binName, JsonPathQuery.putOrSet(jsonPathObject, result.get(binName), jsonObject));
             }
-            aerospikeDocumentRepository.put(writePolicy, documentKey, queryResults, originalJsonPathObject);
+            aerospikeDocumentRepository.put(Lut.setLutPolicy(new WritePolicy(writePolicy), (long) result.get(Lut.LUT_BIN)),
+                    documentKey, queryResults, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinNames, jsonObject, jsonPathObject);
         }
@@ -131,9 +138,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinName, jsonPathObject);
-            Object queryResult = JsonPathQuery.append(jsonPathObject, result, jsonObject);
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, queryResult, originalJsonPathObject);
+            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
+                    Collections.singletonList(documentBinName), jsonPathObject, true);
+            Object queryResult = JsonPathQuery.append(jsonPathObject, result.get(documentBinName), jsonObject);
+            aerospikeDocumentRepository.put(Lut.setLutPolicy(new WritePolicy(writePolicy), (long) result.get(Lut.LUT_BIN)),
+                    documentKey, documentBinName, queryResult, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.append(writePolicy, documentKey, documentBinName, jsonPath, jsonObject, jsonPathObject);
         }
@@ -145,12 +154,15 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
+            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
+                    documentBinNames, jsonPathObject, true);
             Map<String, Object> queryResults = new HashMap<>();
             for (String binName : result.keySet()) {
+                if (binName.equals(Lut.LUT_BIN)) continue;
                 queryResults.put(binName, JsonPathQuery.append(jsonPathObject, result.get(binName), jsonObject));
             }
-            aerospikeDocumentRepository.put(writePolicy, documentKey, queryResults, originalJsonPathObject);
+            aerospikeDocumentRepository.put(Lut.setLutPolicy(new WritePolicy(writePolicy), (long) result.get(Lut.LUT_BIN)),
+                    documentKey, queryResults, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.append(writePolicy, documentKey, documentBinNames, jsonPath, jsonObject, jsonPathObject);
         }
@@ -162,9 +174,11 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Object result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinName, jsonPathObject);
-            Object queryResult = JsonPathQuery.delete(jsonPathObject, result);
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, queryResult, originalJsonPathObject);
+            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
+                    Collections.singletonList(documentBinName), jsonPathObject, true);
+            Object queryResult = JsonPathQuery.delete(jsonPathObject, result.get(documentBinName));
+            aerospikeDocumentRepository.put(Lut.setLutPolicy(new WritePolicy(writePolicy), (long) result.get(Lut.LUT_BIN)),
+                    documentKey, documentBinName, queryResult, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.delete(writePolicy, documentKey, documentBinName, jsonPathObject);
         }
@@ -176,12 +190,15 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey, documentBinNames, jsonPathObject);
+            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
+                    documentBinNames, jsonPathObject, true);
             Map<String, Object> queryResults = new HashMap<>();
             for (String binName : result.keySet()) {
+                if (binName.equals(Lut.LUT_BIN)) continue;
                 queryResults.put(binName, JsonPathQuery.delete(jsonPathObject, result.get(binName)));
             }
-            aerospikeDocumentRepository.put(writePolicy, documentKey, queryResults, originalJsonPathObject);
+            aerospikeDocumentRepository.put(Lut.setLutPolicy(new WritePolicy(writePolicy), (long) result.get(Lut.LUT_BIN)),
+                    documentKey, queryResults, originalJsonPathObject);
         } else {
             aerospikeDocumentRepository.delete(writePolicy, documentKey, documentBinNames, jsonPathObject);
         }

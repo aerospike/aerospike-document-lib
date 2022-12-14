@@ -19,6 +19,8 @@ public interface IAerospikeDocumentRepository {
 
     Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames, JsonPathObject jsonPathObject) throws DocumentApiException;
 
+    Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames, JsonPathObject jsonPathObject, boolean withLut) throws DocumentApiException;
+
     void put(WritePolicy writePolicy, Key documentKey, String documentBinName, JsonNode jsonNode);
 
     void put(WritePolicy writePolicy, Key documentKey, String documentBinName, Object jsonObject, JsonPathObject jsonPathObject) throws DocumentApiException;
