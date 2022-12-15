@@ -2,7 +2,6 @@ package com.aerospike.documentapi;
 
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
-import com.aerospike.client.policy.Policy;
 import com.aerospike.documentapi.batch.BatchOperation;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,18 +21,6 @@ public interface IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     Object get(Key documentKey, String documentBinName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
-
-    /**
-     * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
-     *
-     * @param readPolicy      An Aerospike read policy to use for the get() operation.
-     * @param documentKey     An Aerospike Key.
-     * @param documentBinName The bin name that will store the json.
-     * @param jsonPath        A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
-     */
-    Object get(Policy readPolicy, Key documentKey, String documentBinName, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**

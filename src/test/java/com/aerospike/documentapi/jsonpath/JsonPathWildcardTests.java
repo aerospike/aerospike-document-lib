@@ -1,5 +1,6 @@
 package com.aerospike.documentapi.jsonpath;
 
+import com.aerospike.client.Key;
 import com.aerospike.documentapi.*;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;

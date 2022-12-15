@@ -49,25 +49,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     @Override
     public Object get(Key documentKey, String documentBinName, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException {
-        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
-
-        Object result = aerospikeDocumentRepository.get(readPolicy, documentKey, documentBinName, jsonPathObject);
-        if (jsonPathObject.requiresJsonPathQuery()) {
-            return JsonPathQuery.read(jsonPathObject, result);
-        }
-        return result;
-    }
-
-    @Override
-    public Object get(Policy customReadPolicy, Key documentKey, String documentBinName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException {
-        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
-
-        Object result = aerospikeDocumentRepository.get(customReadPolicy, documentKey, documentBinName, jsonPathObject);
-        if (jsonPathObject.requiresJsonPathQuery()) {
-            return JsonPathQuery.read(jsonPathObject, result);
-        }
-        return result;
+        return get(documentKey, Collections.singletonList(documentBinName), jsonPath).get(documentBinName);
     }
 
     @Override
@@ -91,17 +73,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     @Override
     public void put(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException {
-        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
-        if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
-                    Collections.singletonList(documentBinName), jsonPathObject, true);
-            Object queryResult = JsonPathQuery.putOrSet(jsonPathObject, result.get(documentBinName), jsonObject);
-            aerospikeDocumentRepository.put(getLutPolicy(result), documentKey, documentBinName,
-                    queryResult, originalJsonPathObject);
-        } else {
-            aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, jsonObject, jsonPathObject);
-        }
+        put(documentKey, Collections.singletonList(documentBinName), jsonPath, jsonObject);
     }
 
     @Override
@@ -127,18 +99,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     @Override
     public void append(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException {
-        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
-        if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
-                    Collections.singletonList(documentBinName), jsonPathObject, true);
-            Object queryResult = JsonPathQuery.append(jsonPathObject, result.get(documentBinName), jsonObject);
-            aerospikeDocumentRepository.put(getLutPolicy(result), documentKey, documentBinName,
-                    queryResult, originalJsonPathObject);
-        } else {
-            aerospikeDocumentRepository.append(writePolicy, documentKey, documentBinName, jsonPath,
-                    jsonObject, jsonPathObject);
-        }
+        append(documentKey, Collections.singletonList(documentBinName), jsonPath, jsonObject);
     }
 
     @Override
@@ -165,17 +126,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     @Override
     public void delete(Key documentKey, String documentBinName, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException {
-        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
-        if (jsonPathObject.requiresJsonPathQuery()) {
-            JsonPathObject originalJsonPathObject = jsonPathObject.copy();
-            Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, documentKey,
-                    Collections.singletonList(documentBinName), jsonPathObject, true);
-            Object queryResult = JsonPathQuery.delete(jsonPathObject, result.get(documentBinName));
-            aerospikeDocumentRepository.put(getLutPolicy(result), documentKey, documentBinName, queryResult,
-                    originalJsonPathObject);
-        } else {
-            aerospikeDocumentRepository.delete(writePolicy, documentKey, documentBinName, jsonPathObject);
-        }
+        delete(documentKey, Collections.singletonList(documentBinName), jsonPath);
     }
 
     @Override
