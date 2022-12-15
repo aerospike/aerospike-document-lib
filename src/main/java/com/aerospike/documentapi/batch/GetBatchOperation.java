@@ -6,8 +6,6 @@ import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;
 
 import java.util.Collection;
@@ -55,7 +53,7 @@ public class GetBatchOperation extends AbstractBatchOperation {
 
                 try {
                     res = JsonPathQuery.read(originalJsonPathObject, entry.getValue());
-                } catch (JsonProcessingException | JsonPathException e) {
+                } catch (Exception e) {
                     return batchRecordWithError(entry.getKey());
                 }
 
