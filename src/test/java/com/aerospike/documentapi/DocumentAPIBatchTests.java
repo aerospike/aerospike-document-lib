@@ -824,7 +824,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with integer keys.
      */
     @Test
-    public void testNegativeBatchWrite2StepJsonIntKeys() throws DocumentApiException {
+    public void testNegativeBatchWriteJsonIntKeys() throws DocumentApiException {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<Integer, List<Map<Integer, List<String>>>> map = new HashMap<>();
@@ -843,6 +843,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, map);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
+        inputsList.add(new BatchOperationInput("$.2[1].3", PUT));
         // JSONPath query analogous to "$.example2[*].key03"
         inputsList.add(new BatchOperationInput("$.2[*].3", PUT));
 
@@ -859,7 +860,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
 
         // making sure batch record contains the correct result code
-        batchRecords.forEach(batchRec -> assertEquals(-2, batchRec.resultCode));
+        Integer[] errorCodes = {-2, 26};
+        batchRecords.forEach(batchRec -> assertTrue((Arrays.asList(errorCodes).contains(batchRec.resultCode))));
     }
 
     /**
