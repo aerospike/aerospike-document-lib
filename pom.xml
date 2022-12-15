@@ -9,8 +9,11 @@
     <version>1.2.0</version>
 
     <name>Aerospike Document API</name>
-    <description>This project provides an API which allows Aerospike CDT (Collection Data Type) objects to be accessed and mutated using JSON like syntax.
-        Effectively this provides what can be termed a document API as CDT objects can be used to represent JSON in the Aerospike database.</description>
+    <description>This project provides an API which allows Aerospike CDT (Collection Data Type) objects to be accessed
+        and mutated using JSON like syntax.
+        Effectively this provides what can be termed a document API as CDT objects can be used to represent JSON in the
+        Aerospike database.
+    </description>
     <url>https://github.com/aerospike/aerospike-document-lib</url>
     <organization>
         <name>Aerospike Inc.</name>
@@ -28,9 +31,10 @@
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
         <jackson-databind.version>2.13.3</jackson-databind.version>
         <aerospike-client.version>6.1.4</aerospike-client.version>
-        <junit-jupiter.version>5.9.0</junit-jupiter.version>
         <json-path.version>2.7.0</json-path.version>
         <lombok.version>1.18.22</lombok.version>
+        <junit-jupiter.version>5.9.0</junit-jupiter.version>
+        <mockito.version>4.9.0</mockito.version>
     </properties>
 
     <licenses>
@@ -80,12 +84,6 @@
             <version>${aerospike-client.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <version>${json-path.version}</version>
@@ -95,6 +93,25 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
