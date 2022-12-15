@@ -9,14 +9,20 @@ import com.aerospike.client.cdt.CTX;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.util.Lut;
+import com.jayway.jsonpath.JsonPathException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 public abstract class AbstractBatchOperation implements BatchOperation {
@@ -49,14 +55,24 @@ public abstract class AbstractBatchOperation implements BatchOperation {
 
     @Override
     public void setFirstStepRecord() {
-        Operation[] batchOperations;
         final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts());
-        batchOperations = binNames.stream()
+        List<Operation> batchOperations = binNames.stream()
                 .map(binName -> pathDetails.getFinalPathPart()
                         .toAerospikeGetOperation(binName, pathDetails.getCtxArray()))
-                .toArray(Operation[]::new);
+                .collect(Collectors.toList());
 
-        batchRecord = new BatchRead(key, batchOperations);
+        batchOperations.addAll(readOperations());
+        batchRecord = new BatchRead(key, batchOperations.toArray(new Operation[0]));
+    }
+
+    protected Collection<Operation> readOperations() {
+        return Collections.singleton(Lut.LUT_READ_OP);
+    }
+
+    protected Optional<Long> getLutValue() {
+        return Objects.isNull(batchRecord)
+                ? Optional.empty()
+                : Optional.of(batchRecord.record.getLong(Lut.LUT_BIN));
     }
 
     protected PathDetails getPathDetails(List<PathPart> pathParts) {
@@ -69,7 +85,26 @@ public abstract class AbstractBatchOperation implements BatchOperation {
     }
 
     protected Map<String, Object> firstStepQueryResults() {
-        return null; // is implemented by some child classes
+        Map<String, Object> resultingMap = new HashMap<>();
+
+        if (batchRecord.record != null && batchRecord.record.bins != null) {
+            for (Map.Entry<String, Object> entry : batchRecord.record.bins.entrySet()) {
+                if (entry.getKey().equals(Lut.LUT_BIN)) continue;
+                Object res;
+                try {
+                    res = firstStepJsonPathQuery(entry);
+                } catch (Exception e) {
+                    errorBinName = entry.getKey();
+                    return Collections.emptyMap();
+                }
+                resultingMap.put(entry.getKey(), res);
+            }
+        }
+        return resultingMap;
+    }
+
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     protected Operation toPutOperation(String binName, Object objToPut, PathDetails pathDetails) {
@@ -94,14 +129,14 @@ public abstract class AbstractBatchOperation implements BatchOperation {
             binNames.forEach(binName -> bins.put(binName, originalJsonPathObject));
         }
 
-        Record record;
+        Record aeroRecord;
         if (batchRecord != null && batchRecord.record != null) {
-            record = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
+            aeroRecord = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
         } else {
-            record = new Record(bins, 0, 0);
+            aeroRecord = new Record(bins, 0, 0);
         }
 
-        return new BatchRecord(key, record, -2, false, true);
+        return new BatchRecord(key, aeroRecord, -2, false, true);
     }
 
     @Value

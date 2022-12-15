@@ -5,7 +5,6 @@ import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.documentapi.batch.BatchOperation;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;
@@ -23,7 +22,7 @@ public interface IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     Object get(Key documentKey, String documentBinName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
@@ -35,7 +34,7 @@ public interface IAerospikeDocumentClient {
      * @return Object referenced by jsonPath.
      */
     Object get(Policy readPolicy, Key documentKey, String documentBinName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Retrieve the object in the document with key documentKey that is referenced by the JSON path.
@@ -46,7 +45,7 @@ public interface IAerospikeDocumentClient {
      * @return A Map of Objects referenced by jsonPath where a key is a bin name.
      */
     Map<String, Object> get(Key documentKey, Collection<String> documentBinNames, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Put a document.
@@ -66,7 +65,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject      A JSON object to put in the given JSON path.
      */
     void put(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Put a map representation of a JSON object at a particular path in a JSON document.
@@ -77,7 +76,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject       A JSON object to put in the given JSON path.
      */
     void put(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Append an object to A collection in a document specified by a JSON path.
@@ -88,7 +87,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject      A JSON object to append to the list at the given JSON path.
      */
     void append(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Append an object to A collection in a document specified by a JSON path.
@@ -99,7 +98,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonObject       A JSON object to append to the list at the given JSON path.
      */
     void append(Key documentKey, Collection<String> documentBinNames, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Delete an object in a document specified by a JSON path.
@@ -109,7 +108,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath        A JSON path for the object deletion.
      */
     void delete(Key documentKey, String documentBinName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Delete an object in a document specified by a JSON path.
@@ -119,7 +118,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath         A JSON path for the object deletion.
      */
     void delete(Key documentKey, Collection<String> documentBinNames, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 
     /**
      * Perform batch operations.
@@ -133,5 +132,5 @@ public interface IAerospikeDocumentClient {
      * @throws IllegalArgumentException if the batch has multiple two-step operations with the same key.
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel)
-            throws JsonPathParser.JsonParseException, DocumentApiException, JsonProcessingException;
+            throws JsonPathParser.JsonParseException, DocumentApiException;
 }

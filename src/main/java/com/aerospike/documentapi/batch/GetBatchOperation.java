@@ -6,11 +6,10 @@ import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +39,11 @@ public class GetBatchOperation extends AbstractBatchOperation {
         return batchRecord;
     }
 
+    @Override
+    protected Collection<Operation> readOperations() {
+        return Collections.emptyList();
+    }
+
     private BatchRecord processQueryResults() {
         if (batchRecord != null && batchRecord.record.bins != null) {
             Map<String, Object> bins = new HashMap<>();
@@ -49,7 +53,7 @@ public class GetBatchOperation extends AbstractBatchOperation {
 
                 try {
                     res = JsonPathQuery.read(originalJsonPathObject, entry.getValue());
-                } catch (JsonProcessingException | JsonPathException e) {
+                } catch (Exception e) {
                     return batchRecordWithError(entry.getKey());
                 }
 
