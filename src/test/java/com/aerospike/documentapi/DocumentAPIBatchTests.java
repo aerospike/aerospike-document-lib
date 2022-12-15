@@ -843,9 +843,9 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, map);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
-        inputsList.add(new BatchOperationInput("$.2[1].3", PUT));
+        inputsList.add(new BatchOperationInput("$.2[1].3", PUT)); // resultCode 26
         // JSONPath query analogous to "$.example2[*].key03"
-        inputsList.add(new BatchOperationInput("$.2[*].3", PUT));
+        inputsList.add(new BatchOperationInput("$.2[*].3", PUT)); // resultCode -2
 
         String objToPut = "86";
         List<BatchOperation> batchOpsList = createBatchOperations(
