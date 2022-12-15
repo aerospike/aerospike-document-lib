@@ -70,6 +70,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, jsonNode);
     }
 
+    public void put(Key documentKey, String documentBinName, Map<?,?> map) {
+        aerospikeDocumentRepository.put(writePolicy, documentKey, documentBinName, map);
+    }
+
     @Override
     public void put(Key documentKey, String documentBinName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException {

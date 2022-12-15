@@ -91,6 +91,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         client.put(writePolicy, documentKey, Utils.createBinByJsonNodeType(documentBinName, jsonNode));
     }
 
+    public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, Map<?,?> map) {
+        client.put(writePolicy, documentKey, new Bin(documentBinName, map));
+    }
+
     @Override
     public void put(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, Object jsonObject,
                     JsonPathObject jsonPathObject) throws DocumentApiException {

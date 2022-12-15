@@ -20,15 +20,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -828,6 +821,89 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     /**
+     * Check response to a write-type batch operation for json with integer keys.
+     */
+    @Test
+    public void testNegativeBatchWrite2StepJsonIntKeys() throws DocumentApiException {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        Map<Integer, List<Map<Integer, List<String>>>> map = new HashMap<>();
+        List<String> innerList = new ArrayList<>();
+        innerList.add("A1");
+        innerList.add("B1");
+        innerList.add("C1");
+        innerList.add("D1");
+        Map<Integer, List<String>> innerMap = new HashMap<>();
+        innerMap.put(3, innerList);
+        List<Map<Integer, List<String>>> list = new ArrayList<>();
+        list.add(innerMap);
+        map.put(2, list);
+
+        // Load the "incorrect json"
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, map);
+
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // JSONPath query analogous to "$.example2[*].key03"
+        inputsList.add(new BatchOperationInput("$.2[*].3", PUT));
+
+        String objToPut = "86";
+        List<BatchOperation> batchOpsList = createBatchOperations(
+                documentClient,
+                map,
+                inputsList,
+                objToPut,
+                null,
+                false
+        );
+
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+
+        // making sure batch record contains the correct result code
+        batchRecords.forEach(batchRec -> assertEquals(-2, batchRec.resultCode));
+    }
+
+    /**
+     * Check response to a write-type batch operation for json with binary list elements.
+     */
+    @Test
+    public void testBatchWrite2StepJsonBinaryListValues() throws DocumentApiException {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        Map<String, List<Map<String, Map<String, byte[]>>>> map = new HashMap<>();
+        String mapKey = "A1";
+        String testMapValue = "This is test1 value ☺";
+        Map<String, byte[]> insideMap = new HashMap<>();
+        insideMap.put(mapKey, testMapValue.getBytes(StandardCharsets.UTF_8));
+        Map<String, Map<String, byte[]>> innerMap = new HashMap<>();
+        innerMap.put("3", insideMap);
+        List<Map<String, Map<String, byte[]>>> list = new ArrayList<>();
+        list.add(innerMap);
+        map.put("2", list);
+
+        // Load the "incorrect json"
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, map);
+
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // JSONPath query analogous to "$.example2[*].key03"
+        inputsList.add(new BatchOperationInput("$.2[*].3", PUT));
+
+        byte[] objToPut = "86".getBytes();
+        List<BatchOperation> batchOpsList = createBatchOperations(
+                documentClient,
+                map,
+                inputsList,
+                objToPut,
+                null,
+                false
+        );
+
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+
+        // making sure batch record contains the correct result code
+        batchRecords.forEach(batchRec -> assertEquals(0, batchRec.resultCode));
+    }
+
+    /**
      * Check response to a batch of different types 2-step operations using incorrect path.
      * <ul>
      * <li>Non-existing key with existing first level element.</li>
@@ -931,7 +1007,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
     private List<BatchOperation> createBatchOperations(
             AerospikeDocumentClient documentClient,
-            JsonNode jsonNode,
+            Object jsonNode,
             List<BatchOperationInput> inputsList,
             Object objToPut,
             Object objToAppend,
@@ -953,10 +1029,10 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
             String singleBinName = "";
             if (binNamesList == null) {
                 singleBinName = documentBinName + i;
-                documentClient.put(key, singleBinName, jsonNode);
+                writeDocumentToDB(documentClient, key, singleBinName, jsonNode);
             } else {
                 if (!sameKeys || i == 0) { //  creating only once in case of the same keys and multiple bins
-                    binNamesList.forEach(bName -> documentClient.put(key, bName, jsonNode));
+                    binNamesList.forEach(bName -> writeDocumentToDB(documentClient, key, bName, jsonNode));
                 }
             }
 
@@ -982,6 +1058,14 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         });
 
         return batchOpsList;
+    }
+
+    private void writeDocumentToDB(AerospikeDocumentClient documentClient, Key key, String singleBinName, Object jsonNode) {
+        if (jsonNode instanceof JsonNode) {
+            documentClient.put(key, singleBinName, (JsonNode) jsonNode);
+        } else if (jsonNode instanceof Map) {
+            documentClient.put(key, singleBinName, (Map<?, ?>) jsonNode);
+        }
     }
 
     private BatchOperation constructTestOperation(

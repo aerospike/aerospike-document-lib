@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -117,6 +118,40 @@ public class DocumentAPITest extends BaseTestConfig {
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key19")).get(3)).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
+    }
+
+    /**
+     * Check that the client can be used to read json with keys of type long and binary data as List values
+     */
+    @Test
+    public void testIrregularJsonRetrieval() throws JsonPathParser.JsonParseException, DocumentApiException {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        Map<Long, List<Map<Long, Map<String, byte[]>>>> map = new HashMap<>();
+        String mapKey = "A1";
+        String testMapValue = "This is test1 value ☺";
+        Map<String, byte[]> insideMap = new HashMap<>();
+        insideMap.put(mapKey, testMapValue.getBytes(StandardCharsets.UTF_8));
+        Map<Long, Map<String, byte[]>> innerMap = new HashMap<>();
+        innerMap.put(3L, insideMap);
+        List<Map<Long, Map<String, byte[]>>> list = new ArrayList<>();
+        list.add(innerMap);
+        map.put(2L, list);
+
+        // Load the incorrect "json" map
+        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, map);
+
+        String jsonPath = "$";
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+
+        assertTrue(objectFromDB != null && isValidInnerMapElement(objectFromDB, mapKey, testMapValue));
+    }
+
+    private boolean isValidInnerMapElement(Object objectFromDB, String mapKey, String testMapValue) {
+        byte[] res = ((Map<Long, List<Map<Long, Map<String, byte[]>>>>) objectFromDB)
+                .get(2L).get(0).get(3L).get(mapKey);
+
+        return new String(res).equals(testMapValue);
     }
 
     /**
