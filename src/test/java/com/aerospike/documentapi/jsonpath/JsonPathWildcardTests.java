@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JsonPathWildcardTests extends BaseTestConfig {
 
     @Test
-    public void testWildcardAfterDot() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testWildcardAfterDot() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         Map<String, Object> jsonNodeAsMap = JsonConverters.convertJsonNodeToMap(jsonNode);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -29,7 +28,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     }
 
     @Test
-    public void testWildcardInsideBrackets() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testWildcardInsideBrackets() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -42,7 +41,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     }
 
     @Test
-    public void testWildcardInsideBracketsPut() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testWildcardInsideBracketsPut() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -59,7 +58,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     }
 
     @Test
-    public void testWildcardInsideBracketsAppend() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testWildcardInsideBracketsAppend() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -76,7 +75,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     }
 
     @Test
-    public void testWildcardInsideBracketsDelete() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testWildcardInsideBracketsDelete() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -92,7 +91,7 @@ public class JsonPathWildcardTests extends BaseTestConfig {
     }
 
     @Test
-    public void deleteRootElementJSONPathQuery() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void deleteRootElementJSONPathQuery() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);

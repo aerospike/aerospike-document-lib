@@ -6,15 +6,20 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.Lut;
+import com.aerospike.documentapi.util.TestUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,6 +28,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
 
 class DocumentAPITest extends BaseTestConfig {
+
+    AerospikeDocumentRepository aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
 
     /**
      * Check that the following paths will correctly retrieve document content when content exists:
@@ -129,6 +136,42 @@ class DocumentAPITest extends BaseTestConfig {
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
         expectedObject = ((List<?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key19")).get(3)).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
+    }
+
+    /**
+     * Check that the client can be used to read json with keys of type long and binary data as List values
+     */
+    @Test
+    void testIrregularJsonRetrieval() throws JsonPathParser.JsonParseException, DocumentApiException {
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+
+        Map<Long, List<Map<Long, Map<String, byte[]>>>> map = new HashMap<>();
+        String mapKey = "A1";
+        String testMapValue = "This is test1 value ☺";
+        Map<String, byte[]> insideMap = new HashMap<>();
+        insideMap.put(mapKey, testMapValue.getBytes(StandardCharsets.UTF_8));
+        Map<Long, Map<String, byte[]>> innerMap = new HashMap<>();
+        innerMap.put(3L, insideMap);
+        List<Map<Long, Map<String, byte[]>>> list = new ArrayList<>();
+        list.add(innerMap);
+        map.put(2L, list);
+
+        // Load the incorrect "json" map
+        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, documentBinName, map, documentClient, aerospikeDocumentRepository);
+
+        String jsonPath = "$";
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+
+        assertNotNull(objectFromDB);
+        assertTrue(isValidInnerMapElement(objectFromDB, mapKey, testMapValue));
+    }
+
+    private boolean isValidInnerMapElement(Object objectFromDB, String mapKey, String testMapValue) {
+        @SuppressWarnings("unchecked")
+        byte[] res = ((Map<Long, List<Map<Long, Map<String, byte[]>>>>) objectFromDB)
+                .get(2L).get(0).get(3L).get(mapKey);
+
+        return new String(res, StandardCharsets.UTF_8).equals(testMapValue);
     }
 
     /**

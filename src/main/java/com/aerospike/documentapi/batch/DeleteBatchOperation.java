@@ -7,11 +7,13 @@ import com.aerospike.client.Operation;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.policy.BatchWritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
+import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
-import com.jayway.jsonpath.JsonPathException;
 
 import java.util.Collection;
 import java.util.Map;
+
+import static com.aerospike.documentapi.util.Utils.getPathDetails;
 
 public class DeleteBatchOperation extends AbstractBatchOperation {
 
@@ -20,7 +22,7 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
     }
 
     @Override
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) {
         return JsonPathQuery.delete(jsonPathObject, entry.getValue());
     }
 
@@ -36,13 +38,13 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts());
+                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
                         .map(entry -> pathDetails.getFinalPathPart()
                                 .toAerospikePutOperation(entry.getKey(), entry.getValue(), pathDetails.getCtxArray()))
                         .toArray(Operation[]::new);
             } else {
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts());
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
                 batchOps = binNames.stream()
                         .map(binName -> pathDetails.getFinalPathPart()
                                 .toAerospikeDeleteOperation(binName, pathDetails.getCtxArray()))

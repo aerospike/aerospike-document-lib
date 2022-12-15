@@ -5,12 +5,10 @@ import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
-import com.aerospike.client.cdt.CTX;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
-import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
-import com.jayway.jsonpath.JsonPathException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -23,6 +21,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.aerospike.documentapi.util.Utils.getPathDetails;
 
 @Getter
 public abstract class AbstractBatchOperation implements BatchOperation {
@@ -55,7 +55,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
 
     @Override
     public void setFirstStepRecord() {
-        final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts());
+        final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
         List<Operation> batchOperations = binNames.stream()
                 .map(binName -> pathDetails.getFinalPathPart()
                         .toAerospikeGetOperation(binName, pathDetails.getCtxArray()))
@@ -73,15 +73,6 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         return Objects.isNull(batchRecord)
                 ? Optional.empty()
                 : Optional.of(batchRecord.record.getLong(Lut.LUT_BIN));
-    }
-
-    protected PathDetails getPathDetails(List<PathPart> pathParts) {
-        // We need to treat the last part of the path differently
-        PathPart finalPathPart = JsonPathParser.extractLastPathPartAndModifyList(pathParts);
-        // Then turn the rest into the contexts representation
-        CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathParts);
-
-        return new PathDetails(finalPathPart, ctxArray);
     }
 
     protected Map<String, Object> firstStepQueryResults() {
@@ -103,7 +94,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         return resultingMap;
     }
 
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -129,21 +120,14 @@ public abstract class AbstractBatchOperation implements BatchOperation {
             binNames.forEach(binName -> bins.put(binName, originalJsonPathObject));
         }
 
-        Record aeroRecord;
+        Record record;
         if (batchRecord != null && batchRecord.record != null) {
-            aeroRecord = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
+            record = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
         } else {
-            aeroRecord = new Record(bins, 0, 0);
+            record = new Record(bins, 0, 0);
         }
 
-        return new BatchRecord(key, aeroRecord, -2, false, true);
-    }
-
-    @Value
-    @RequiredArgsConstructor
-    protected static class PathDetails {
-        PathPart finalPathPart;
-        CTX[] ctxArray;
+        return new BatchRecord(key, record, -2, false, true);
     }
 
     @Value

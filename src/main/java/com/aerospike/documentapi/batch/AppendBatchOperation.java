@@ -5,18 +5,17 @@ import com.aerospike.client.BatchRecord;
 import com.aerospike.client.BatchWrite;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
-import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.policy.BatchWritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
-import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
-import com.jayway.jsonpath.JsonPathException;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.aerospike.documentapi.util.Utils.getPathDetails;
 
 public class AppendBatchOperation extends AbstractBatchOperation {
 
@@ -27,17 +26,8 @@ public class AppendBatchOperation extends AbstractBatchOperation {
         this.objToAppend = objectToPut;
     }
 
-    private PathDetails getPathDetailsForAppend(List<PathPart> pathParts) {
-        // We need to treat the last part of the path differently
-        PathPart finalPathPart = JsonPathParser.extractLastPathPart(pathParts);
-        // Then turn the rest into the contexts representation
-        CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathParts);
-
-        return new PathDetails(finalPathPart, ctxArray);
-    }
-
     @Override
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) {
         return JsonPathQuery.append(jsonPathObject, entry.getValue(), objToAppend);
     }
 
@@ -54,13 +44,14 @@ public class AppendBatchOperation extends AbstractBatchOperation {
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts());
+                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
                         .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
                         .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
-                final PathDetails pathDetails = getPathDetailsForAppend(jsonPathObject.getPathParts()); // needs to be treated without modifying
+                // needs to be treated without modifying
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), false);
                 batchOps = binNames.stream()
                         .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
                         .filter(Objects::nonNull)
