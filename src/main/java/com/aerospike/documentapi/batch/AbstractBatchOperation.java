@@ -9,8 +9,6 @@ import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jayway.jsonpath.JsonPathException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -86,7 +84,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
                 Object res;
                 try {
                     res = firstStepJsonPathQuery(entry);
-                } catch (JsonProcessingException | JsonPathException e) {
+                } catch (Exception e) {
                     errorBinName = entry.getKey();
                     return Collections.emptyMap();
                 }
@@ -96,8 +94,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         return resultingMap;
     }
 
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry)
-            throws JsonProcessingException, JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

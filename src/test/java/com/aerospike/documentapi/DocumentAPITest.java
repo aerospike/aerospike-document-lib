@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
 
-public class DocumentAPITest extends BaseTestConfig {
+class DocumentAPITest extends BaseTestConfig {
 
     AerospikeDocumentRepository aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
 
@@ -53,7 +53,7 @@ public class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositivePathRetrieval() throws IOException,
+    void testPositivePathRetrieval() throws
             JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
@@ -142,7 +142,7 @@ public class DocumentAPITest extends BaseTestConfig {
      * Check that the client can be used to read json with keys of type long and binary data as List values
      */
     @Test
-    public void testIrregularJsonRetrieval() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testIrregularJsonRetrieval() throws JsonPathParser.JsonParseException, DocumentApiException {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<Long, List<Map<Long, Map<String, byte[]>>>> map = new HashMap<>();
@@ -162,14 +162,16 @@ public class DocumentAPITest extends BaseTestConfig {
         String jsonPath = "$";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
 
-        assertTrue(objectFromDB != null && isValidInnerMapElement(objectFromDB, mapKey, testMapValue));
+        assertNotNull(objectFromDB);
+        assertTrue(isValidInnerMapElement(objectFromDB, mapKey, testMapValue));
     }
 
     private boolean isValidInnerMapElement(Object objectFromDB, String mapKey, String testMapValue) {
+        @SuppressWarnings("unchecked")
         byte[] res = ((Map<Long, List<Map<Long, Map<String, byte[]>>>>) objectFromDB)
                 .get(2L).get(0).get(3L).get(mapKey);
 
-        return new String(res).equals(testMapValue);
+        return new String(res, StandardCharsets.UTF_8).equals(testMapValue);
     }
 
     /**
