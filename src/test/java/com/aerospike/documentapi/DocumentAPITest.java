@@ -6,6 +6,7 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.Lut;
+import com.aerospike.documentapi.util.TestUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -27,6 +28,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
 
 public class DocumentAPITest extends BaseTestConfig {
+
+    AerospikeDocumentRepository aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
 
     /**
      * Check that the following paths will correctly retrieve document content when content exists:
@@ -154,7 +157,7 @@ public class DocumentAPITest extends BaseTestConfig {
         map.put(2L, list);
 
         // Load the incorrect "json" map
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, map);
+        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, documentBinName, map, documentClient, aerospikeDocumentRepository);
 
         String jsonPath = "$";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);

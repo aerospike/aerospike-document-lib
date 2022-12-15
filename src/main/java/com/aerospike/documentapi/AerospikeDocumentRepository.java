@@ -36,33 +36,33 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames,
+    public Map<String, Object> get(Policy readPolicy, Key key, Collection<String> binNames,
                                    JsonPathObject jsonPathObject) throws DocumentApiException {
-        return get(readPolicy, documentKey, documentBinNames, jsonPathObject, false);
+        return get(readPolicy, key, binNames, jsonPathObject, false);
     }
 
     @Override
-    public Map<String, Object> get(Policy readPolicy, Key documentKey, Collection<String> documentBinNames,
+    public Map<String, Object> get(Policy readPolicy, Key key, Collection<String> binNames,
                                    JsonPathObject jsonPathObject, boolean withLut) throws DocumentApiException {
         Map<String, Object> results = new HashMap<>();
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
             List<Operation> operations = new ArrayList<>();
-            for (String binName : documentBinNames) {
+            for (String binName : binNames) {
                 operations.add(Operation.get(binName));
             }
             if (withLut) {
                 operations.add(Lut.LUT_READ_OP);
             }
             WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
-            Record rec = client.operate(writePolicy, documentKey, operations.toArray(new Operation[0]));
+            Record rec = client.operate(writePolicy, key, operations.toArray(new Operation[0]));
             if (rec != null) {
                 results.putAll(rec.bins);
             }
         } else { // else retrieve using pure contexts
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
 
-            List<Operation> operations = documentBinNames.stream()
+            List<Operation> operations = binNames.stream()
                     .map(binName -> pathDetails.getFinalPathPart().toAerospikeGetOperation(
                             binName,
                             pathDetails.getCtxArray())
@@ -75,7 +75,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             Record rec;
             try {
                 WritePolicy writePolicy = readPolicy == null ? null : new WritePolicy(readPolicy);
-                rec = client.operate(writePolicy, documentKey, operations.toArray(new Operation[0]));
+                rec = client.operate(writePolicy, key, operations.toArray(new Operation[0]));
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
@@ -87,38 +87,39 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, JsonNode jsonNode) {
-        client.put(writePolicy, documentKey, Utils.createBinByJsonNodeType(documentBinName, jsonNode));
-    }
-
-    public void put(WritePolicy writePolicy, Key documentKey, String documentBinName, Map<?,?> map) {
-        client.put(writePolicy, documentKey, new Bin(documentBinName, map));
+    public void put(WritePolicy writePolicy, Key key, String binName, JsonNode jsonNode) {
+        client.put(writePolicy, key, Utils.createBinByJsonNodeType(binName, jsonNode));
     }
 
     @Override
-    public void put(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, Object jsonObject,
+    public void put(WritePolicy writePolicy, Key key, String binName, Map<?, ?> map) {
+        client.put(writePolicy, key, new Bin(binName, map));
+    }
+
+    @Override
+    public void put(WritePolicy writePolicy, Key key, Collection<String> binNames, Object jsonObject,
                     JsonPathObject jsonPathObject) throws DocumentApiException {
         Operation[] operations;
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
-            operations = documentBinNames.stream()
+            operations = binNames.stream()
                     .map(bn -> {
                         Bin bin = new Bin(bn, jsonObject);
                         return Operation.put(bin);
                     })
                     .toArray(Operation[]::new);
-            client.operate(writePolicy, documentKey, operations);
+            client.operate(writePolicy, key, operations);
         } else { // else put using contexts
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
 
             try {
-                operations = documentBinNames.stream()
+                operations = binNames.stream()
                         .map(binName -> pathDetails.getFinalPathPart().toAerospikePutOperation(
                                 binName,
                                 jsonObject,
                                 pathDetails.getCtxArray())
                         ).toArray(Operation[]::new);
-                client.operate(writePolicy, documentKey, operations);
+                client.operate(writePolicy, key, operations);
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
@@ -126,8 +127,8 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void put(WritePolicy writePolicy, Key documentKey, Map<String, Object> queryResults,
-                    JsonPathObject jsonPathObject) throws DocumentApiException {
+    public void put(WritePolicy writePolicy, Key key, Map<String, Object> queryResults, JsonPathObject jsonPathObject)
+            throws DocumentApiException {
         Operation[] operations;
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
@@ -137,7 +138,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                         return Operation.put(bin);
                     })
                     .toArray(Operation[]::new);
-            client.operate(writePolicy, documentKey, operations);
+            client.operate(writePolicy, key, operations);
         } else { // else put using contexts
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
 
@@ -148,7 +149,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                                 entry.getValue(),
                                 pathDetails.getCtxArray())
                         ).toArray(Operation[]::new);
-                client.operate(writePolicy, documentKey, operations);
+                client.operate(writePolicy, key, operations);
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
@@ -156,8 +157,9 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void append(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames, String jsonPath,
-                       Object jsonObject, JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+    public void append(WritePolicy writePolicy, Key key, Collection<String> binNames, String jsonPath,
+                       Object jsonObject, JsonPathObject jsonPathObject)
+            throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().isEmpty()) {
             throw new JsonPathParser.ListException(jsonPath);
@@ -165,13 +167,13 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), false);
 
             try {
-                Operation[] operations = documentBinNames.stream()
+                Operation[] operations = binNames.stream()
                         .map(binName -> pathDetails.getFinalPathPart().toAerospikeAppendOperation(
                                 binName,
                                 jsonObject,
                                 pathDetails.getCtxArray())
                         ).toArray(Operation[]::new);
-                client.operate(writePolicy, documentKey, operations);
+                client.operate(writePolicy, key, operations);
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
@@ -179,24 +181,24 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void delete(WritePolicy writePolicy, Key documentKey, Collection<String> documentBinNames,
-                       JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException {
+    public void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject)
+            throws JsonPathParser.ListException, DocumentApiException {
         // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().isEmpty()) {
-            Operation[] operations = documentBinNames.stream()
+            Operation[] operations = binNames.stream()
                     .map(MapOperation::clear)
                     .toArray(Operation[]::new);
-            client.operate(writePolicy, documentKey, operations);
+            client.operate(writePolicy, key, operations);
         } else {
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
 
             try {
-                Operation[] operations = documentBinNames.stream()
-                        .map(binName -> pathDetails.getFinalPathPart().toAerospikeDeleteOperation(
-                                binName,
+                Operation[] operations = binNames.stream()
+                        .map(bName -> pathDetails.getFinalPathPart().toAerospikeDeleteOperation(
+                                bName,
                                 pathDetails.getCtxArray())
                         ).toArray(Operation[]::new);
-                client.operate(writePolicy, documentKey, operations);
+                client.operate(writePolicy, key, operations);
             } catch (AerospikeException e) {
                 throw DocumentApiException.toDocumentException(e);
             }
