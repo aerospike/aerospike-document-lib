@@ -8,7 +8,6 @@ import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.policy.BatchWritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.util.Lut;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 
 import java.util.Collection;
@@ -25,8 +24,7 @@ public class PutBatchOperation extends AbstractBatchOperation {
     }
 
     @Override
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry)
-            throws JsonProcessingException, JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
         return JsonPathQuery.putOrSet(jsonPathObject, entry.getValue(), objToPut);
     }
 

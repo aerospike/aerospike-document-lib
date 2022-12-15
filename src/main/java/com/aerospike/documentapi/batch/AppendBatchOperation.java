@@ -11,7 +11,6 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
 import com.aerospike.documentapi.util.Lut;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 
 import java.util.Collection;
@@ -38,8 +37,7 @@ public class AppendBatchOperation extends AbstractBatchOperation {
     }
 
     @Override
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry)
-            throws JsonProcessingException, JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
         return JsonPathQuery.append(jsonPathObject, entry.getValue(), objToAppend);
     }
 

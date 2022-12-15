@@ -10,7 +10,6 @@ import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
 import com.aerospike.documentapi.util.Lut;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPathException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -94,7 +93,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
                 Object res;
                 try {
                     res = firstStepJsonPathQuery(entry);
-                } catch (JsonProcessingException | JsonPathException e) {
+                } catch (Exception e) {
                     errorBinName = entry.getKey();
                     return Collections.emptyMap();
                 }
@@ -104,8 +103,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         return resultingMap;
     }
 
-    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry)
-            throws JsonProcessingException, JsonPathException {
+    protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) throws JsonPathException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -131,14 +129,14 @@ public abstract class AbstractBatchOperation implements BatchOperation {
             binNames.forEach(binName -> bins.put(binName, originalJsonPathObject));
         }
 
-        Record record;
+        Record aeroRecord;
         if (batchRecord != null && batchRecord.record != null) {
-            record = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
+            aeroRecord = new Record(bins, batchRecord.record.generation, batchRecord.record.expiration);
         } else {
-            record = new Record(bins, 0, 0);
+            aeroRecord = new Record(bins, 0, 0);
         }
 
-        return new BatchRecord(key, record, -2, false, true);
+        return new BatchRecord(key, aeroRecord, -2, false, true);
     }
 
     @Value
