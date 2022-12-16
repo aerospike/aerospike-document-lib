@@ -9,6 +9,7 @@ import com.aerospike.documentapi.batch.GetBatchOperation;
 import com.aerospike.documentapi.batch.PutBatchOperation;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
+import com.aerospike.documentapi.util.TestJsonConverters;
 import com.aerospike.documentapi.util.TestUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.DocumentContext;
@@ -18,23 +19,22 @@ import lombok.Setter;
 import net.minidev.json.JSONArray;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.GET;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.APPEND;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.DELETE;
+import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.GET;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.PUT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DocumentAPIBatchTests extends BaseTestConfig {
-
-    AerospikeDocumentRepository aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
+class DocumentAPIBatchTests extends BaseTestConfig {
 
     /**
      * Check the correct document content retrieval in a batch of single step operations.
@@ -46,7 +46,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchGet() throws DocumentApiException {
+    void testPositiveBatchGet() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -64,7 +64,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         // adding similar document bins with different jsonPath strings
         IntStream.range(0, jsonPathsMap.size()).forEachOrdered(i -> {
             Key key = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY + i);
-            String binName = documentBinName + i;
+            String binName = DOCUMENT_BIN_NAME + i;
             documentClient.put(key, binName, jsonNode);
 
             BatchOperation batchOp = new GetBatchOperation(
@@ -99,7 +99,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testNegativeBatchGet() throws DocumentApiException {
+    void testNegativeBatchGet() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -147,7 +147,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchPut() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testPositiveBatchPut() throws DocumentApiException, JsonPathParser.JsonParseException {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -174,10 +174,11 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         // Check the value put previously
         for (BatchOperation batchOp : batchOpsList) {
-            Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
-            );
+            Object objFromDb = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
             // Check that the last element in the list we put to is the initial put value
-            assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
+            assertNotNull(objFromDb);
+            assertTrue(TestJsonConverters.jsonEquals(objFromDb, putValue));
         }
     }
 
@@ -191,7 +192,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchPutWildcard() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testPositiveBatchPutWildcard() throws DocumentApiException, JsonPathParser.JsonParseException {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -222,14 +223,16 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         // Check the value put previously
         for (BatchOperation batchOp : batchOpsList) {
-            Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
-            );
+            Object objFromDb = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
             if (objFromDb instanceof JSONArray) {
                 for (Object res : (JSONArray) objFromDb) {
-                    assertTrue(res != null && TestJsonConverters.jsonEquals(res, putValue));
+                    assertNotNull(res);
+                    assertTrue(TestJsonConverters.jsonEquals(res, putValue));
                 }
             } else {
-                assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, putValue));
+                assertNotNull(objFromDb);
+                assertTrue(TestJsonConverters.jsonEquals(objFromDb, putValue));
             }
         }
     }
@@ -244,7 +247,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testNegativeBatchPut() throws DocumentApiException {
+    void testNegativeBatchPut() throws DocumentApiException {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -287,7 +290,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchAppend() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchAppend() throws JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -313,11 +316,11 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         documentClient.batchPerform(batchOpsList, true);
 
         for (BatchOperation batchOp : batchOpsList) {
-            List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
-            );
+            List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
             // Check that the last element in the list we appended to is the value we added
-            assertTrue(appendedList != null &&
-                    TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), appendValue));
+            assertNotNull(appendedList);
+            assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), appendValue));
         }
     }
 
@@ -331,7 +334,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testNegativeBatchAppend() throws DocumentApiException {
+    void testNegativeBatchAppend() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -379,8 +382,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchDelete() throws IOException,
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchDelete() throws JsonPathParser.JsonParseException, DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -413,8 +415,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
         // reading original objects
         for (BatchOperation batchOp : batchOpsList) {
-            Object originalObject = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
-            );
+            Object originalObject = documentClient.get(batchOp.getKey(),
+                    batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
             originalObjects[batchOpsList.indexOf(batchOp)] = originalObject;
 
             // Check the original object exists
@@ -449,7 +451,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testNegativeBatchDelete() throws DocumentApiException {
+    void testNegativeBatchDelete() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -486,36 +488,33 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
             // the response has a non-null record with resultCode == 0
             // and record.bins containing null value
             if (batchOp.getJsonPath().equals("$.example1.nokey")) {
-                assertTrue(
-                        batchOp.getBatchRecord().record != null
-                                && batchOp.getBatchRecord().resultCode == 0
-                                && batchOp.getBatchRecord().record.bins.get(batchOp.getBinNames().iterator().next()) == null
-                );
+                assertNotNull(batchOp.getBatchRecord().record);
+                assertEquals(0, batchOp.getBatchRecord().resultCode);
+                assertNull(batchOp.getBatchRecord().record.bins.get(batchOp.getBinNames().iterator().next()));
             } else {
                 // making sure all records contain the resulting record == null and the necessary resulting code
                 // PARAMETER_ERROR = 4, BIN_TYPE_ERROR = 12, OP_NOT_APPLICABLE = 26
-                assertTrue(batchOp.getBatchRecord().record == null
-                        && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode)));
+                assertNull(batchOp.getBatchRecord().record);
+                assertTrue(Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode));
             }
         }
     }
 
     @Test
-    public void testPositiveBatchDeleteRootElement() throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+    void testPositiveBatchDeleteRootElement() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
         String jsonPath = "$";
         BatchOperation batchOp = new DeleteBatchOperation(
                 TEST_AEROSPIKE_KEY,
-                Collections.singletonList(documentBinName),
+                Collections.singletonList(DOCUMENT_BIN_NAME),
                 jsonPath
         );
         documentClient.batchPerform(Collections.singletonList(batchOp), true);
 
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertTrue(((Map<?, ?>) objectFromDB).isEmpty());
     }
 
@@ -529,7 +528,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchMix() throws JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -572,18 +571,19 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     assertTrue(TestJsonConverters.jsonEquals(batchRecord.record.getValue(binName), jsonNodeAsMap));
                     break;
                 case 1:
-                    Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
-                    );
+                    Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     // Check that the last element in the list we put to is the initial put value
-                    assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, objToPut));
+                    assertNotNull(objFromDb);
+                    assertTrue(TestJsonConverters.jsonEquals(objFromDb, objToPut));
                     break;
                 case 2:
                     List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
                             batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
                     );
                     // Check that the last element in the list we appended to is the value we added
-                    assertTrue(appendedList != null &&
-                            TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), objToAppend));
+                    assertNotNull(appendedList);
+                    assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), objToAppend));
                     break;
                 case 3:
                     assertTrue(jsonPathDoesNotExist(
@@ -594,7 +594,6 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     );
                     break;
             }
-
             i++;
         }
     }
@@ -611,8 +610,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix2StepWildcard() throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+    void testPositiveBatchMix2StepWildcard() throws JsonPathParser.JsonParseException, DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -669,7 +667,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                    assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                    assertNotNull(objFromDb);
+                    assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
                 case 4:
                     objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
@@ -677,7 +676,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     modifiedJson = JsonPath.parse(testMaterialJson).add(inputsList.get(i).getJsonPath(), objToAppend).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                    assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                    assertNotNull(objFromDb);
+                    assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
                 case 5:
                     objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
@@ -685,10 +685,10 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     modifiedJson = JsonPath.parse(testMaterialJson).delete(inputsList.get(i).getJsonPath()).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                    assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                    assertNotNull(objFromDb);
+                    assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
             }
-
             i++;
         }
     }
@@ -703,7 +703,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix2StepWildcardMultipleBins() throws JsonPathParser.JsonParseException,
+    void testPositiveBatchMix2StepWildcardMultipleBins() throws JsonPathParser.JsonParseException,
             DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
@@ -756,21 +756,23 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                 modifiedJson = context.set(inputsList.get(i).getJsonPath(), objToPut).json();
                 expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                assertNotNull(objFromDb);
+                assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
             } else if (batchOp.getClass().equals(APPEND.getBatchOperationClass())) {
                 objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
                 modifiedJson = context.add(inputsList.get(i).getJsonPath(), objToAppend).json();
                 expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                assertNotNull(objFromDb);
+                assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
             } else if (batchOp.getClass().equals(DELETE.getBatchOperationClass())) {
                 objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
                 modifiedJson = context.delete(inputsList.get(i).getJsonPath()).json();
                 expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                assertNotNull(objFromDb);
+                assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
             }
-
             i++;
         }
     }
@@ -782,7 +784,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testNegativeBatchMix2StepWildcardIncorrectParts() throws DocumentApiException {
+    void testNegativeBatchMix2StepWildcardIncorrectParts() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -817,7 +819,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with integer keys.
      */
     @Test
-    public void testNegativeBatchWriteJsonIntKeys() throws DocumentApiException {
+    void testNegativeBatchWriteJsonIntKeys() throws DocumentApiException {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<Integer, List<Map<Integer, List<String>>>> map = new HashMap<>();
@@ -833,7 +835,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         map.put(2, list);
 
         // Load the "incorrect json"
-        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, documentBinName, map, documentClient, aerospikeDocumentRepository);
+        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, map, documentClient, aerospikeDocumentRepository);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         inputsList.add(new BatchOperationInput("$.2[1].3", PUT)); // resultCode 26
@@ -861,7 +863,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with binary list elements.
      */
     @Test
-    public void testBatchWrite2StepJsonBinaryListValues() throws DocumentApiException {
+    void testBatchWrite2StepJsonBinaryListValues() throws DocumentApiException {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<String, List<Map<String, Map<String, byte[]>>>> map = new HashMap<>();
@@ -876,7 +878,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
         map.put("2", list);
 
         // Load the "incorrect json"
-        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, documentBinName, map, documentClient, aerospikeDocumentRepository);
+        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, map, documentClient, aerospikeDocumentRepository);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // JSONPath query analogous to "$.example2[*].key03"
@@ -905,7 +907,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testNegativeBatchMix2StepWildcardIncorrectKeys() throws DocumentApiException {
+    void testNegativeBatchMix2StepWildcardIncorrectKeys() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -946,7 +948,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testBatchMix2StepWildcardNegativeAndPositive() throws DocumentApiException,
+    void testBatchMix2StepWildcardNegativeAndPositive() throws DocumentApiException,
             JsonPathParser.JsonParseException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
@@ -986,15 +988,15 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
                     assertEquals(-2, batchRecord.resultCode);
                     break;
                 case 1:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
-                    );
+                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
                     modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
-                    assertTrue(objFromDb != null && TestJsonConverters.jsonEquals(objFromDb, expectedObject));
+                    assertNotNull(objFromDb);
+                    assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
             }
-
             i++;
         }
     }
@@ -1022,7 +1024,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
 
             String singleBinName = "";
             if (binNamesList == null) {
-                singleBinName = documentBinName + i;
+                singleBinName = DOCUMENT_BIN_NAME + i;
                 TestUtils.writeDocumentToDB(key, singleBinName, jsonNode, documentClient, aerospikeDocumentRepository);
             } else {
                 if (!sameKeys || i == 0) { //  creating only once in case of the same keys and multiple bins
@@ -1058,8 +1060,8 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     private BatchOperation constructTestOperation(
             Key key,
             List<String> binNames,
-            BatchOperationInput batchOperationInput)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
+            BatchOperationInput batchOperationInput
+    ) throws NoSuchMethodException, InvocationTargetException, InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         BatchOperation batchOp;
 

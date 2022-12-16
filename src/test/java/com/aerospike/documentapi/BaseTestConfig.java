@@ -13,6 +13,7 @@ import java.io.IOException;
  * Constants used in testing
  */
 public class BaseTestConfig {
+
     public static final String AEROSPIKE_SERVER_IP = "localhost";
     public static final int AEROSPIKE_SERVER_PORT = 3000;
     public static final String AEROSPIKE_NAMESPACE = "test";
@@ -20,11 +21,12 @@ public class BaseTestConfig {
 
     public static final String JSON_EXAMPLE_KEY = "jsonExampleKey";
     public static final String JSON_EXAMPLE_BIN = "jsonExampleBin";
+    public static final String DOCUMENT_BIN_NAME = "documentBin";
 
     public static final Key TEST_AEROSPIKE_KEY = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY);
 
     public static IAerospikeClient client;
-    public static String documentBinName = "documentBin";
+    public static AerospikeDocumentRepository aerospikeDocumentRepository;
 
     public static String events1;
     public static String events2;
@@ -37,6 +39,7 @@ public class BaseTestConfig {
     @BeforeAll
     public static void setupClass() throws IOException {
         client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
+        aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
         loadJsonFiles();
     }
 
