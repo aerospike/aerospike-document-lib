@@ -15,6 +15,13 @@ public class JsonPathQuery {
     private JsonPathQuery() {
     }
 
+    /**
+     * @param jsonPathObject
+     * @param object
+     * @return result of applying the operation to the parsed JSON.
+     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
+     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     */
     @SneakyThrows
     public static Object read(JsonPathObject jsonPathObject, Object object) {
         validate(object);
@@ -24,6 +31,14 @@ public class JsonPathQuery {
         return JsonPath.read(resultJson, jsonPath);
     }
 
+    /**
+     * @param jsonPathObject
+     * @param object
+     * @param value
+     * @return result of applying the operation to the parsed JSON.
+     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
+     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     */
     @SneakyThrows
     public static Object putOrSet(JsonPathObject jsonPathObject, Object object, Object value) {
         validate(object);
@@ -56,6 +71,14 @@ public class JsonPathQuery {
         }
     }
 
+    /**
+     * @param jsonPathObject
+     * @param object
+     * @param value
+     * @return result of applying the operation to the parsed JSON.
+     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
+     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     */
     @SneakyThrows
     public static Object append(JsonPathObject jsonPathObject, Object object, Object value) {
         validate(object);
@@ -65,6 +88,13 @@ public class JsonPathQuery {
         return JsonPath.parse(resultJson).add(jsonPath, value).json();
     }
 
+    /**
+     * @param jsonPathObject
+     * @param object
+     * @return result of applying the operation to the parsed JSON.
+     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
+     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     */
     @SneakyThrows
     public static Object delete(JsonPathObject jsonPathObject, Object object) {
         validate(object);
