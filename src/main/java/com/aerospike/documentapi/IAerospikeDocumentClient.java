@@ -19,8 +19,8 @@ public interface IAerospikeDocumentClient {
      * @param binName  The bin name that will store the json.
      * @param jsonPath A JSON path to get the reference from.
      * @return Object referenced by jsonPath.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     Object get(Key key, String binName, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -31,9 +31,9 @@ public interface IAerospikeDocumentClient {
      * @param key      An Aerospike Key.
      * @param binNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath A JSON path to get the reference from.
-     * @return A Map of Objects referenced by jsonPath where a key is a bin name.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @return A map of objects referenced by jsonPath where bin name is a key.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -54,8 +54,8 @@ public interface IAerospikeDocumentClient {
      * @param binName    The bin name that will store the json.
      * @param jsonPath   A JSON path to put the given JSON object in.
      * @param jsonObject A JSON object to put in the given JSON path.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     void put(Key key, String binName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -67,8 +67,8 @@ public interface IAerospikeDocumentClient {
      * @param binNames   A collection of bin names that each contains the same structure of a document.
      * @param jsonPath   A JSON path to put the given JSON object in.
      * @param jsonObject A JSON object to put in the given JSON path.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     void put(Key key, Collection<String> binNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -78,10 +78,10 @@ public interface IAerospikeDocumentClient {
      *
      * @param key        An Aerospike Key.
      * @param binName    The bin name that will store the json.
-     * @param jsonPath   A JSON path that includes A collection to append the given JSON object to.
+     * @param jsonPath   A JSON path that includes a collection to append the given JSON object to.
      * @param jsonObject A JSON object to append to the list at the given JSON path.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     void append(Key key, String binName, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -91,10 +91,10 @@ public interface IAerospikeDocumentClient {
      *
      * @param key        An Aerospike Key.
      * @param binNames   A collection of bin names that each contains the same structure of a document.
-     * @param jsonPath   A JSON path that includes A collection to append the given JSON object to.
+     * @param jsonPath   A JSON path that includes a collection to append the given JSON object to.
      * @param jsonObject A JSON object to append to the list at the given JSON path.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     void append(Key key, Collection<String> binNames, String jsonPath, Object jsonObject)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -105,8 +105,8 @@ public interface IAerospikeDocumentClient {
      * @param key      An Aerospike Key.
      * @param binName  The bin name that will store the json.
      * @param jsonPath A JSON path for the object deletion.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     void delete(Key key, String binName, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException;
@@ -117,8 +117,8 @@ public interface IAerospikeDocumentClient {
      * @param key      An Aerospike Key.
      * @param binNames A collection of bin names that each contains the same structure of a document.
      * @param jsonPath A JSON path for the object deletion.
-     * @throws DocumentApiException              if nothing was found by the given JSON path.
-     * @throws JsonPathParser.JsonParseException if there was an exception during JSON parsing.
+     * @throws DocumentApiException              if there was an error while executing or post-production.
+     * @throws JsonPathParser.JsonParseException if there was an error during JSON parsing.
      */
     void delete(Key key, Collection<String> binNames, String jsonPath)
             throws JsonPathParser.JsonParseException, DocumentApiException;
