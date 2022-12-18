@@ -1,8 +1,11 @@
 package com.aerospike.documentapi.jsonpath;
 
+import com.aerospike.client.AerospikeException;
+import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import lombok.SneakyThrows;
 import net.minidev.json.JSONArray;
 
 public class JsonPathQuery {
@@ -12,13 +15,19 @@ public class JsonPathQuery {
     private JsonPathQuery() {
     }
 
+    @SneakyThrows
     public static Object read(JsonPathObject jsonPathObject, Object object) {
+        validate(object);
+
         String resultJson = JsonConverters.writeValueAsString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         return JsonPath.read(resultJson, jsonPath);
     }
 
+    @SneakyThrows
     public static Object putOrSet(JsonPathObject jsonPathObject, Object object, Object value) {
+        validate(object);
+
         String resultJson = JsonConverters.writeValueAsString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
@@ -47,15 +56,25 @@ public class JsonPathQuery {
         }
     }
 
+    @SneakyThrows
     public static Object append(JsonPathObject jsonPathObject, Object object, Object value) {
+        validate(object);
+
         String resultJson = JsonConverters.writeValueAsString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         return JsonPath.parse(resultJson).add(jsonPath, value).json();
     }
 
+    @SneakyThrows
     public static Object delete(JsonPathObject jsonPathObject, Object object) {
+        validate(object);
+
         String resultJson = JsonConverters.writeValueAsString(object);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         return JsonPath.parse(resultJson).delete(jsonPath).json();
+    }
+
+    private static void validate(Object object) throws DocumentApiException {
+        if (object == null) throw DocumentApiException.toDocumentException(new AerospikeException(26));
     }
 }

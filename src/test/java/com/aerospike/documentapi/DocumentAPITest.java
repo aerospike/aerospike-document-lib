@@ -114,7 +114,8 @@ class DocumentAPITest extends BaseTestConfig {
 
         jsonPath = "$.example4.key19[2].key20[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-        expectedObject = ((List<?>) ((Map<?, ?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key19")).get(2)).get("key20")).get(1);
+        expectedObject = ((List<?>) ((Map<?, ?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4"))
+                .get("key19")).get(2)).get("key20")).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[2].key21.key23";
@@ -124,12 +125,14 @@ class DocumentAPITest extends BaseTestConfig {
 
         jsonPath = "$.example3[1].key08[1].key16";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-        expectedObject = ((Map<?, ?>) ((List<?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key16");
+        expectedObject = ((Map<?, ?>) ((List<?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3"))
+                .get(1)).get("key08")).get(1)).get("key16");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key17[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-        expectedObject = ((List<?>) ((Map<?, ?>) ((List<?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
+        expectedObject = ((List<?>) ((Map<?, ?>) ((List<?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap
+                .get("example3")).get(1)).get("key08")).get(1)).get("key17")).get(2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[3][1]";

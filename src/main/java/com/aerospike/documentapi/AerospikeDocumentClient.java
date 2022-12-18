@@ -85,10 +85,10 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
             Map<String, Object> result = aerospikeDocumentRepository.get(writePolicy, key,
                     binNames, jsonPathObject, true);
             Map<String, Object> queryResults = result.entrySet().stream()
-                    .filter(e -> !e.getKey().equals(Lut.LUT_BIN))
+                    .filter(entry -> !entry.getKey().equals(Lut.LUT_BIN))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
-                            e -> JsonPathQuery.putOrSet(jsonPathObject, e.getValue(), jsonObject))
+                            entry -> JsonPathQuery.putOrSet(jsonPathObject, entry.getValue(), jsonObject))
                     );
             aerospikeDocumentRepository.put(getLutPolicy(result), key, queryResults, originalJsonPathObject);
         } else {
