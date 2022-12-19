@@ -36,7 +36,7 @@ public class AppendBatchOperation extends AbstractBatchOperation {
 
         if (originalJsonPathObject.getPathParts().isEmpty()) {
             // If there are no parts, you cannot append
-            throw new AerospikeException(new DocumentApiException.JsonRootAppendException(getJsonPath()));
+            throw new AerospikeException(new DocumentApiException.JsonAppendException(getJsonPath()));
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step

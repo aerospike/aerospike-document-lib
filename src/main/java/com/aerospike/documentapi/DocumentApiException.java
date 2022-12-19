@@ -48,7 +48,7 @@ public class DocumentApiException extends Exception {
      */
     public static class TypeMismatchException extends DocumentApiException {
         public TypeMismatchException(AerospikeException e) {
-            super();
+            super(e);
         }
     }
 
@@ -73,9 +73,9 @@ public class DocumentApiException extends Exception {
         }
     }
 
-    public static class JsonRootAppendException extends JsonParseException {
-        public JsonRootAppendException(String jsonString) {
-            super(String.format("Cannot append to document root '%s'", jsonString));
+    public static class JsonAppendException extends JsonParseException {
+        public JsonAppendException(String jsonString) {
+            super(String.format("Cannot append to '%s'", jsonString));
         }
     }
 

@@ -161,7 +161,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             throws DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().isEmpty()) {
-            throw new DocumentApiException.JsonRootAppendException(jsonPath);
+            throw new DocumentApiException.JsonAppendException(jsonPath);
         } else {
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), false);
 
