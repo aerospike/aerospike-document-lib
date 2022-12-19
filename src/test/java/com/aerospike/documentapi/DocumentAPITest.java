@@ -7,7 +7,6 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.Lut;
 import com.aerospike.documentapi.util.TestJsonConverters;
-import com.aerospike.documentapi.util.TestUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -155,7 +154,7 @@ class DocumentAPITest extends BaseTestConfig {
         map.put(2L, list);
 
         // Load the incorrect "json" map
-        TestUtils.writeDocumentToDB(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, map, documentClient, aerospikeDocumentRepository);
+        writeDocumentToDB(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, map);
 
         String jsonPath = "$";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
