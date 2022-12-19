@@ -10,7 +10,6 @@ import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +18,10 @@ import java.util.Vector;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class NullResultsTests extends BaseTestConfig {
+class NullResultsTests extends BaseTestConfig {
 
     @Test
-    public void testNullResultsWithFilterExpression() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testNullResultsWithFilterExpression() throws JsonPathParser.JsonParseException, DocumentApiException {
         Policy readPolicy = client.getReadPolicyDefault();
         readPolicy.filterExp = Exp.build(Exp.eq(Exp.stringBin("docBin"), Exp.val("hi")));
         readPolicy.failOnFilteredOut = false;

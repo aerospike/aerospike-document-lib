@@ -1,12 +1,14 @@
 package com.aerospike.documentapi.jsonpath;
 
-import com.aerospike.documentapi.*;
+import com.aerospike.documentapi.AerospikeDocumentClient;
+import com.aerospike.documentapi.BaseTestConfig;
+import com.aerospike.documentapi.DocumentApiException;
+import com.aerospike.documentapi.util.TestJsonConverters;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +16,10 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JsonPathMultipleBinsTests extends BaseTestConfig {
+class JsonPathMultipleBinsTests extends BaseTestConfig {
 
     @Test
-    public void testMultipleBinsWithJsonPathQueries() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleBinsWithJsonPathQueries() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -83,7 +85,7 @@ public class JsonPathMultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    public void deleteRootElementMultipleBinsWithJSONPathQuery() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void deleteRootElementMultipleBinsWithJSONPathQuery() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";

@@ -2,10 +2,10 @@ package com.aerospike.documentapi;
 
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
+import com.aerospike.documentapi.util.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +14,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MultipleBinsTests extends BaseTestConfig {
+class MultipleBinsTests extends BaseTestConfig {
 
     @Test
-    public void testMultipleGetOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleGetOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         Map<String, Object> jsonNodeAsMapEvents1 = JsonConverters.convertJsonNodeToMap(jsonNodeEvents1);
@@ -43,7 +43,7 @@ public class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    public void testMultiplePutOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultiplePutOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -68,7 +68,7 @@ public class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    public void testMultipleAppendOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleAppendOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -96,7 +96,7 @@ public class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    public void testMultipleDeleteOperations() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleDeleteOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -112,14 +112,14 @@ public class MultipleBinsTests extends BaseTestConfig {
 
         documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
-        for (Object value : ((Map<?, ?>) objectFromDB).values()) {
+        Map<?, ?> objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        for (Object value : objectFromDB.values()) {
             assertNull(value);
         }
     }
 
     @Test
-    public void deleteRootElementMultipleBins() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    void deleteRootElementMultipleBins() throws JsonPathParser.JsonParseException, DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";

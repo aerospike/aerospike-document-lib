@@ -1,4 +1,4 @@
-package com.aerospike.documentapi;
+package com.aerospike.documentapi.util;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,23 +27,6 @@ public class TestJsonConverters {
         } else {
             return object1.toString().equals(object2.toString());
         }
-    }
-
-    /**
-     * Verify jsonEquals functionality.
-     */
-    @Test
-    public void testMapEquals() {
-        HashMap<String, Object> map1 = new HashMap<>();
-        HashMap<String, Object> map2 = new HashMap<>();
-
-        map1.put("key1", 1);
-        map1.put("key2", 2);
-        map1.put("key3", 3);
-        map2.put("key3", 3);
-        map2.put("key1", 1);
-        map2.put("key2", 2);
-        assertTrue(TestJsonConverters.jsonEquals(map1, map2));
     }
 
     /**
@@ -105,5 +88,22 @@ public class TestJsonConverters {
      */
     private static boolean listEquals(List<?> list1, List<?> list2) {
         return jsonListToString(list1).equals(jsonListToString(list2));
+    }
+
+    /**
+     * Verify jsonEquals functionality.
+     */
+    @Test
+    void testMapEquals() {
+        HashMap<String, Object> map1 = new HashMap<>();
+        HashMap<String, Object> map2 = new HashMap<>();
+
+        map1.put("key1", 1);
+        map1.put("key2", 2);
+        map1.put("key3", 3);
+        map2.put("key3", 3);
+        map2.put("key1", 1);
+        map2.put("key2", 2);
+        assertTrue(TestJsonConverters.jsonEquals(map1, map2));
     }
 }
