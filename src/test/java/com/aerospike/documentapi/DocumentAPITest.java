@@ -3,7 +3,6 @@ package com.aerospike.documentapi;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.exp.Exp;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.Lut;
 import com.aerospike.documentapi.util.TestJsonConverters;
