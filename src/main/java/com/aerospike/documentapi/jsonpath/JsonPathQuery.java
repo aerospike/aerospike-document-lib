@@ -8,8 +8,6 @@ import com.jayway.jsonpath.PathNotFoundException;
 import lombok.SneakyThrows;
 import net.minidev.json.JSONArray;
 
-import static com.aerospike.client.ResultCode.OP_NOT_APPLICABLE;
-
 public class JsonPathQuery {
 
     static final String DOCUMENT_ROOT = "$";

@@ -3,7 +3,6 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;

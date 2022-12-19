@@ -12,7 +12,6 @@ import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
 import com.aerospike.documentapi.util.Utils;
@@ -162,7 +161,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
             throws DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().isEmpty()) {
-            throw new DocumentApiException.ListException(jsonPath);
+            throw new DocumentApiException.JsonRootAppendException(jsonPath);
         } else {
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), false);
 

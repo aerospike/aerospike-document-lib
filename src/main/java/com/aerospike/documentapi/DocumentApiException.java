@@ -16,13 +16,17 @@ public class DocumentApiException extends Exception {
         super();
     }
 
+    public DocumentApiException(AerospikeException e) {
+        super(e);
+    }
+
     /**
      * Thrown if a non-existing map or list is accessed, and also if accessing a list element out of
      * existing list bounds.
      */
     public static class ObjectNotFoundException extends DocumentApiException {
         public ObjectNotFoundException(AerospikeException e) {
-            super();
+            super(e);
         }
 
         public ObjectNotFoundException() {
@@ -35,7 +39,7 @@ public class DocumentApiException extends Exception {
      */
     public static class KeyNotFoundException extends DocumentApiException {
         public KeyNotFoundException(AerospikeException e) {
-            super();
+            super(e);
         }
     }
 
@@ -69,9 +73,9 @@ public class DocumentApiException extends Exception {
         }
     }
 
-    public static class ListException extends JsonParseException {
-        public ListException(String jsonString) {
-            super(String.format("You cannot append to document root '%s'", jsonString));
+    public static class JsonRootAppendException extends JsonParseException {
+        public JsonRootAppendException(String jsonString) {
+            super(String.format("Cannot append to document root '%s'", jsonString));
         }
     }
 
