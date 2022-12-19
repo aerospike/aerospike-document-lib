@@ -8,12 +8,6 @@ import com.aerospike.client.ResultCode;
  */
 public class DocumentApiException extends Exception {
 
-    AerospikeException e;
-
-    public DocumentApiException(AerospikeException e) {
-        this.e = e;
-    }
-
     public DocumentApiException(String message) {
         super(message);
     }
@@ -28,7 +22,7 @@ public class DocumentApiException extends Exception {
      */
     public static class ObjectNotFoundException extends DocumentApiException {
         public ObjectNotFoundException(AerospikeException e) {
-            super(e);
+            super();
         }
 
         public ObjectNotFoundException() {
@@ -41,7 +35,7 @@ public class DocumentApiException extends Exception {
      */
     public static class KeyNotFoundException extends DocumentApiException {
         public KeyNotFoundException(AerospikeException e) {
-            super(e);
+            super();
         }
     }
 
@@ -50,7 +44,7 @@ public class DocumentApiException extends Exception {
      */
     public static class TypeMismatchException extends DocumentApiException {
         public TypeMismatchException(AerospikeException e) {
-            super(e);
+            super();
         }
     }
 
@@ -84,8 +78,8 @@ public class DocumentApiException extends Exception {
     /**
      * Utility method to categorise the different sort of exceptions we encounter.
      *
-     * @param e AerospikeException
-     * @return case-specific exception or throw the original AerospikeException
+     * @param e AerospikeException.
+     * @return case-specific exception or throw the original AerospikeException.
      */
     public static DocumentApiException toDocumentException(AerospikeException e) {
         if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {

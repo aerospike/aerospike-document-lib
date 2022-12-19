@@ -210,7 +210,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         try {
             return client.operate(batchPolicy, batchRecords);
         } catch (AerospikeException e) {
-            throw new DocumentApiException(e);
+            throw DocumentApiException.toDocumentException(e);
         }
     }
 }

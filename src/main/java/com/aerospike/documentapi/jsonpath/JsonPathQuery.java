@@ -34,7 +34,7 @@ public class JsonPathQuery {
             String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
             return JsonPath.read(resultJson, jsonPath);
         } catch (Exception e) {
-            throw new DocumentApiException(new AerospikeException(e));
+            throw DocumentApiException.toDocumentException(new AerospikeException(e));
         }
     }
 
