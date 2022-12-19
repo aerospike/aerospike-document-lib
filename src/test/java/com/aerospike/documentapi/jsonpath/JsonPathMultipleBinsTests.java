@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JsonPathMultipleBinsTests extends BaseTestConfig {
 
     @Test
-    public void testMultipleBinsWithJsonPathQueries() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testMultipleBinsWithJsonPathQueries() throws DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -83,7 +83,7 @@ public class JsonPathMultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    public void deleteRootElementMultipleBinsWithJSONPathQuery() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void deleteRootElementMultipleBinsWithJSONPathQuery() throws DocumentApiException {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";

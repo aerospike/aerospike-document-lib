@@ -53,8 +53,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositivePathRetrieval() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositivePathRetrieval() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -145,7 +144,7 @@ class DocumentAPITest extends BaseTestConfig {
      * Check that the client can be used to read json with keys of type long and binary data as List values
      */
     @Test
-    void testIrregularJsonRetrieval() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testIrregularJsonRetrieval() throws DocumentApiException {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<Long, List<Map<Long, Map<String, byte[]>>>> map = new HashMap<>();
@@ -190,7 +189,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativePathRetrieval() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testNegativePathRetrieval() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -214,8 +213,8 @@ class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example1[1]";
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-            fail("DocumentApiException.NotAListException should have been thrown");
-        } catch (DocumentApiException.NotAListException ignored) {
+            fail("DocumentApiException.TypeMismatchException should have been thrown");
+        } catch (DocumentApiException.TypeMismatchException ignored) {
         }
 
         // Reference a primitive as if it was a map
@@ -232,8 +231,8 @@ class DocumentAPITest extends BaseTestConfig {
         jsonPath = "$.example4.key10.key11[2]";
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-            fail("DocumentApiException.NotAListException should have been thrown");
-        } catch (DocumentApiException.NotAListException ignored) {
+            fail("DocumentApiException.TypeMismatchException should have been thrown");
+        } catch (DocumentApiException.TypeMismatchException ignored) {
         }
 
         // Reference a list item that is not there
@@ -269,8 +268,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositivePut() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositivePut() throws DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -335,8 +333,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativePut() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testNegativePut() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -401,8 +398,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveAppend() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveAppend() throws DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -439,8 +435,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeAppend() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testNegativeAppend() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -524,8 +519,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveDelete() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveDelete() throws DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -615,8 +609,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeDelete() throws
-            JsonPathParser.JsonParseException, DocumentApiException {
+    void testNegativeDelete() throws DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -656,7 +649,7 @@ class DocumentAPITest extends BaseTestConfig {
 
         // Delete a key in a list
         jsonPath = "$.example2.nokey";
-        // accessing this path throws an error so we know it's not there to start with
+        // accessing this path throws an error, so we know it's not there to start with
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
@@ -672,11 +665,11 @@ class DocumentAPITest extends BaseTestConfig {
 
         // Delete an index in a map
         jsonPath = "$.example1[1]";
-        // accessing this path throws an error so we know it's not there to start with
+        // accessing this path throws an error, so we know it's not there to start with
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (DocumentApiException.NotAListException ignored) {
+        } catch (DocumentApiException.TypeMismatchException ignored) {
         }
 
         // Delete call should throw an error
@@ -720,7 +713,7 @@ class DocumentAPITest extends BaseTestConfig {
     }
 
     @Test
-    void testTopLevelArrayType() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testTopLevelArrayType() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(topLevelArrayTypeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -733,7 +726,7 @@ class DocumentAPITest extends BaseTestConfig {
     }
 
     @Test
-    void deleteRootElement() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void deleteRootElement() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);

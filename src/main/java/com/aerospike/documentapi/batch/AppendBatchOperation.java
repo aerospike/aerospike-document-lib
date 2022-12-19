@@ -6,6 +6,7 @@ import com.aerospike.client.BatchWrite;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.policy.BatchWritePolicy;
+import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.jsonpath.PathDetails;
@@ -36,11 +37,7 @@ public class AppendBatchOperation extends AbstractBatchOperation {
 
         if (originalJsonPathObject.getPathParts().isEmpty()) {
             // If there are no parts, you cannot append
-            try {
-                throw new JsonPathParser.ListException(getJsonPath());
-            } catch (JsonPathParser.ListException e) {
-                throw new AerospikeException(e);
-            }
+            throw new AerospikeException(new DocumentApiException.ListException(getJsonPath()));
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step

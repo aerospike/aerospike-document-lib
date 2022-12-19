@@ -8,6 +8,8 @@ import com.jayway.jsonpath.PathNotFoundException;
 import lombok.SneakyThrows;
 import net.minidev.json.JSONArray;
 
+import static com.aerospike.client.ResultCode.OP_NOT_APPLICABLE;
+
 public class JsonPathQuery {
 
     static final String DOCUMENT_ROOT = "$";
@@ -16,34 +18,40 @@ public class JsonPathQuery {
     }
 
     /**
-     * @param jsonPathObject
-     * @param object
-     * @return result of applying the operation to the parsed JSON.
-     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
-     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     * Retrieving the objects that match JSON path query.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @return list of objects matched by the given path.
+     * @throws DocumentApiException if there was an error.
      */
     @SneakyThrows
-    public static Object read(JsonPathObject jsonPathObject, Object object) {
-        validate(object);
+    public static Object read(JsonPathObject jsonPathObject, Object json) {
+        validateNotNull(json);
 
-        String resultJson = JsonConverters.writeValueAsString(object);
-        String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
-        return JsonPath.read(resultJson, jsonPath);
+        try {
+            String resultJson = JsonConverters.writeValueAsString(json);
+            String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
+            return JsonPath.read(resultJson, jsonPath);
+        } catch (Exception e) {
+            throw new DocumentApiException(new AerospikeException(e));
+        }
     }
 
     /**
-     * @param jsonPathObject
-     * @param object
-     * @param value
-     * @return result of applying the operation to the parsed JSON.
-     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
-     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     * Putting a value according to JSON path query and returning the updated JSON.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @param value          an object to put.
+     * @return updated JSON.
+     * @throws DocumentApiException if there was an error.
      */
     @SneakyThrows
-    public static Object putOrSet(JsonPathObject jsonPathObject, Object object, Object value) {
-        validate(object);
+    public static Object putOrSet(JsonPathObject jsonPathObject, Object json, Object value) {
+        validateNotNull(json);
 
-        String resultJson = JsonConverters.writeValueAsString(object);
+        String resultJson = JsonConverters.writeValueAsString(json);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
         // if jsonPath exists or if it leads to an array element
@@ -72,39 +80,41 @@ public class JsonPathQuery {
     }
 
     /**
-     * @param jsonPathObject
-     * @param object
-     * @param value
-     * @return result of applying the operation to the parsed JSON.
-     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
-     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     * Appending a value according to JSON path query and returning the updated JSON.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @param value          an object to append.
+     * @return updated JSON.
+     * @throws DocumentApiException if there was an error.
      */
     @SneakyThrows
-    public static Object append(JsonPathObject jsonPathObject, Object object, Object value) {
-        validate(object);
+    public static Object append(JsonPathObject jsonPathObject, Object json, Object value) {
+        validateNotNull(json);
 
-        String resultJson = JsonConverters.writeValueAsString(object);
+        String resultJson = JsonConverters.writeValueAsString(json);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         return JsonPath.parse(resultJson).add(jsonPath, value).json();
     }
 
     /**
-     * @param jsonPathObject
-     * @param object
-     * @return result of applying the operation to the parsed JSON.
-     * @throws DocumentApiException.ObjectNotFoundException if object was passed as null.
-     * @throws JsonPathParser.JsonParseException            if there was an exception during JSON parsing.
+     * Deleting an element according to JSON path query and returning the updated JSON.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @return updated JSON.
+     * @throws DocumentApiException if there was an error.
      */
     @SneakyThrows
-    public static Object delete(JsonPathObject jsonPathObject, Object object) {
-        validate(object);
+    public static Object delete(JsonPathObject jsonPathObject, Object json) {
+        validateNotNull(json);
 
-        String resultJson = JsonConverters.writeValueAsString(object);
+        String resultJson = JsonConverters.writeValueAsString(json);
         String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
         return JsonPath.parse(resultJson).delete(jsonPath).json();
     }
 
-    private static void validate(Object object) throws DocumentApiException {
-        if (object == null) throw DocumentApiException.toDocumentException(new AerospikeException(26));
+    private static void validateNotNull(Object object) throws DocumentApiException {
+        if (object == null) throw new DocumentApiException.ObjectNotFoundException();
     }
 }

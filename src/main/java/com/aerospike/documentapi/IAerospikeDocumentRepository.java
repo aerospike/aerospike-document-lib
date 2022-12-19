@@ -32,10 +32,10 @@ public interface IAerospikeDocumentRepository {
             throws DocumentApiException;
 
     void append(WritePolicy writePolicy, Key key, Collection<String> binNames, String jsonPath, Object jsonObject,
-                JsonPathObject jsonPathObject) throws JsonPathParser.ListException, DocumentApiException;
+                JsonPathObject jsonPathObject) throws DocumentApiException;
 
     void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject)
-            throws JsonPathParser.ListException, DocumentApiException;
+            throws DocumentApiException;
 
     boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords) throws DocumentApiException;
 }

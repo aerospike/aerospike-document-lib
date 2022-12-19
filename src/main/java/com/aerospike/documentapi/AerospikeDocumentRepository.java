@@ -159,10 +159,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public void append(WritePolicy writePolicy, Key key, Collection<String> binNames, String jsonPath,
                        Object jsonObject, JsonPathObject jsonPathObject)
-            throws JsonPathParser.ListException, DocumentApiException {
+            throws DocumentApiException {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().isEmpty()) {
-            throw new JsonPathParser.ListException(jsonPath);
+            throw new DocumentApiException.ListException(jsonPath);
         } else {
             PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), false);
 
@@ -182,7 +182,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
 
     @Override
     public void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject)
-            throws JsonPathParser.ListException, DocumentApiException {
+            throws DocumentApiException {
         // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().isEmpty()) {
             Operation[] operations = binNames.stream()

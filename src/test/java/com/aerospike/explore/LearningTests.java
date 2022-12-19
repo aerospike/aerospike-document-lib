@@ -136,7 +136,7 @@ public class LearningTests extends BaseTestConfig {
     }
 
     @Test
-    public void demo() throws JsonPathParser.JsonParseException, DocumentApiException {
+    public void demo() throws DocumentApiException {
         // Put it in the DB
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 

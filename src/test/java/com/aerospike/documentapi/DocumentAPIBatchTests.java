@@ -147,7 +147,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchPut() throws DocumentApiException, JsonPathParser.JsonParseException {
+    public void testPositiveBatchPut() throws DocumentApiException {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -191,7 +191,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchPutWildcard() throws DocumentApiException, JsonPathParser.JsonParseException {
+    public void testPositiveBatchPutWildcard() throws DocumentApiException {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -287,7 +287,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchAppend() throws JsonPathParser.JsonParseException, DocumentApiException {
+    public void testPositiveBatchAppend() throws DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -379,8 +379,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchDelete() throws IOException,
-            JsonPathParser.JsonParseException, DocumentApiException {
+    public void testPositiveBatchDelete() throws DocumentApiException {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -501,8 +500,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     @Test
-    public void testPositiveBatchDeleteRootElement() throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+    public void testPositiveBatchDeleteRootElement() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
@@ -529,7 +527,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix() throws IOException, JsonPathParser.JsonParseException, DocumentApiException {
+    public void testPositiveBatchMix() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -611,8 +609,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix2StepWildcard() throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+    public void testPositiveBatchMix2StepWildcard() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -703,8 +700,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testPositiveBatchMix2StepWildcardMultipleBins() throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+    public void testPositiveBatchMix2StepWildcardMultipleBins() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -946,8 +942,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    public void testBatchMix2StepWildcardNegativeAndPositive() throws DocumentApiException,
-            JsonPathParser.JsonParseException {
+    public void testBatchMix2StepWildcardNegativeAndPositive() throws DocumentApiException {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -1084,7 +1079,7 @@ public class DocumentAPIBatchTests extends BaseTestConfig {
             String binName,
             String jsonPath,
             Object originalObject
-    ) throws JsonPathParser.JsonParseException, DocumentApiException {
+    ) throws DocumentApiException {
         Object res;
 
         try {
