@@ -1,84 +1,85 @@
 package com.aerospike.documentapi.jsonpath;
 
-import com.aerospike.documentapi.*;
+import com.aerospike.documentapi.AerospikeDocumentClient;
+import com.aerospike.documentapi.BaseTestConfig;
+import com.aerospike.documentapi.DocumentApiException;
+import com.aerospike.documentapi.util.TestJsonConverters;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JsonPathDeepScanTests extends BaseTestConfig {
+class JsonPathDeepScanTests extends BaseTestConfig {
 
     @Test
-    public void testDeepScan() throws DocumentApiException {
+    void testDeepScan() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
         // The price of everything
         String jsonPath = "$.store..price";
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
 
     @Test
-    public void testDeepScanAtTheBeginning() throws DocumentApiException {
+    void testDeepScanAtTheBeginning() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
         // The third book
         String jsonPath = "$..book[2]";
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
 
     @Test
-    public void testDeepScanWithWildCard() throws DocumentApiException {
+    void testDeepScanWithWildCard() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
         // Give me every thing
         String jsonPath = "$..*";
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
 
     @Test
-    public void testDeepScanPut() throws DocumentApiException {
+    void testDeepScanPut() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
         // Give me every thing
         String jsonPath = "$..author";
         String jsonObject = "J.K. Rowling";
         // Modify the authors of all books to "J.K. Rowling"
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonPath, jsonObject);
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, jsonObject);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         Object modifiedJson = JsonPath.parse(storeJson).set(jsonPath, jsonObject).json();
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
     }
 
     @Test
-    public void testDeepScanDelete() throws DocumentApiException {
+    void testDeepScanDelete() throws DocumentApiException {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
-        documentClient.put(TEST_AEROSPIKE_KEY, documentBinName, jsonNode);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
         // The price of everything
         String jsonPath = "$.store..price";
         // Delete the price field of every object exists in the store
-        documentClient.delete(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
-        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, documentBinName, jsonPath);
+        documentClient.delete(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
+        Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         Object modifiedJson = JsonPath.parse(storeJson).delete(jsonPath).json();
         Object expectedObject = JsonPath.read(modifiedJson, jsonPath);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
