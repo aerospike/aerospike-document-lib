@@ -6,7 +6,6 @@ import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;

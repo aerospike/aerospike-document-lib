@@ -25,5 +25,5 @@ public abstract class PathPart {
 
     public abstract Operation toAerospikeDeleteOperation(String binName, CTX[] contexts);
 
-    public abstract PathPartTypeEnum getType();
+    public abstract PathPartType getType();
 }
