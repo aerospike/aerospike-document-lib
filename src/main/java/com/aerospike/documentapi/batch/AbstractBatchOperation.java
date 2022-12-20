@@ -5,7 +5,6 @@ import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
-import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
@@ -41,11 +40,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         this.key = key;
         this.binNames = binNames;
         this.jsonPath = jsonPath;
-        try {
-            this.jsonPathObject = new JsonPathParser().parse(jsonPath);
-        } catch (DocumentApiException.JsonParseException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this.jsonPathObject = new JsonPathParser().parse(jsonPath);
         this.requiringJsonPathQuery = jsonPathObject.requiresJsonPathQuery();
         // copying in order to have it for a second step
         this.originalJsonPathObject = jsonPathObject.copy();

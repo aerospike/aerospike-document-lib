@@ -36,13 +36,13 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
 
     @Override
     public Map<String, Object> get(Policy readPolicy, Key key, Collection<String> binNames,
-                                   JsonPathObject jsonPathObject) throws DocumentApiException {
+                                   JsonPathObject jsonPathObject) {
         return get(readPolicy, key, binNames, jsonPathObject, false);
     }
 
     @Override
     public Map<String, Object> get(Policy readPolicy, Key key, Collection<String> binNames,
-                                   JsonPathObject jsonPathObject, boolean withLut) throws DocumentApiException {
+                                   JsonPathObject jsonPathObject, boolean withLut) {
         Map<String, Object> results = new HashMap<>();
         // If there are no parts, retrieve the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
@@ -97,7 +97,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
 
     @Override
     public void put(WritePolicy writePolicy, Key key, Collection<String> binNames, Object jsonObject,
-                    JsonPathObject jsonPathObject) throws DocumentApiException {
+                    JsonPathObject jsonPathObject) {
         Operation[] operations;
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
@@ -126,8 +126,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void put(WritePolicy writePolicy, Key key, Map<String, Object> queryResults, JsonPathObject jsonPathObject)
-            throws DocumentApiException {
+    public void put(WritePolicy writePolicy, Key key, Map<String, Object> queryResults, JsonPathObject jsonPathObject) {
         Operation[] operations;
         // If there are no parts, put the full document
         if (jsonPathObject.getPathParts().isEmpty()) {
@@ -157,8 +156,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
 
     @Override
     public void append(WritePolicy writePolicy, Key key, Collection<String> binNames, String jsonPath,
-                       Object jsonObject, JsonPathObject jsonPathObject)
-            throws DocumentApiException {
+                       Object jsonObject, JsonPathObject jsonPathObject) {
         // If there are no parts, you can't append
         if (jsonPathObject.getPathParts().isEmpty()) {
             throw new DocumentApiException.JsonAppendException(jsonPath);
@@ -180,8 +178,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject)
-            throws DocumentApiException {
+    public void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject) {
         // If there are no parts, put an empty map in each given bin
         if (jsonPathObject.getPathParts().isEmpty()) {
             Operation[] operations = binNames.stream()
@@ -205,7 +202,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     }
 
     @Override
-    public boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords) throws DocumentApiException {
+    public boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords) {
         try {
             return client.operate(batchPolicy, batchRecords);
         } catch (AerospikeException e) {

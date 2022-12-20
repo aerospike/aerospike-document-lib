@@ -25,30 +25,22 @@ public class DocumentApiException extends RuntimeException {
     }
 
     /**
-     * Utility method to wrap Exception. AerospikeException is processed separately to display its result code name.
+     * Utility method to wrap an Exception.
+     * {@link AerospikeException} is processed separately to display its result code name.
      *
-     * @param e Exception.
-     * @return DocumentApiException.
+     * @param e the original exception.
+     * @return a DocumentApiException wrapping the original exception.
      */
     public static DocumentApiException toDocumentException(Exception e) {
-        return e instanceof AerospikeException ?
-                wrapAerospikeException((AerospikeException) e)
+        return e instanceof AerospikeException
+                ? wrapAerospikeException((AerospikeException) e)
                 : new DocumentApiException(e);
-    }
-
-    /*
-     * Exception for displaying different types of json path errors.
-     */
-    public static class JsonParseException extends DocumentApiException {
-        JsonParseException(String message) {
-            super(message);
-        }
     }
 
     /**
      * Exception to be thrown in case of invalid json prefix.
      */
-    public static class JsonPrefixException extends JsonParseException {
+    public static class JsonPrefixException extends DocumentApiException {
         public JsonPrefixException(String jsonString) {
             super(String.format("'%s' should start with either a '$.' or '$['", jsonString));
         }
@@ -57,7 +49,7 @@ public class DocumentApiException extends RuntimeException {
     /**
      * Exception to be thrown in case of invalid json path.
      */
-    public static class JsonPathException extends JsonParseException {
+    public static class JsonPathException extends DocumentApiException {
         public JsonPathException(String jsonString) {
             super(String.format("'%s' does not match key[number] format", jsonString));
         }
@@ -66,7 +58,7 @@ public class DocumentApiException extends RuntimeException {
     /**
      * Exception to be thrown in case of invalid appending to json.
      */
-    public static class JsonAppendException extends JsonParseException {
+    public static class JsonAppendException extends DocumentApiException {
         public JsonAppendException(String jsonString) {
             super(String.format("Cannot append to '%s'", jsonString));
         }

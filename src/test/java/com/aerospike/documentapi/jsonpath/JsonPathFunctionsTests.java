@@ -21,7 +21,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     }
 
     @Test
-    void testLength() throws Exception {
+    void testLength() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String jsonPath = "$.[*].x1.length()";
@@ -34,7 +34,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMin() throws Exception {
+    void testMin() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String jsonPath = "$.[*].x1.min()";
@@ -47,7 +47,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMax() throws Exception {
+    void testMax() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String jsonPath = "$.[*].x1.max()";
@@ -60,7 +60,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     }
 
     @Test
-    void testAvg() throws Exception {
+    void testAvg() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String jsonPath = "$.[*].x1.avg()";
@@ -73,7 +73,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     }
 
     @Test
-    void testStddev() throws Exception {
+    void testStddev() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String jsonPath = "$.[*].x1.stddev()";

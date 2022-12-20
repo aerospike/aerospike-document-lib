@@ -47,14 +47,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public Object get(Key key, String binName, String jsonPath)
-            throws DocumentApiException {
+    public Object get(Key key, String binName, String jsonPath) {
         return get(key, Collections.singletonList(binName), jsonPath).get(binName);
     }
 
     @Override
-    public Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath)
-            throws DocumentApiException {
+    public Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath) {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
 
         Map<String, Object> result = aerospikeDocumentRepository.get(readPolicy, key,
@@ -71,12 +69,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public void put(Key key, String binName, String jsonPath, Object object) throws DocumentApiException {
+    public void put(Key key, String binName, String jsonPath, Object object) {
         put(key, Collections.singletonList(binName), jsonPath, object);
     }
 
     @Override
-    public void put(Key key, Collection<String> binNames, String jsonPath, Object object) throws DocumentApiException {
+    public void put(Key key, Collection<String> binNames, String jsonPath, Object object) {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
@@ -95,12 +93,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public void append(Key key, String binName, String jsonPath, Object object) throws DocumentApiException {
+    public void append(Key key, String binName, String jsonPath, Object object) {
         append(key, Collections.singletonList(binName), jsonPath, object);
     }
 
     @Override
-    public void append(Key key, Collection<String> binNames, String jsonPath, Object object) throws DocumentApiException {
+    public void append(Key key, Collection<String> binNames, String jsonPath, Object object) {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
@@ -120,12 +118,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public void delete(Key key, String binName, String jsonPath) throws DocumentApiException {
+    public void delete(Key key, String binName, String jsonPath) {
         delete(key, Collections.singletonList(binName), jsonPath);
     }
 
     @Override
-    public void delete(Key key, Collection<String> binNames, String jsonPath) throws DocumentApiException {
+    public void delete(Key key, Collection<String> binNames, String jsonPath) {
         JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
         if (jsonPathObject.requiresJsonPathQuery()) {
             JsonPathObject originalJsonPathObject = jsonPathObject.copy();
@@ -144,8 +142,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel)
-            throws DocumentApiException {
+    public List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) {
         Map<Key, List<BatchOperation>> sameKeyGroups = groupByKeys(batchOperations);
 
         // validating and collecting first step operations

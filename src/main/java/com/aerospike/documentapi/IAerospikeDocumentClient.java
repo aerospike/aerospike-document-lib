@@ -20,7 +20,7 @@ public interface IAerospikeDocumentClient {
      * @return object matched by jsonPath.
      * @throws DocumentApiException if there was an error.
      */
-    Object get(Key key, String binName, String jsonPath) throws DocumentApiException;
+    Object get(Key key, String binName, String jsonPath);
 
     /**
      * Retrieve a map of objects matched by JSON path.
@@ -31,7 +31,7 @@ public interface IAerospikeDocumentClient {
      * @return A map of objects matched by jsonPath with bin names as keys.
      * @throws DocumentApiException if there was an error.
      */
-    Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath) throws DocumentApiException;
+    Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath);
 
     /**
      * Put a JSON document.
@@ -51,7 +51,7 @@ public interface IAerospikeDocumentClient {
      * @param object   An object to put in the given JSON path.
      * @throws DocumentApiException if there was an error.
      */
-    void put(Key key, String binName, String jsonPath, Object object) throws DocumentApiException;
+    void put(Key key, String binName, String jsonPath, Object object);
 
     /**
      * Put an object at a particular path in JSON document.
@@ -62,7 +62,7 @@ public interface IAerospikeDocumentClient {
      * @param object   the object to be put at the given JSON path.
      * @throws DocumentApiException if there was an error.
      */
-    void put(Key key, Collection<String> binNames, String jsonPath, Object object) throws DocumentApiException;
+    void put(Key key, Collection<String> binNames, String jsonPath, Object object);
 
     /**
      * Append an object to a collection at a particular path in JSON document.
@@ -73,7 +73,7 @@ public interface IAerospikeDocumentClient {
      * @param object   the object to be appended at the given JSON path.
      * @throws DocumentApiException if there was an error.
      */
-    void append(Key key, String binName, String jsonPath, Object object) throws DocumentApiException;
+    void append(Key key, String binName, String jsonPath, Object object);
 
     /**
      * Append an object to a collection at a particular path in JSON document.
@@ -84,7 +84,7 @@ public interface IAerospikeDocumentClient {
      * @param object   the object to be appended at the given JSON path.
      * @throws DocumentApiException if there was an error.
      */
-    void append(Key key, Collection<String> binNames, String jsonPath, Object object) throws DocumentApiException;
+    void append(Key key, Collection<String> binNames, String jsonPath, Object object);
 
     /**
      * Delete an object at a particular path in JSON document.
@@ -94,7 +94,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath JSON path for the object deletion.
      * @throws DocumentApiException if there was an error.
      */
-    void delete(Key key, String binName, String jsonPath) throws DocumentApiException;
+    void delete(Key key, String binName, String jsonPath);
 
     /**
      * Delete an object at a particular path in JSON document.
@@ -104,7 +104,7 @@ public interface IAerospikeDocumentClient {
      * @param jsonPath JSON path for the object deletion.
      * @throws DocumentApiException if there was an error.
      */
-    void delete(Key key, Collection<String> binNames, String jsonPath) throws DocumentApiException;
+    void delete(Key key, Collection<String> binNames, String jsonPath);
 
     /**
      * Perform batch operations.
@@ -115,7 +115,8 @@ public interface IAerospikeDocumentClient {
      * @param batchOperations a list of batch operations to apply.
      * @param parallel        whether batch processing stream operations should run in parallel.
      * @return a list of corresponding {@link BatchRecord} results.
+     * @throws DocumentApiException     if there was an error.
      * @throws IllegalArgumentException if the batch has multiple two-step operations with the same key.
      */
-    List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel) throws DocumentApiException;
+    List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel);
 }

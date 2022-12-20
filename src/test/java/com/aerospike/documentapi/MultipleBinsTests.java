@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MultipleBinsTests extends BaseTestConfig {
 
     @Test
-    void testMultipleGetOperations() throws DocumentApiException {
+    void testMultipleGetOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         Map<String, Object> jsonNodeAsMapEvents1 = JsonConverters.convertJsonNodeToMap(jsonNodeEvents1);
@@ -42,7 +42,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMultiplePutOperations() throws DocumentApiException {
+    void testMultiplePutOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -67,7 +67,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMultipleAppendOperations() throws DocumentApiException {
+    void testMultipleAppendOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -95,7 +95,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMultipleDeleteOperations() throws DocumentApiException {
+    void testMultipleDeleteOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -118,7 +118,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void deleteRootElementMultipleBins() throws DocumentApiException {
+    void deleteRootElementMultipleBins() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";

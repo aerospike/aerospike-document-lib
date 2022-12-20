@@ -44,7 +44,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchGet() throws DocumentApiException {
+    void testPositiveBatchGet() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         Map<String, Object> jsonNodeAsMap = JsonConverters.convertJsonNodeToMap(jsonNode);
@@ -96,7 +96,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchGet() throws DocumentApiException {
+    void testNegativeBatchGet() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -142,7 +142,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchPut() throws DocumentApiException {
+    void testPositiveBatchPut() {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -185,7 +185,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchPutWildcard() throws DocumentApiException {
+    void testPositiveBatchPutWildcard() {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -238,7 +238,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchPut() throws DocumentApiException {
+    void testNegativeBatchPut() {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -279,7 +279,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchAppend() throws DocumentApiException {
+    void testPositiveBatchAppend() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -321,7 +321,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchAppend() throws DocumentApiException {
+    void testNegativeBatchAppend() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -367,7 +367,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchDelete() throws DocumentApiException {
+    void testPositiveBatchDelete() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -433,7 +433,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchDelete() throws DocumentApiException {
+    void testNegativeBatchDelete() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -481,7 +481,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     @Test
-    void testPositiveBatchDeleteRootElement() throws DocumentApiException {
+    void testPositiveBatchDeleteRootElement() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
@@ -507,7 +507,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchMix() throws DocumentApiException {
+    void testPositiveBatchMix() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -587,7 +587,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchMix2StepWildcard() throws DocumentApiException {
+    void testPositiveBatchMix2StepWildcard() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -678,7 +678,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchMix2StepWildcardMultipleBins() throws DocumentApiException {
+    void testPositiveBatchMix2StepWildcardMultipleBins() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -756,7 +756,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchMix2StepWildcardIncorrectParts() throws DocumentApiException {
+    void testNegativeBatchMix2StepWildcardIncorrectParts() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -789,7 +789,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with integer keys.
      */
     @Test
-    void testNegativeBatchWriteJsonIntKeys() throws DocumentApiException {
+    void testNegativeBatchWriteJsonIntKeys() {
         Map<Integer, List<Map<Integer, List<String>>>> map = new HashMap<>();
         List<String> innerList = new ArrayList<>();
         innerList.add("A1");
@@ -830,7 +830,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with binary list elements.
      */
     @Test
-    void testBatchWrite2StepJsonBinaryListValues() throws DocumentApiException {
+    void testBatchWrite2StepJsonBinaryListValues() {
         Map<String, List<Map<String, Map<String, byte[]>>>> map = new HashMap<>();
         String mapKey = "A1";
         String testMapValue = "This is test1 value ☺";
@@ -871,7 +871,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchMix2StepWildcardIncorrectKeys() throws DocumentApiException {
+    void testNegativeBatchMix2StepWildcardIncorrectKeys() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -910,7 +910,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testBatchMix2StepWildcardNegativeAndPositive() throws DocumentApiException {
+    void testBatchMix2StepWildcardNegativeAndPositive() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -1042,7 +1042,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
             String binName,
             String jsonPath,
             Object originalObject
-    ) throws DocumentApiException {
+    ) {
         Object res;
 
         try {

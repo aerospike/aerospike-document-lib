@@ -118,7 +118,7 @@ public class JsonPathQuery {
         }
     }
 
-    private static void validateNotNull(Object json) throws DocumentApiException {
-        if (json == null) throw new DocumentApiException("Error: json for performing path query is null");
+    private static void validateNotNull(Object json) {
+        if (json == null) throw new DocumentApiException("Json object for performing path query is null");
     }
 }

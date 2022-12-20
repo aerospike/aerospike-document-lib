@@ -2,7 +2,6 @@ package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.documentapi.AerospikeDocumentClient;
 import com.aerospike.documentapi.BaseTestConfig;
-import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JsonPathMultipleBinsTests extends BaseTestConfig {
 
     @Test
-    void testMultipleBinsWithJsonPathQueries() throws DocumentApiException {
+    void testMultipleBinsWithJsonPathQueries() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -85,7 +84,7 @@ class JsonPathMultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void deleteRootElementMultipleBinsWithJSONPathQuery() throws DocumentApiException {
+    void deleteRootElementMultipleBinsWithJSONPathQuery() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";

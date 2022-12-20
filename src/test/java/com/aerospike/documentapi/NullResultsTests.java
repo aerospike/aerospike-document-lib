@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class NullResultsTests extends BaseTestConfig {
 
     @Test
-    void testNullResultsWithFilterExpression() throws DocumentApiException {
+    void testNullResultsWithFilterExpression() {
         Policy readPolicy = client.getReadPolicyDefault();
         readPolicy.filterExp = Exp.build(Exp.eq(Exp.stringBin("docBin"), Exp.val("hi")));
         readPolicy.failOnFilteredOut = false;

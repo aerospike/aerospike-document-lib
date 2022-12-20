@@ -69,9 +69,9 @@ public class JsonPathParser {
      *
      * @param jsonString the given JSON path string.
      * @return the {@link JsonPathObject} object.
-     * @throws DocumentApiException.JsonParseException if fails to parse the JSON path string.
+     * @throws DocumentApiException if fails to parse the JSON path string.
      */
-    public JsonPathObject parse(String jsonString) throws DocumentApiException.JsonParseException {
+    public JsonPathObject parse(String jsonString) {
         validateJsonPath(jsonString);
 
         StringTokenizer tokenizer = new StringTokenizer(jsonString, JSON_PATH_SEPARATOR);
@@ -114,7 +114,7 @@ public class JsonPathParser {
      * @param pathPart pathPart to parse.
      * @throws DocumentApiException.JsonPathException if fails to parse the pathPart string.
      */
-    private void parsePathPart(String pathPart) throws DocumentApiException.JsonPathException {
+    private void parsePathPart(String pathPart) {
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
         if ((!pathPart.contains("[")) && (!pathPart.contains("]"))) {
             // ignore * wildcard after a dot, it's the same as ending with a .path
@@ -144,7 +144,7 @@ public class JsonPathParser {
                 .orElse(null); // in case there no match for a query indication
     }
 
-    private void validateJsonPath(String jsonString) throws DocumentApiException.JsonParseException {
+    private void validateJsonPath(String jsonString) {
         if (!jsonString.equals(DOCUMENT_ROOT_TOKEN)
                 && !jsonString.startsWith("$.")
                 && !jsonString.startsWith("$[")) {

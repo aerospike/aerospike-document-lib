@@ -49,7 +49,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositivePathRetrieval() throws DocumentApiException {
+    void testPositivePathRetrieval() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -140,7 +140,7 @@ class DocumentAPITest extends BaseTestConfig {
      * Check that the client can be used to read json with keys of type long and binary data as List values
      */
     @Test
-    void testIrregularJsonRetrieval() throws DocumentApiException {
+    void testIrregularJsonRetrieval() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         Map<Long, List<Map<Long, Map<String, byte[]>>>> map = new HashMap<>();
@@ -185,7 +185,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativePathRetrieval() throws DocumentApiException {
+    void testNegativePathRetrieval() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -264,7 +264,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositivePut() throws DocumentApiException {
+    void testPositivePut() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -330,7 +330,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativePut() throws DocumentApiException {
+    void testNegativePut() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -396,7 +396,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveAppend() throws DocumentApiException {
+    void testPositiveAppend() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -433,7 +433,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeAppend() throws DocumentApiException {
+    void testNegativeAppend() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         // Put it in the DB
@@ -517,7 +517,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveDelete() throws DocumentApiException {
+    void testPositiveDelete() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -607,7 +607,7 @@ class DocumentAPITest extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeDelete() throws DocumentApiException {
+    void testNegativeDelete() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
@@ -711,7 +711,7 @@ class DocumentAPITest extends BaseTestConfig {
     }
 
     @Test
-    void testTopLevelArrayType() throws DocumentApiException {
+    void testTopLevelArrayType() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(topLevelArrayTypeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
@@ -724,7 +724,7 @@ class DocumentAPITest extends BaseTestConfig {
     }
 
     @Test
-    void deleteRootElement() throws DocumentApiException {
+    void deleteRootElement() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
