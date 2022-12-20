@@ -28,7 +28,7 @@ public class DocumentApiException extends Exception {
      */
     public static DocumentApiException toDocumentException(AerospikeException e) {
         if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {
-            return new KeyNotFoundException(e);
+            return new InvalidParameterException(e);
         } else if (e.getResultCode() == ResultCode.BIN_TYPE_ERROR) {
             return new TypeMismatchException(e);
         } else if (e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) {
@@ -55,8 +55,8 @@ public class DocumentApiException extends Exception {
     /**
      * Thrown if accessing a list as if it were a map, or looking for a key in a map that doesn't exist.
      */
-    public static class KeyNotFoundException extends DocumentApiException {
-        public KeyNotFoundException(AerospikeException e) {
+    public static class InvalidParameterException extends DocumentApiException {
+        public InvalidParameterException(AerospikeException e) {
             super(e);
         }
     }

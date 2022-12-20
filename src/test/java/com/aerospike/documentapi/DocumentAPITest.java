@@ -202,7 +202,7 @@ class DocumentAPITest extends BaseTestConfig {
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
         // Reference a map as if it were a list
@@ -220,7 +220,7 @@ class DocumentAPITest extends BaseTestConfig {
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
         // Reference a primitive as if it were a list
@@ -325,8 +325,9 @@ class DocumentAPITest extends BaseTestConfig {
      * <ul>
      * <li>Putting a key into a map that doesn't exist.</li>
      * <li>Putting a value into a list that doesn't exist.</li>
-     * <li>Treating a map as if it were a list.</li>
      * <li>Treating a list as if it were a map.</li>
+     * <li>Treating a map as if it were a list.</li>
+     * <li>Putting unacceptable data type (an array instead of a list).</li>
      * </ul>
      */
     @Test
@@ -351,7 +352,7 @@ class DocumentAPITest extends BaseTestConfig {
         } catch (DocumentApiException.ObjectNotFoundException ignored) {
         }
 
-        // Access a list that doesn't exist
+        // Put a key into a list that doesn't exist
         jsonPath = "$.example9[2]";
         putValue = 80;
         try {
@@ -360,24 +361,25 @@ class DocumentAPITest extends BaseTestConfig {
         } catch (DocumentApiException.ObjectNotFoundException ignored) {
         }
 
-        // Treat a map as if it were a list
+        // Treat a list (example2) as if it were a map
         jsonPath = "$.example2.key09";
         putValue = 81;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue);
-            fail("DocumentApiException.KeyNotFoundException should have been thrown");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+            fail("DocumentApiException.InvalidParameterException should have been thrown");
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
-        // Treat a list as if it were a map
+        // Treat a map as if it were a list
         jsonPath = "$.example1[1]";
         putValue = 82;
         try {
             documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue);
-            fail("DocumentApiException.KeyNotFoundException should have been thrown");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+            fail("DocumentApiException.InvalidParameterException should have been thrown");
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
+        // Put unacceptable data type (an array instead of a list)
         jsonPath = "$.example1.key01[3]";
         int[] putValue2 = {79};
         try {
@@ -460,7 +462,7 @@ class DocumentAPITest extends BaseTestConfig {
         try {
             documentClient.append(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue);
             fail("DocumentApiException.KeyNotFoundException should have been thrown");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
         // Append to a primitive
@@ -650,14 +652,14 @@ class DocumentAPITest extends BaseTestConfig {
         try {
             documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
         // Delete call should throw an error
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
         // Delete an index in a map
@@ -673,7 +675,7 @@ class DocumentAPITest extends BaseTestConfig {
         try {
             documentClient.delete(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
             fail("Should have thrown an error - " + jsonPath + " doesn't exist");
-        } catch (DocumentApiException.KeyNotFoundException ignored) {
+        } catch (DocumentApiException.InvalidParameterException ignored) {
         }
 
         // Delete a key in a map that doesn't exist
