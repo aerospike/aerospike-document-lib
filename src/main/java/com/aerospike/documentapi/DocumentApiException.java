@@ -21,6 +21,24 @@ public class DocumentApiException extends Exception {
     }
 
     /**
+     * Utility method to categorise the different sort of exceptions we encounter.
+     *
+     * @param e AerospikeException.
+     * @return case-specific exception or throw the original AerospikeException.
+     */
+    public static DocumentApiException toDocumentException(AerospikeException e) {
+        if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {
+            return new KeyNotFoundException(e);
+        } else if (e.getResultCode() == ResultCode.BIN_TYPE_ERROR) {
+            return new TypeMismatchException(e);
+        } else if (e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) {
+            return new ObjectNotFoundException(e);
+        } else {
+            throw e;
+        }
+    }
+
+    /**
      * Thrown if a non-existing map or list is accessed, and also if accessing a list element out of
      * existing list bounds.
      */
@@ -56,8 +74,8 @@ public class DocumentApiException extends Exception {
      * Different types of json path exceptions
      */
     public static class JsonParseException extends DocumentApiException {
-        JsonParseException(String str) {
-            super(str);
+        JsonParseException(String message) {
+            super(message);
         }
     }
 
@@ -76,24 +94,6 @@ public class DocumentApiException extends Exception {
     public static class JsonAppendException extends JsonParseException {
         public JsonAppendException(String jsonString) {
             super(String.format("Cannot append to '%s'", jsonString));
-        }
-    }
-
-    /**
-     * Utility method to categorise the different sort of exceptions we encounter.
-     *
-     * @param e AerospikeException.
-     * @return case-specific exception or throw the original AerospikeException.
-     */
-    public static DocumentApiException toDocumentException(AerospikeException e) {
-        if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {
-            return new KeyNotFoundException(e);
-        } else if (e.getResultCode() == ResultCode.BIN_TYPE_ERROR) {
-            return new TypeMismatchException(e);
-        } else if (e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) {
-            return new ObjectNotFoundException(e);
-        } else {
-            throw e;
         }
     }
 }
