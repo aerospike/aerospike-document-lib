@@ -1,5 +1,5 @@
 package com.aerospike.documentapi.jsonpath.pathpart;
 
-public enum PathPartTypeEnum {
+public enum PathPartType {
     LIST, MAP
 }

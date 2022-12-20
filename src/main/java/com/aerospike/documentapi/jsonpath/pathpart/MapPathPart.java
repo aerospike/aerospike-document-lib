@@ -65,7 +65,7 @@ public class MapPathPart extends PathPart {
     }
 
     @Override
-    public PathPartTypeEnum getType() {
-        return PathPartTypeEnum.MAP;
+    public PathPartType getType() {
+        return PathPartType.MAP;
     }
 }
