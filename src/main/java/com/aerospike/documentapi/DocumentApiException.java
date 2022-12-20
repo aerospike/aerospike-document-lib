@@ -25,7 +25,7 @@ public class DocumentApiException extends RuntimeException {
     }
 
     /**
-     * Utility method to wrap Exception. AerospikeException is processed differently to display its result code name.
+     * Utility method to wrap Exception. AerospikeException is processed separately to display its result code name.
      *
      * @param e Exception.
      * @return DocumentApiException.
