@@ -4,74 +4,40 @@ import com.aerospike.client.AerospikeException;
 import com.aerospike.client.ResultCode;
 
 /**
- * Classes used to type the errors that can be returned.
+ * Exceptions wrapper. In case of AerospikeException displays its result code name.
  */
-public class DocumentApiException extends Exception {
+public class DocumentApiException extends RuntimeException {
 
     public DocumentApiException(String message) {
         super(message);
     }
 
-    public DocumentApiException() {
-        super();
-    }
-
-    public DocumentApiException(AerospikeException e) {
+    public DocumentApiException(Exception e) {
         super(e);
     }
 
+    public DocumentApiException(String resultCodeName, AerospikeException ae) {
+        super(resultCodeName, ae);
+    }
+
+    public static DocumentApiException wrapAerospikeException(AerospikeException ae) {
+        return new DocumentApiException(ResultCode.getResultString(ae.getResultCode()), ae);
+    }
+
     /**
-     * Utility method to categorise particular types of exceptions we encounter.
+     * Utility method to wrap Exception. AerospikeException is processed differently to display its result code name.
      *
-     * @param e AerospikeException.
-     * @return case-specific exception or throw the original AerospikeException.
+     * @param e Exception.
+     * @return DocumentApiException.
      */
-    public static DocumentApiException toDocumentException(AerospikeException e) {
-        if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {
-            return new InvalidParameterException(e);
-        } else if (e.getResultCode() == ResultCode.BIN_TYPE_ERROR) {
-            return new TypeMismatchException(e);
-        } else if (e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) {
-            return new ObjectNotFoundException(e);
-        } else {
-            throw e;
-        }
-    }
-
-    /**
-     * Thrown if a non-existing map or list is accessed, and also if accessing a list element out of
-     * existing list bounds.
-     */
-    public static class ObjectNotFoundException extends DocumentApiException {
-        public ObjectNotFoundException(AerospikeException e) {
-            super(e);
-        }
-
-        public ObjectNotFoundException() {
-            super();
-        }
-    }
-
-    /**
-     * Thrown if accessing a list as if it were a map, or looking for a key in a map that doesn't exist.
-     */
-    public static class InvalidParameterException extends DocumentApiException {
-        public InvalidParameterException(AerospikeException e) {
-            super(e);
-        }
-    }
-
-    /**
-     * Thrown when there is type mismatch, e.g. accessing a map as if it were a list.
-     */
-    public static class TypeMismatchException extends DocumentApiException {
-        public TypeMismatchException(AerospikeException e) {
-            super(e);
-        }
+    public static DocumentApiException toDocumentException(Exception e) {
+        return e instanceof AerospikeException ?
+                wrapAerospikeException((AerospikeException) e)
+                : new DocumentApiException(e);
     }
 
     /*
-     * Different types of json path exceptions
+     * Exception for displaying different types of json path errors.
      */
     public static class JsonParseException extends DocumentApiException {
         JsonParseException(String message) {
@@ -79,18 +45,27 @@ public class DocumentApiException extends Exception {
         }
     }
 
+    /**
+     * Exception to be thrown in case of invalid json prefix.
+     */
     public static class JsonPrefixException extends JsonParseException {
         public JsonPrefixException(String jsonString) {
             super(String.format("'%s' should start with either a '$.' or '$['", jsonString));
         }
     }
 
+    /**
+     * Exception to be thrown in case of invalid json path.
+     */
     public static class JsonPathException extends JsonParseException {
         public JsonPathException(String jsonString) {
             super(String.format("'%s' does not match key[number] format", jsonString));
         }
     }
 
+    /**
+     * Exception to be thrown in case of invalid appending to json.
+     */
     public static class JsonAppendException extends JsonParseException {
         public JsonAppendException(String jsonString) {
             super(String.format("Cannot append to '%s'", jsonString));

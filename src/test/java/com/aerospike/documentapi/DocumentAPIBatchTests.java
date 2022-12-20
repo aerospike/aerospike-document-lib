@@ -1047,7 +1047,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
 
         try {
             res = documentClient.get(key, binName, jsonPath);
-        } catch (DocumentApiException.ObjectNotFoundException ignored) {
+        } catch (DocumentApiException ignored) {
             return true;
         }
 
