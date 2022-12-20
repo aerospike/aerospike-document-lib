@@ -16,7 +16,7 @@ public class JsonPathQuery {
     }
 
     /**
-     * Retrieving the objects that match JSON path query.
+     * Retrieve the objects that match JSON path query.
      *
      * @param jsonPathObject parsed JSON path.
      * @param json           an object that represents a list or a map (e.g., Aerospike database result).
@@ -37,7 +37,7 @@ public class JsonPathQuery {
     }
 
     /**
-     * Putting a value according to JSON path query and returning the updated JSON.
+     * Put a value according to JSON path query and return the updated JSON.
      *
      * @param jsonPathObject parsed JSON path.
      * @param json           an object that represents a list or a map (e.g., Aerospike database result).
@@ -78,7 +78,7 @@ public class JsonPathQuery {
     }
 
     /**
-     * Appending a value according to JSON path query and returning the updated JSON.
+     * Append a value according to JSON path query and return the updated JSON.
      *
      * @param jsonPathObject parsed JSON path.
      * @param json           an object that represents a list or a map (e.g., Aerospike database result).
@@ -96,7 +96,7 @@ public class JsonPathQuery {
     }
 
     /**
-     * Deleting an element according to JSON path query and returning the updated JSON.
+     * Delete an element according to JSON path query and return the updated JSON.
      *
      * @param jsonPathObject parsed JSON path.
      * @param json           an object that represents a list or a map (e.g., Aerospike database result).
