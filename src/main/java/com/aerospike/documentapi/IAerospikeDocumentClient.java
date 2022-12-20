@@ -3,7 +3,6 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;
@@ -13,99 +12,99 @@ import java.util.Map;
 public interface IAerospikeDocumentClient {
 
     /**
-     * Retrieve the object in the document with the key that is referenced by JSON path.
+     * Retrieve an object matched by JSON path.
      *
-     * @param key      An Aerospike Key.
-     * @param binName  The bin name that will store the json.
-     * @param jsonPath A JSON path to get the reference from.
-     * @return Object referenced by jsonPath.
+     * @param key      Aerospike Key.
+     * @param binName  name of a bin storing json.
+     * @param jsonPath JSON path matching the required elements.
+     * @return object matched by jsonPath.
+     * @throws DocumentApiException if there was an error.
      */
-    Object get(Key key, String binName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    Object get(Key key, String binName, String jsonPath);
 
     /**
-     * Retrieve the object in the document with the key that is referenced by JSON path.
+     * Retrieve a map of objects matched by JSON path.
      *
-     * @param key      An Aerospike Key.
-     * @param binNames A collection of bin names that each contains the same structure of a document.
-     * @param jsonPath A JSON path to get the reference from.
-     * @return A Map of Objects referenced by jsonPath where a key is a bin name.
+     * @param key      Aerospike Key.
+     * @param binNames names of bins storing json (all bins with the same document structure).
+     * @param jsonPath JSON path matching the required elements.
+     * @return A map of objects matched by jsonPath with bin names as keys.
+     * @throws DocumentApiException if there was an error.
      */
-    Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    Map<String, Object> get(Key key, Collection<String> binNames, String jsonPath);
 
     /**
-     * Put a document.
+     * Put a JSON document.
      *
-     * @param key        An Aerospike Key.
-     * @param binName    The bin name that will store the json.
-     * @param jsonObject A JSON object to put.
+     * @param key        Aerospike Key.
+     * @param binName    name of a bin to store json.
+     * @param jsonObject JSON object (document) to put.
      */
     void put(Key key, String binName, JsonNode jsonObject);
 
     /**
-     * Put a map representation of a JSON object at a particular path in JSON document.
+     * Put an object at a particular path in JSON document.
      *
-     * @param key        An Aerospike Key.
-     * @param binName    The bin name that will store the json.
-     * @param jsonPath   A JSON path to put the given JSON object in.
-     * @param jsonObject A JSON object to put in the given JSON path.
+     * @param key      Aerospike Key.
+     * @param binName  name of a bin storing json.
+     * @param jsonPath A JSON path to put the given JSON object in.
+     * @param object   An object to put in the given JSON path.
+     * @throws DocumentApiException if there was an error.
      */
-    void put(Key key, String binName, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    void put(Key key, String binName, String jsonPath, Object object);
 
     /**
-     * Put a map representation of a JSON object at a particular path in JSON document.
+     * Put an object at a particular path in JSON document.
      *
-     * @param key        An Aerospike Key.
-     * @param binNames   A collection of bin names that each contains the same structure of a document.
-     * @param jsonPath   A JSON path to put the given JSON object in.
-     * @param jsonObject A JSON object to put in the given JSON path.
+     * @param key      Aerospike Key.
+     * @param binNames names of bins storing json (all bins with the same document structure).
+     * @param jsonPath JSON path to put the given JSON object in.
+     * @param object   the object to be put at the given JSON path.
+     * @throws DocumentApiException if there was an error.
      */
-    void put(Key key, Collection<String> binNames, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    void put(Key key, Collection<String> binNames, String jsonPath, Object object);
 
     /**
-     * Append an object to a collection in a document specified by JSON path.
+     * Append an object to a collection at a particular path in JSON document.
      *
-     * @param key        An Aerospike Key.
-     * @param binName    The bin name that will store the json.
-     * @param jsonPath   A JSON path that includes A collection to append the given JSON object to.
-     * @param jsonObject A JSON object to append to the list at the given JSON path.
+     * @param key      Aerospike Key.
+     * @param binName  name of a bin storing json.
+     * @param jsonPath JSON path that includes a collection to append the given JSON object to.
+     * @param object   the object to be appended at the given JSON path.
+     * @throws DocumentApiException if there was an error.
      */
-    void append(Key key, String binName, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    void append(Key key, String binName, String jsonPath, Object object);
 
     /**
-     * Append an object to a collection in a document specified by JSON path.
+     * Append an object to a collection at a particular path in JSON document.
      *
-     * @param key        An Aerospike Key.
-     * @param binNames   A collection of bin names that each contains the same structure of a document.
-     * @param jsonPath   A JSON path that includes A collection to append the given JSON object to.
-     * @param jsonObject A JSON object to append to the list at the given JSON path.
+     * @param key      Aerospike Key.
+     * @param binNames names of bins storing json (all bins with the same document structure).
+     * @param jsonPath JSON path that includes a collection to append the given JSON object to.
+     * @param object   the object to be appended at the given JSON path.
+     * @throws DocumentApiException if there was an error.
      */
-    void append(Key key, Collection<String> binNames, String jsonPath, Object jsonObject)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    void append(Key key, Collection<String> binNames, String jsonPath, Object object);
 
     /**
-     * Delete an object in a document specified by JSON path.
+     * Delete an object at a particular path in JSON document.
      *
-     * @param key      An Aerospike Key.
-     * @param binName  The bin name that will store the json.
-     * @param jsonPath A JSON path for the object deletion.
+     * @param key      Aerospike Key.
+     * @param binName  name of a bin storing json.
+     * @param jsonPath JSON path for the object deletion.
+     * @throws DocumentApiException if there was an error.
      */
-    void delete(Key key, String binName, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    void delete(Key key, String binName, String jsonPath);
 
     /**
-     * Delete an object in a document specified by JSON path.
+     * Delete an object at a particular path in JSON document.
      *
-     * @param key      An Aerospike Key.
-     * @param binNames A collection of bin names that each contains the same structure of a document.
-     * @param jsonPath A JSON path for the object deletion.
+     * @param key      Aerospike Key.
+     * @param binNames names of bins storing json (all bins with the same document structure).
+     * @param jsonPath JSON path for the object deletion.
+     * @throws DocumentApiException if there was an error.
      */
-    void delete(Key key, Collection<String> binNames, String jsonPath)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    void delete(Key key, Collection<String> binNames, String jsonPath);
 
     /**
      * Perform batch operations.
@@ -113,11 +112,11 @@ public interface IAerospikeDocumentClient {
      * <p>The order and consistency of one-step (JSON path) operations with the same keys is not guaranteed.</p>
      * <p>Two-step (JSONPath query) operations with the same keys are not allowed in a batch.</p>
      *
-     * @param batchOperations A list of batch operations to apply.
-     * @param parallel        Whether batch processing stream operations should run in parallel.
-     * @return The list of corresponding {@link BatchRecord} results.
+     * @param batchOperations a list of batch operations to apply.
+     * @param parallel        whether batch processing stream operations should run in parallel.
+     * @return a list of corresponding {@link BatchRecord} results.
+     * @throws DocumentApiException     if there was an error.
      * @throws IllegalArgumentException if the batch has multiple two-step operations with the same key.
      */
-    List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel)
-            throws JsonPathParser.JsonParseException, DocumentApiException;
+    List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel);
 }

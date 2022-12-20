@@ -40,11 +40,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         this.key = key;
         this.binNames = binNames;
         this.jsonPath = jsonPath;
-        try {
-            this.jsonPathObject = new JsonPathParser().parse(jsonPath);
-        } catch (JsonPathParser.JsonParseException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this.jsonPathObject = new JsonPathParser().parse(jsonPath);
         this.requiringJsonPathQuery = jsonPathObject.requiresJsonPathQuery();
         // copying in order to have it for a second step
         this.originalJsonPathObject = jsonPathObject.copy();

@@ -1,6 +1,5 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MultipleBinsTests extends BaseTestConfig {
 
     @Test
-    void testMultipleGetOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleGetOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         Map<String, Object> jsonNodeAsMapEvents1 = JsonConverters.convertJsonNodeToMap(jsonNodeEvents1);
@@ -43,7 +42,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMultiplePutOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultiplePutOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -68,7 +67,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMultipleAppendOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleAppendOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -96,7 +95,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void testMultipleDeleteOperations() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testMultipleDeleteOperations() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";
@@ -119,7 +118,7 @@ class MultipleBinsTests extends BaseTestConfig {
     }
 
     @Test
-    void deleteRootElementMultipleBins() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void deleteRootElementMultipleBins() {
         JsonNode jsonNodeEvents1 = JsonConverters.convertStringToJsonNode(events1);
         JsonNode jsonNodeEvents2 = JsonConverters.convertStringToJsonNode(events2);
         String documentBinName1 = "events1Bin";

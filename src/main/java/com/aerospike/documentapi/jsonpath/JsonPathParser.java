@@ -1,6 +1,7 @@
 package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.client.cdt.CTX;
+import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.jsonpath.pathpart.ListPathPart;
 import com.aerospike.documentapi.jsonpath.pathpart.MapPathPart;
 import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
@@ -68,9 +69,9 @@ public class JsonPathParser {
      *
      * @param jsonString the given JSON path string.
      * @return the {@link JsonPathObject} object.
-     * @throws JsonParseException if fails to parse the JSON path string.
+     * @throws DocumentApiException if fails to parse the JSON path string.
      */
-    public JsonPathObject parse(String jsonString) throws JsonParseException {
+    public JsonPathObject parse(String jsonString) {
         validateJsonPath(jsonString);
 
         StringTokenizer tokenizer = new StringTokenizer(jsonString, JSON_PATH_SEPARATOR);
@@ -94,7 +95,7 @@ public class JsonPathParser {
             jsonPathObject.setJsonPathSecondStepQuery(jsonPathPathPartsString);
             tokenizer = new StringTokenizer(aerospikePathPartsString, JSON_PATH_SEPARATOR);
             if (!tokenizer.nextToken().equals(DOCUMENT_ROOT_TOKEN)) {
-                throw new JsonPrefixException(jsonString);
+                throw new DocumentApiException.JsonPrefixException(jsonString);
             }
         }
 
@@ -108,12 +109,12 @@ public class JsonPathParser {
     /**
      * An internal method to process the individual path parts.
      * Appends the found path parts to the list of path parts already found.
-     * Expected form of pathPart is key[index1][index2]
+     * Expected form of pathPart is key[index1][index2].
      *
      * @param pathPart pathPart to parse.
-     * @throws JsonParseException if fails to parse the pathPart string.
+     * @throws DocumentApiException.JsonPathException if fails to parse the pathPart string.
      */
-    private void parsePathPart(String pathPart) throws JsonParseException {
+    private void parsePathPart(String pathPart) {
         Matcher keyMatcher = PATH_PATTERN.matcher(pathPart);
         if ((!pathPart.contains("[")) && (!pathPart.contains("]"))) {
             // ignore * wildcard after a dot, it's the same as ending with a .path
@@ -131,7 +132,7 @@ public class JsonPathParser {
                 jsonPathObject.addPathPart(new ListPathPart(Integer.parseInt(indexMatcher.group(2))));
             }
         } else {
-            throw new JsonPathException(pathPart);
+            throw new DocumentApiException.JsonPathException(pathPart);
         }
     }
 
@@ -143,56 +144,11 @@ public class JsonPathParser {
                 .orElse(null); // in case there no match for a query indication
     }
 
-    private void validateJsonPath(String jsonString) throws JsonParseException {
+    private void validateJsonPath(String jsonString) {
         if (!jsonString.equals(DOCUMENT_ROOT_TOKEN)
                 && !jsonString.startsWith("$.")
                 && !jsonString.startsWith("$[")) {
-            throw new JsonPrefixException(jsonString);
-        }
-    }
-
-    /*
-     * Different types of json path exceptions
-     */
-
-    public abstract static class JsonParseException extends Exception {
-        final String jsonString;
-
-        JsonParseException(String s) {
-            jsonString = s;
-        }
-    }
-
-    public static class JsonPrefixException extends JsonParseException {
-        JsonPrefixException(String s) {
-            super(s);
-        }
-
-        @Override
-        public String toString() {
-            return jsonString + " should start with a $";
-        }
-    }
-
-    public static class JsonPathException extends JsonParseException {
-        JsonPathException(String s) {
-            super(s);
-        }
-
-        @Override
-        public String toString() {
-            return jsonString + " does not match key[number] format";
-        }
-    }
-
-    public static class ListException extends JsonParseException {
-        public ListException(String s) {
-            super(s);
-        }
-
-        @Override
-        public String toString() {
-            return "You can't append to a document root";
+            throw new DocumentApiException.JsonPrefixException(jsonString);
         }
     }
 }

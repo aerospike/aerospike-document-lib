@@ -1,5 +1,6 @@
 package com.aerospike.documentapi.jsonpath;
 
+import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -12,22 +13,51 @@ public class JsonPathQuery {
     private JsonPathQuery() {
     }
 
-    public static Object read(JsonPathObject jsonPathObject, Object object) {
-        String resultJson = JsonConverters.writeValueAsString(object);
-        String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
-        return JsonPath.read(resultJson, jsonPath);
+    /**
+     * Retrieve the objects that match JSON path query.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @return list of objects matched by the given path.
+     * @throws DocumentApiException if there was validation error.
+     */
+    public static Object read(JsonPathObject jsonPathObject, Object json) {
+        validateNotNull(json);
+
+        try {
+            String resultJson = JsonConverters.writeValueAsString(json);
+            String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
+            return JsonPath.read(resultJson, jsonPath);
+        } catch (Exception e) {
+            throw DocumentApiException.toDocumentException(e);
+        }
     }
 
-    public static Object putOrSet(JsonPathObject jsonPathObject, Object object, Object value) {
-        String resultJson = JsonConverters.writeValueAsString(object);
-        String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
-        JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
-        // if jsonPath exists or if it leads to an array element
-        if (!keys.isEmpty() || jsonPath.charAt(jsonPath.length() - 1) == ']') {
-            return setOrAdd(resultJson, jsonPath, value);
+    /**
+     * Put a value according to JSON path query and return the updated JSON.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @param value          an object to put.
+     * @return updated JSON.
+     * @throws DocumentApiException if there was an error.
+     */
+    public static Object putOrSet(JsonPathObject jsonPathObject, Object json, Object value) {
+        validateNotNull(json);
+
+        try {
+            String resultJson = JsonConverters.writeValueAsString(json);
+            String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
+            JSONArray keys = JsonPath.parse(resultJson).read(jsonPath);
+            // if jsonPath exists or if it leads to an array element
+            if (!keys.isEmpty() || jsonPath.charAt(jsonPath.length() - 1) == ']') {
+                return setOrAdd(resultJson, jsonPath, value);
+            }
+            // if jsonPath does not exist in json, and it leads to a map element
+            return put(resultJson, jsonPath, value);
+        } catch (Exception e) {
+            throw DocumentApiException.toDocumentException(e);
         }
-        // if jsonPath does not exist in json, and it leads to a map element
-        return put(resultJson, jsonPath, value);
     }
 
     private static Object put(String resultJson, String jsonPath, Object value) {
@@ -47,15 +77,48 @@ public class JsonPathQuery {
         }
     }
 
-    public static Object append(JsonPathObject jsonPathObject, Object object, Object value) {
-        String resultJson = JsonConverters.writeValueAsString(object);
-        String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
-        return JsonPath.parse(resultJson).add(jsonPath, value).json();
+    /**
+     * Append a value according to JSON path query and return the updated JSON.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @param value          an object to append.
+     * @return updated JSON.
+     * @throws DocumentApiException if there was an error.
+     */
+    public static Object append(JsonPathObject jsonPathObject, Object json, Object value) {
+        validateNotNull(json);
+
+        try {
+            String resultJson = JsonConverters.writeValueAsString(json);
+            String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
+            return JsonPath.parse(resultJson).add(jsonPath, value).json();
+        } catch (Exception e) {
+            throw DocumentApiException.toDocumentException(e);
+        }
     }
 
-    public static Object delete(JsonPathObject jsonPathObject, Object object) {
-        String resultJson = JsonConverters.writeValueAsString(object);
-        String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
-        return JsonPath.parse(resultJson).delete(jsonPath).json();
+    /**
+     * Delete an element according to JSON path query and return the updated JSON.
+     *
+     * @param jsonPathObject parsed JSON path.
+     * @param json           an object that represents a list or a map (e.g., Aerospike database result).
+     * @return updated JSON.
+     * @throws DocumentApiException if there was an error.
+     */
+    public static Object delete(JsonPathObject jsonPathObject, Object json) {
+        validateNotNull(json);
+
+        try {
+            String resultJson = JsonConverters.writeValueAsString(json);
+            String jsonPath = DOCUMENT_ROOT + jsonPathObject.getJsonPathSecondStepQuery();
+            return JsonPath.parse(resultJson).delete(jsonPath).json();
+        } catch (Exception e) {
+            throw DocumentApiException.toDocumentException(e);
+        }
+    }
+
+    private static void validateNotNull(Object json) {
+        if (json == null) throw new DocumentApiException("Json object for performing path query is null");
     }
 }

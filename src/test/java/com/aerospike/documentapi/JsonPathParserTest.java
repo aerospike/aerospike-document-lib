@@ -21,7 +21,7 @@ class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {
+        } catch (DocumentApiException ignored) {
         }
     }
 
@@ -35,7 +35,7 @@ class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {
+        } catch (DocumentApiException ignored) {
         }
     }
 
@@ -48,7 +48,7 @@ class JsonPathParserTest {
         JsonPathParser parser = new JsonPathParser();
         try {
             parser.parse(testPath);
-        } catch (JsonPathParser.JsonParseException e) {
+        } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
     }
@@ -63,7 +63,7 @@ class JsonPathParserTest {
         JsonPathObject jsonPathObject = new JsonPathObject();
         try {
             jsonPathObject = parser.parse(testPath);
-        } catch (JsonPathParser.JsonParseException e) {
+        } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(1, jsonPathObject.getPathParts().size());
@@ -80,7 +80,7 @@ class JsonPathParserTest {
         JsonPathObject jsonPathObject = new JsonPathObject();
         try {
             jsonPathObject = parser.parse(testPath);
-        } catch (JsonPathParser.JsonParseException e) {
+        } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(1, jsonPathObject.getPathParts().size());
@@ -97,7 +97,7 @@ class JsonPathParserTest {
         JsonPathObject jsonPathObject = new JsonPathObject();
         try {
             jsonPathObject = parser.parse(testPath);
-        } catch (JsonPathParser.JsonParseException e) {
+        } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(2, jsonPathObject.getPathParts().size());
@@ -115,7 +115,7 @@ class JsonPathParserTest {
         JsonPathObject jsonPathObject = new JsonPathObject();
         try {
             jsonPathObject = parser.parse(testPath);
-        } catch (JsonPathParser.JsonParseException e) {
+        } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
         assertEquals(3, jsonPathObject.getPathParts().size());
@@ -134,7 +134,7 @@ class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {
+        } catch (DocumentApiException ignored) {
         }
     }
 
@@ -148,7 +148,7 @@ class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {
+        } catch (DocumentApiException ignored) {
         }
     }
 
@@ -162,7 +162,7 @@ class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {
+        } catch (DocumentApiException ignored) {
         }
     }
 
@@ -176,7 +176,7 @@ class JsonPathParserTest {
         try {
             parser.parse(testPath);
             fail("Should not be here, parser should have thrown error");
-        } catch (JsonPathParser.JsonParseException ignored) {
+        } catch (DocumentApiException ignored) {
         }
     }
 }

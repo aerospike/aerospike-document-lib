@@ -2,8 +2,8 @@ package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.documentapi.AerospikeDocumentClient;
 import com.aerospike.documentapi.BaseTestConfig;
-import com.aerospike.documentapi.util.TestJsonConverters;
 import com.aerospike.documentapi.util.JsonConverters;
+import com.aerospike.documentapi.util.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
@@ -24,13 +24,13 @@ class JsonPathFilterTests extends BaseTestConfig {
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.delete(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, "$");
     }
 
     @Test
-    void testFilters() throws Exception {
+    void testFilters() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String jsonPath;
@@ -63,7 +63,7 @@ class JsonPathFilterTests extends BaseTestConfig {
     }
 
     @Test
-    void testPutNonExistingKey() throws Exception {
+    void testPutNonExistingKey() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String conditionValue = "new";
@@ -75,7 +75,7 @@ class JsonPathFilterTests extends BaseTestConfig {
     }
 
     @Test
-    void testPutExistingKey() throws Exception {
+    void testPutExistingKey() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
         String isbnValue = "0-111-22222-3";

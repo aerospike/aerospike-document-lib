@@ -2,9 +2,8 @@ package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.documentapi.AerospikeDocumentClient;
 import com.aerospike.documentapi.BaseTestConfig;
-import com.aerospike.documentapi.DocumentApiException;
-import com.aerospike.documentapi.util.TestJsonConverters;
 import com.aerospike.documentapi.util.JsonConverters;
+import com.aerospike.documentapi.util.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JsonPathDeepScanTests extends BaseTestConfig {
 
     @Test
-    void testDeepScan() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testDeepScan() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
@@ -27,7 +26,7 @@ class JsonPathDeepScanTests extends BaseTestConfig {
     }
 
     @Test
-    void testDeepScanAtTheBeginning() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testDeepScanAtTheBeginning() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
@@ -40,7 +39,7 @@ class JsonPathDeepScanTests extends BaseTestConfig {
     }
 
     @Test
-    void testDeepScanWithWildCard() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testDeepScanWithWildCard() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
@@ -53,7 +52,7 @@ class JsonPathDeepScanTests extends BaseTestConfig {
     }
 
     @Test
-    void testDeepScanPut() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testDeepScanPut() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
@@ -70,7 +69,7 @@ class JsonPathDeepScanTests extends BaseTestConfig {
     }
 
     @Test
-    void testDeepScanDelete() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testDeepScanDelete() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);

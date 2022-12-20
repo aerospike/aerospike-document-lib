@@ -1,10 +1,8 @@
 package com.aerospike.documentapi;
 
-import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.exp.Exp;
 import com.aerospike.client.policy.Policy;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.policy.DocumentPolicy;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class NullResultsTests extends BaseTestConfig {
 
     @Test
-    void testNullResultsWithFilterExpression() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testNullResultsWithFilterExpression() {
         Policy readPolicy = client.getReadPolicyDefault();
         readPolicy.filterExp = Exp.build(Exp.eq(Exp.stringBin("docBin"), Exp.val("hi")));
         readPolicy.failOnFilteredOut = false;
@@ -56,8 +54,8 @@ class NullResultsTests extends BaseTestConfig {
         readPolicy.failOnFilteredOut = true;
         try {
             docClient.get(doc1, "docBin", "$.k4");
-            fail("Should fail with AerospikeException: Transaction filtered out.");
-        } catch (AerospikeException ignored) {
+            fail("Should fail with DocumentApiException: Transaction filtered out.");
+        } catch (DocumentApiException ignored) {
         }
     }
 }

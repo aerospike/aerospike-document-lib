@@ -4,59 +4,63 @@ import com.aerospike.client.AerospikeException;
 import com.aerospike.client.ResultCode;
 
 /**
- * Classes used to type the errors that can be returned.
+ * Exceptions wrapper. In case of AerospikeException displays its result code name.
  */
-public class DocumentApiException extends Exception {
+public class DocumentApiException extends RuntimeException {
 
-    AerospikeException e;
+    public DocumentApiException(String message) {
+        super(message);
+    }
 
-    public DocumentApiException(AerospikeException e) {
-        this.e = e;
+    public DocumentApiException(Exception e) {
+        super(e);
+    }
+
+    public DocumentApiException(String resultCodeName, AerospikeException ae) {
+        super(resultCodeName, ae);
+    }
+
+    public static DocumentApiException wrapAerospikeException(AerospikeException ae) {
+        return new DocumentApiException(ResultCode.getResultString(ae.getResultCode()), ae);
     }
 
     /**
-     * Thrown if a map or list is accessed that doesn't exist. Also if accessing a list element out of
-     * existing list bounds.
-     */
-    public static class ObjectNotFoundException extends DocumentApiException {
-        public ObjectNotFoundException(AerospikeException e) {
-            super(e);
-        }
-    }
-
-    /**
-     * Thrown if accessing a list as if it was a map, or looking for a key in a map that doesn't exist.
-     */
-    public static class KeyNotFoundException extends DocumentApiException {
-        public KeyNotFoundException(AerospikeException e) {
-            super(e);
-        }
-    }
-
-    /**
-     * Thrown if accessing a map as if it were a list or looking for a list element in a list that doesn't exist.
-     */
-    public static class NotAListException extends DocumentApiException {
-        public NotAListException(AerospikeException e) {
-            super(e);
-        }
-    }
-
-    /**
-     * Utility method to categorise the different sort of exceptions we will encounter.
+     * Utility method to wrap an Exception.
+     * {@link AerospikeException} is processed separately to display its result code name.
      *
-     * @param e An AerospikeException.
-     * @return A more descriptive case-specific exception.
+     * @param e the original exception.
+     * @return a DocumentApiException wrapping the original exception.
      */
-    public static DocumentApiException toDocumentException(AerospikeException e) {
-        if (e.getResultCode() == ResultCode.PARAMETER_ERROR) {
-            return new KeyNotFoundException(e);
-        } else if (e.getResultCode() == ResultCode.BIN_TYPE_ERROR) {
-            return new NotAListException(e);
-        } else if (e.getResultCode() == ResultCode.OP_NOT_APPLICABLE) {
-            return new ObjectNotFoundException(e);
-        } else {
-            throw e;
+    public static DocumentApiException toDocumentException(Exception e) {
+        return e instanceof AerospikeException
+                ? wrapAerospikeException((AerospikeException) e)
+                : new DocumentApiException(e);
+    }
+
+    /**
+     * Exception to be thrown in case of invalid json prefix.
+     */
+    public static class JsonPrefixException extends DocumentApiException {
+        public JsonPrefixException(String jsonString) {
+            super(String.format("'%s' should start with either a '$.' or '$['", jsonString));
+        }
+    }
+
+    /**
+     * Exception to be thrown in case of invalid json path.
+     */
+    public static class JsonPathException extends DocumentApiException {
+        public JsonPathException(String jsonString) {
+            super(String.format("'%s' does not match key[number] format", jsonString));
+        }
+    }
+
+    /**
+     * Exception to be thrown in case of invalid appending to json.
+     */
+    public static class JsonAppendException extends DocumentApiException {
+        public JsonAppendException(String jsonString) {
+            super(String.format("Cannot append to '%s'", jsonString));
         }
     }
 }

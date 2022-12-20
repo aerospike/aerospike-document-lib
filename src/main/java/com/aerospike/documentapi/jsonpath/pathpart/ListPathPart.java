@@ -64,7 +64,7 @@ public class ListPathPart extends PathPart {
     }
 
     @Override
-    public PathPartTypeEnum getType() {
-        return PathPartTypeEnum.LIST;
+    public PathPartType getType() {
+        return PathPartType.LIST;
     }
 }

@@ -7,7 +7,6 @@ import com.aerospike.documentapi.batch.BatchOperation;
 import com.aerospike.documentapi.batch.DeleteBatchOperation;
 import com.aerospike.documentapi.batch.GetBatchOperation;
 import com.aerospike.documentapi.batch.PutBatchOperation;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.JsonConverters;
 import com.aerospike.documentapi.util.TestJsonConverters;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,7 +44,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchGet() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testPositiveBatchGet() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
         Map<String, Object> jsonNodeAsMap = JsonConverters.convertJsonNodeToMap(jsonNode);
@@ -88,27 +87,27 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * of single step operations using incorrect path.
      * <ul>
      * <li>Non-existing key.</li>
-     * <li>Referencing a map as if it was a list.</li>
-     * <li>Referencing a primitive as if it was a map.</li>
-     * <li>Referencing a primitive as if it was a list.</li>
+     * <li>Referencing a map as if it were a list.</li>
+     * <li>Referencing a primitive as if it were a map.</li>
+     * <li>Referencing a primitive as if it were a list.</li>
      * <li>Referencing a non-existing list item.</li>
      * <li>Referencing a non-existing map.</li>
      * <li>Referencing a non-existing list.</li>
      * </ul>
      */
     @Test
-    void testNegativeBatchGet() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testNegativeBatchGet() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // non-existing key
         inputsList.add(new BatchOperationInput("$.example3[1].key08.nonexistentkey", GET));
-        // referencing a map as if it was a list
+        // referencing a map as if it were a list
         inputsList.add(new BatchOperationInput("$.example1[1]", GET));
-        // referencing a primitive as if it was a map
+        // referencing a primitive as if it were a map
         inputsList.add(new BatchOperationInput("$.example4.key10.key11.nonexistentkey", GET));
-        // referencing a primitive as if it was a list
+        // referencing a primitive as if it were a list
         inputsList.add(new BatchOperationInput("$.example4.key10.key11[2]", GET));
         // referencing a non-existing list item
         inputsList.add(new BatchOperationInput("$.example4.key13.key15[9]", GET));
@@ -143,7 +142,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchPut() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testPositiveBatchPut() {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -186,7 +185,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchPutWildcard() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testPositiveBatchPutWildcard() {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -234,12 +233,12 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * <ul>
      * <li>Putting a key into a map that doesn't exist.</li>
      * <li>Putting to a list that doesn't exist.</li>
-     * <li>Treating a map as if it was a list.</li>
-     * <li>Treating a list as if it was a map.</li>
+     * <li>Treating a map as if it were a list.</li>
+     * <li>Treating a list as if it were a map.</li>
      * </ul>
      */
     @Test
-    void testNegativeBatchPut() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testNegativeBatchPut() {
         // Set up the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -248,9 +247,9 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         inputsList.add(new BatchOperationInput("$.example9.key01", PUT));
         // putting to a list that doesn't exist
         inputsList.add(new BatchOperationInput("$.example9[2]", PUT));
-        // treating a map as if it was a list
+        // treating a map as if it were a list
         inputsList.add(new BatchOperationInput("$.example2.key09", PUT));
-        // treating a list as if it was a map
+        // treating a list as if it were a map
         inputsList.add(new BatchOperationInput("$.example1[1]", PUT));
 
         int putValue = 70;
@@ -280,7 +279,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchAppend() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchAppend() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -322,7 +321,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchAppend() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testNegativeBatchAppend() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -368,7 +367,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchDelete() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchDelete() {
         // Set up test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -434,7 +433,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchDelete() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testNegativeBatchDelete() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -482,7 +481,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     @Test
-    void testPositiveBatchDeleteRootElement() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchDeleteRootElement() {
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
@@ -508,7 +507,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchMix() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchMix() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -588,7 +587,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchMix2StepWildcard() throws JsonPathParser.JsonParseException, DocumentApiException {
+    void testPositiveBatchMix2StepWildcard() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -679,8 +678,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testPositiveBatchMix2StepWildcardMultipleBins() throws JsonPathParser.JsonParseException,
-            DocumentApiException {
+    void testPositiveBatchMix2StepWildcardMultipleBins() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -758,8 +756,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchMix2StepWildcardIncorrectParts() throws DocumentApiException,
-            JsonPathParser.JsonParseException {
+    void testNegativeBatchMix2StepWildcardIncorrectParts() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -792,7 +789,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with integer keys.
      */
     @Test
-    void testNegativeBatchWriteJsonIntKeys() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testNegativeBatchWriteJsonIntKeys() {
         Map<Integer, List<Map<Integer, List<String>>>> map = new HashMap<>();
         List<String> innerList = new ArrayList<>();
         innerList.add("A1");
@@ -833,7 +830,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * Check response to a write-type batch operation for json with binary list elements.
      */
     @Test
-    void testBatchWrite2StepJsonBinaryListValues() throws DocumentApiException, JsonPathParser.JsonParseException {
+    void testBatchWrite2StepJsonBinaryListValues() {
         Map<String, List<Map<String, Map<String, byte[]>>>> map = new HashMap<>();
         String mapKey = "A1";
         String testMapValue = "This is test1 value ☺";
@@ -874,8 +871,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testNegativeBatchMix2StepWildcardIncorrectKeys() throws DocumentApiException,
-            JsonPathParser.JsonParseException {
+    void testNegativeBatchMix2StepWildcardIncorrectKeys() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -914,8 +910,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * </ul>
      */
     @Test
-    void testBatchMix2StepWildcardNegativeAndPositive() throws DocumentApiException,
-            JsonPathParser.JsonParseException {
+    void testBatchMix2StepWildcardNegativeAndPositive() {
         // Load the test document
         JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
 
@@ -1047,12 +1042,12 @@ class DocumentAPIBatchTests extends BaseTestConfig {
             String binName,
             String jsonPath,
             Object originalObject
-    ) throws JsonPathParser.JsonParseException, DocumentApiException {
+    ) {
         Object res;
 
         try {
             res = documentClient.get(key, binName, jsonPath);
-        } catch (DocumentApiException.ObjectNotFoundException ignored) {
+        } catch (DocumentApiException ignored) {
             return true;
         }
 
