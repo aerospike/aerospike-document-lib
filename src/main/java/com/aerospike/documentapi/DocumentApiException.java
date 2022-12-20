@@ -21,7 +21,7 @@ public class DocumentApiException extends Exception {
     }
 
     /**
-     * Utility method to categorise the different sort of exceptions we encounter.
+     * Utility method to categorise particular types of exceptions we encounter.
      *
      * @param e AerospikeException.
      * @return case-specific exception or throw the original AerospikeException.
@@ -53,7 +53,7 @@ public class DocumentApiException extends Exception {
     }
 
     /**
-     * Thrown if accessing a list as if it was a map, or looking for a key in a map that doesn't exist.
+     * Thrown if accessing a list as if it were a map, or looking for a key in a map that doesn't exist.
      */
     public static class KeyNotFoundException extends DocumentApiException {
         public KeyNotFoundException(AerospikeException e) {
@@ -62,7 +62,7 @@ public class DocumentApiException extends Exception {
     }
 
     /**
-     * Thrown when there is type mismatch, e.g. accessing a map as if it was a list.
+     * Thrown when there is type mismatch, e.g. accessing a map as if it were a list.
      */
     public static class TypeMismatchException extends DocumentApiException {
         public TypeMismatchException(AerospikeException e) {

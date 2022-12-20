@@ -87,9 +87,9 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * of single step operations using incorrect path.
      * <ul>
      * <li>Non-existing key.</li>
-     * <li>Referencing a map as if it was a list.</li>
-     * <li>Referencing a primitive as if it was a map.</li>
-     * <li>Referencing a primitive as if it was a list.</li>
+     * <li>Referencing a map as if it were a list.</li>
+     * <li>Referencing a primitive as if it were a map.</li>
+     * <li>Referencing a primitive as if it were a list.</li>
      * <li>Referencing a non-existing list item.</li>
      * <li>Referencing a non-existing map.</li>
      * <li>Referencing a non-existing list.</li>
@@ -103,11 +103,11 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         List<BatchOperationInput> inputsList = new ArrayList<>();
         // non-existing key
         inputsList.add(new BatchOperationInput("$.example3[1].key08.nonexistentkey", GET));
-        // referencing a map as if it was a list
+        // referencing a map as if it were a list
         inputsList.add(new BatchOperationInput("$.example1[1]", GET));
-        // referencing a primitive as if it was a map
+        // referencing a primitive as if it were a map
         inputsList.add(new BatchOperationInput("$.example4.key10.key11.nonexistentkey", GET));
-        // referencing a primitive as if it was a list
+        // referencing a primitive as if it were a list
         inputsList.add(new BatchOperationInput("$.example4.key10.key11[2]", GET));
         // referencing a non-existing list item
         inputsList.add(new BatchOperationInput("$.example4.key13.key15[9]", GET));
@@ -233,8 +233,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
      * <ul>
      * <li>Putting a key into a map that doesn't exist.</li>
      * <li>Putting to a list that doesn't exist.</li>
-     * <li>Treating a map as if it was a list.</li>
-     * <li>Treating a list as if it was a map.</li>
+     * <li>Treating a map as if it were a list.</li>
+     * <li>Treating a list as if it were a map.</li>
      * </ul>
      */
     @Test
@@ -247,9 +247,9 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         inputsList.add(new BatchOperationInput("$.example9.key01", PUT));
         // putting to a list that doesn't exist
         inputsList.add(new BatchOperationInput("$.example9[2]", PUT));
-        // treating a map as if it was a list
+        // treating a map as if it were a list
         inputsList.add(new BatchOperationInput("$.example2.key09", PUT));
-        // treating a list as if it was a map
+        // treating a list as if it were a map
         inputsList.add(new BatchOperationInput("$.example1[1]", PUT));
 
         int putValue = 70;

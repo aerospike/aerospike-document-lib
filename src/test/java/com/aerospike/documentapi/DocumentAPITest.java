@@ -178,8 +178,8 @@ class DocumentAPITest extends BaseTestConfig {
      * <ul>
      * <li>Reference a list as if it were a map.</li>
      * <li>Reference a map as if it were a list.</li>
-     * <li>Reference a primitive as if it was a map.</li>
-     * <li>Reference a primitive as if it was a list.</li>
+     * <li>Reference a primitive as if it were a map.</li>
+     * <li>Reference a primitive as if it were a list.</li>
      * <li>Reference a list item that is not there (out of bounds).</li>
      * <li>Reference a map that isn't there.</li>
      * <li>Reference a list that isn't there.</li>
@@ -214,7 +214,7 @@ class DocumentAPITest extends BaseTestConfig {
         } catch (DocumentApiException.TypeMismatchException ignored) {
         }
 
-        // Reference a primitive as if it was a map
+        // Reference a primitive as if it were a map
         // $.example4.key10.key11 is a primitive
         jsonPath = "$.example4.key10.key11.nonexistentkey";
         try {
@@ -223,7 +223,7 @@ class DocumentAPITest extends BaseTestConfig {
         } catch (DocumentApiException.KeyNotFoundException ignored) {
         }
 
-        // Reference a primitive as if it was a list
+        // Reference a primitive as if it were a list
         // $.example4.key10.key11 is a primitive
         jsonPath = "$.example4.key10.key11[2]";
         try {
