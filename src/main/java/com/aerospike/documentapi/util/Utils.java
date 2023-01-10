@@ -4,7 +4,7 @@ import com.aerospike.client.Bin;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
-import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.token.ContextAwareToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.experimental.UtilityClass;
 
@@ -27,13 +27,17 @@ public class Utils {
         }
     }
 
-    public static PathDetails getPathDetails(List<PathPart> pathParts, boolean modify) {
+    public static PathDetails getPathDetails(List<ContextAwareToken> tokens, boolean modify) {
         // We need to treat the last part of the path differently and without modifying
-        PathPart finalPathPart = modify ? JsonPathParser.extractLastPathPartAndModifyList(pathParts)
-                : JsonPathParser.extractLastPathPart(pathParts);
+        ContextAwareToken finalToken = modify ? JsonPathParser.extractLastPathPartAndModifyList(tokens)
+                : JsonPathParser.extractLastPathPart(tokens);
         // Then turn the rest into the contexts representation
-        CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(pathParts);
+        CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(tokens);
 
-        return new PathDetails(finalPathPart, ctxArray);
+        return new PathDetails(finalToken, ctxArray);
+    }
+
+    public static boolean isBlank(String string) {
+        return string == null || string.trim().isEmpty();
     }
 }

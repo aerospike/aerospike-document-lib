@@ -51,9 +51,9 @@ public abstract class AbstractBatchOperation implements BatchOperation {
 
     @Override
     public void setFirstStepRecord() {
-        final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
+        final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
         List<Operation> batchOperations = binNames.stream()
-                .map(binName -> pathDetails.getFinalPathPart()
+                .map(binName -> pathDetails.getFinalToken()
                         .toAerospikeGetOperation(binName, pathDetails.getCtxArray()))
                 .collect(Collectors.toList());
 
@@ -96,7 +96,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
 
     protected Operation toPutOperation(String binName, Object objToPut, PathDetails pathDetails) {
         try {
-            return pathDetails.getFinalPathPart()
+            return pathDetails.getFinalToken()
                     .toAerospikePutOperation(binName, objToPut, pathDetails.getCtxArray());
         } catch (IllegalArgumentException e) {
             errorBinName = binName;

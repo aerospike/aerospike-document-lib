@@ -2,8 +2,8 @@ package com.aerospike.documentapi;
 
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
-import com.aerospike.documentapi.jsonpath.pathpart.ListPathPart;
-import com.aerospike.documentapi.jsonpath.pathpart.MapPathPart;
+import com.aerospike.documentapi.token.ListToken;
+import com.aerospike.documentapi.token.MapToken;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,8 +66,8 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(1, jsonPathObject.getPathParts().size());
-        assertEquals(new ListPathPart(1), jsonPathObject.getPathParts().get(0));
+        assertEquals(1, jsonPathObject.getPathTokensWithoutQuery().size());
+        assertEquals(new ListToken(1), jsonPathObject.getPathTokensWithoutQuery().get(0));
     }
 
     /**
@@ -83,8 +83,8 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(1, jsonPathObject.getPathParts().size());
-        assertEquals(new MapPathPart("key"), jsonPathObject.getPathParts().get(0));
+        assertEquals(1, jsonPathObject.getPathTokensWithoutQuery().size());
+        assertEquals(new MapToken("key"), jsonPathObject.getPathTokensWithoutQuery().get(0));
     }
 
     /**
@@ -100,9 +100,9 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(2, jsonPathObject.getPathParts().size());
-        assertEquals(new MapPathPart("key"), jsonPathObject.getPathParts().get(0));
-        assertEquals(new ListPathPart(2), jsonPathObject.getPathParts().get(1));
+        assertEquals(2, jsonPathObject.getPathTokensWithoutQuery().size());
+        assertEquals(new MapToken("key"), jsonPathObject.getPathTokensWithoutQuery().get(0));
+        assertEquals(new ListToken(2), jsonPathObject.getPathTokensWithoutQuery().get(1));
     }
 
     /**
@@ -118,10 +118,10 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(3, jsonPathObject.getPathParts().size());
-        assertEquals(new MapPathPart("key"), jsonPathObject.getPathParts().get(0));
-        assertEquals(new ListPathPart(1), jsonPathObject.getPathParts().get(1));
-        assertEquals(new ListPathPart(2), jsonPathObject.getPathParts().get(2));
+        assertEquals(3, jsonPathObject.getPathTokensWithoutQuery().size());
+        assertEquals(new MapToken("key"), jsonPathObject.getPathTokensWithoutQuery().get(0));
+        assertEquals(new ListToken(1), jsonPathObject.getPathTokensWithoutQuery().get(1));
+        assertEquals(new ListToken(2), jsonPathObject.getPathTokensWithoutQuery().get(2));
     }
 
     /**

@@ -30,7 +30,7 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
     public BatchRecord setSecondStepRecordAndGet() {
         Operation[] batchOps;
 
-        if (originalJsonPathObject.getPathParts().isEmpty()) {
+        if (originalJsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
             // If there are no parts, put an empty map in the given bin
             batchOps = getBinNames().stream()
                     .map(MapOperation::clear)
@@ -38,15 +38,15 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts(), true);
+                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathTokensWithoutQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
-                        .map(entry -> pathDetails.getFinalPathPart()
+                        .map(entry -> pathDetails.getFinalToken()
                                 .toAerospikePutOperation(entry.getKey(), entry.getValue(), pathDetails.getCtxArray()))
                         .toArray(Operation[]::new);
             } else {
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
                 batchOps = binNames.stream()
-                        .map(binName -> pathDetails.getFinalPathPart()
+                        .map(binName -> pathDetails.getFinalToken()
                                 .toAerospikeDeleteOperation(binName, pathDetails.getCtxArray()))
                         .toArray(Operation[]::new);
             }

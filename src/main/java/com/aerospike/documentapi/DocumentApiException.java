@@ -51,7 +51,7 @@ public class DocumentApiException extends RuntimeException {
      */
     public static class JsonPathException extends DocumentApiException {
         public JsonPathException(String jsonString) {
-            super(String.format("'%s' does not match key[number] format", jsonString));
+            super(String.format("'%s' does not match JsonPath format", jsonString));
         }
     }
 
@@ -63,4 +63,14 @@ public class DocumentApiException extends RuntimeException {
             super(String.format("Cannot append to '%s'", jsonString));
         }
     }
+
+    /**
+     * Exception to be thrown in case of invalid json path.
+     */
+    public static class JsonPathParseException extends DocumentApiException {
+        public JsonPathParseException(String jsonPathPart) {
+            super(String.format("Unable to parse '%s' as jsonPath token", jsonPathPart));
+        }
+    }
+
 }

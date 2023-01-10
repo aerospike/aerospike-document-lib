@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.jsonpath.pathpart;
+package com.aerospike.documentapi.token;
 
 import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
@@ -9,21 +9,21 @@ import com.aerospike.documentapi.util.Utils;
 /**
  * AccessPathPart analysis is ultimately used to create CTX (context) objects and operations
  */
-public abstract class PathPart {
+public abstract class ContextAwareToken extends Token {
 
     public abstract CTX toAerospikeContext();
 
     public abstract Operation toAerospikeGetOperation(String binName, CTX[] contexts);
 
-    public abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException;
+    public abstract Operation toAerospikePutOperation(String binName, Object object, CTX[] contexts)
+            throws IllegalArgumentException;
 
-    public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts) throws IllegalArgumentException {
+    public Operation toAerospikeAppendOperation(String binName, Object object, CTX[] contexts)
+            throws IllegalArgumentException {
         Utils.validateNotArray(object);
 
         return ListOperation.append(binName, Value.get(object), contexts);
     }
 
     public abstract Operation toAerospikeDeleteOperation(String binName, CTX[] contexts);
-
-    public abstract PathPartType getType();
 }
