@@ -53,14 +53,33 @@ public class FilterExpFactory {
         }
     }
 
-    public static Exp getUnaryLogicalExp(String name, Exp exp) {
-        final Operator.LogicUnary op = Operator.LogicUnary.fromString(name);
+    public static Exp getNotExistsLogicalExp(String logicalOp, Exp exp) {
+        final Operator.LogicUnary op = Operator.LogicUnary.fromString(logicalOp);
         Preconditions.checkNotNull(op, "getUnaryLogicalExp operator fromString");
         switch (op) {
-            case NOT:
+            case NOT_EXISTS:
                 return Exp.not(exp);
             default:
-                throw new InvalidParameterException(String.format("Invalid unary logical operator name: %s", name));
+                throw new InvalidParameterException(String.format("Invalid unary logical operator name: %s", logicalOp));
+        }
+    }
+
+    public static Exp getUnaryLogicalExp(String logicalOp, String operand) { // store enums in stack instead of strings?
+        final Operator.LogicUnary op = Operator.LogicUnary.fromString(logicalOp);
+        Preconditions.checkNotNull(op, "getUnaryLogicalExp operator fromString");
+        switch (op) {
+            case NOT_EXISTS:
+                return Exp.eq(
+                        MapExp.getByKey(MapReturnType.COUNT, Exp.Type.INT, Exp.val(operand), Exp.mapBin("mapbin")), // TODO
+                        Exp.val(0)
+                );
+            case EXISTS:
+                return Exp.gt(
+                        MapExp.getByKey(MapReturnType.COUNT, Exp.Type.INT, Exp.val(operand), Exp.mapBin("mapbin")), // TODO
+                        Exp.val(0)
+                );
+            default:
+                throw new InvalidParameterException(String.format("Invalid unary logical operator name: %s", logicalOp));
         }
     }
 

@@ -24,7 +24,7 @@ public class FilterToken extends Token {
         }
         String filterExpr = strPart.substring(filterStartIdx + 2, filterEndIdx - 1).trim(); // leaving parentheses
 //        validate(criteria);// TODO
-//        filterCriteria = FilterCriteria.parse(filterExpr);
+        filterCriteria = FilterCriteria.parse(filterExpr);
         return true;
     }
 

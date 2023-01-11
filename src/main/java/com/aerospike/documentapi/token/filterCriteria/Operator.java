@@ -71,7 +71,7 @@ public class Operator {
     }
 
     public enum LogicUnary {
-        NOT(".");
+        NOT_EXISTS("!"), EXISTS("EXISTS");
 
         private final String name;
 
