@@ -19,11 +19,6 @@ public class RootToken extends Token {
         return TokenType.ROOT;
     }
 
-    @Override
-    public boolean requiresJsonQuery() {
-        return false;
-    }
-
     public static Optional<Token> match(String strPart) {
         Token token = new RootToken();
         return token.read(strPart) ? Optional.of(token) : Optional.empty();

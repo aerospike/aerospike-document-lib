@@ -79,11 +79,6 @@ public class MapToken extends ContextAwareToken {
     }
 
     @Override
-    public boolean requiresJsonQuery() {
-        return false;
-    }
-
-    @Override
     public boolean read(String strPart) {
         setString(key);
 

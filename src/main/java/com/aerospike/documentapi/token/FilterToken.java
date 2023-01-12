@@ -2,7 +2,7 @@ package com.aerospike.documentapi.token;
 
 import com.aerospike.client.exp.Exp;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
-import com.aerospike.documentapi.token.filterCriteria.FilterCriteria;
+import com.aerospike.documentapi.token.filterExpr.FilterExprParser;
 
 import java.util.Optional;
 
@@ -22,9 +22,8 @@ public class FilterToken extends Token {
         if (!strPart.endsWith(filterEndIndication)) {
             filterEndIdx = strPart.indexOf(JsonPathParser.filterEndIndication) + 2; // TODO: can there be a list elem after a filter?
         }
-        String filterExpr = strPart.substring(filterStartIdx + 2, filterEndIdx - 1).trim(); // leaving parentheses
-//        validate(criteria);// TODO
-        filterCriteria = FilterCriteria.parse(filterExpr);
+        String filterExpr = strPart.substring(filterStartIdx + 2, filterEndIdx - 1).trim();
+        filterCriteria = FilterExprParser.parse(filterExpr);
         return true;
     }
 
@@ -34,12 +33,12 @@ public class FilterToken extends Token {
     }
 
     @Override
-    public TokenType getType() {
-        return TokenType.FILTER;
+    public boolean requiresJsonQuery() {
+        return true;
     }
 
     @Override
-    public boolean requiresJsonQuery() {
-        return true;
+    public TokenType getType() {
+        return TokenType.FILTER;
     }
 }

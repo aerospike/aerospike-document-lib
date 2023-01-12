@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.token.filterCriteria;
+package com.aerospike.documentapi.token.filterExpr;
 
 import com.aerospike.client.cdt.ListReturnType;
 import com.aerospike.client.cdt.MapReturnType;
@@ -93,6 +93,50 @@ public class FilterExpFactory {
         }
         return exp;
     }
+
+    public static FilterCriterion getFilterCriterion(String op, String left, String right) {
+        FilterCriterion filterCriteria;
+        Optional<Integer> intVal = parseInt(right); // can left operand also be int?
+        FilterExprPart rightPart = intVal.map(integer -> toFilterCriterion(Exp.Type.INT, integer))
+                .orElseGet(() -> toFilterCriterion(Exp.Type.STRING, right));
+        return new FilterCriterion(
+                toFilterType(op),
+                toFilterCriterion(Exp.Type.STRING, left),
+                rightPart
+        );
+    }
+
+    private static FilterExprPart toFilterCriterion(Exp.Type type, Object value) {
+        return new FilterExprPart(type, value);
+    }
+
+    private static class FilterExprPart {
+
+        private final Exp.Type type;
+        private final Object value;
+
+        private FilterExprPart(Exp.Type type, Object value) {
+            this.value = value;
+            this.type = type;
+        }
+    }
+
+    static class FilterCriterion {
+
+        private final Operator.OperatorType operatorType;
+        private final FilterExprPart[] filterExprParts;
+
+        public FilterCriterion(Operator.OperatorType operatorType, FilterExprPart... filterExprParts) {
+            this.operatorType = operatorType;
+            this.filterExprParts = filterExprParts;
+        }
+    }
+
+    private static Operator.OperatorType toFilterType(String operator) {
+        final Operator.Simple op = Operator.Simple.fromString(operator); // TODO: other as well
+        Preconditions.checkNotNull(op, "toFilterType operator fromString");
+        return op;
+}
 
     public static Exp getSimpleExp(String op, Exp left, Exp right) {
         final Operator.Simple operator = Operator.Simple.fromString(op);

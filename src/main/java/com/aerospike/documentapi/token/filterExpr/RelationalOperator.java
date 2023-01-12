@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.token.filterCriteria;
+package com.aerospike.documentapi.token.filterExpr;
 
 import java.util.Locale;
 

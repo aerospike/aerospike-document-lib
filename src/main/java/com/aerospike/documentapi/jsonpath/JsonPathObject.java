@@ -48,7 +48,7 @@ public class JsonPathObject {
             addQueryToken(token);
             setRequiresJsonPathQuery(true);
         } else {
-            addPathToken((ContextAwareToken) token); // each token not requiring query extends ContextAwareToken
+            addPathToken((ContextAwareToken) token);
         }
     }
 

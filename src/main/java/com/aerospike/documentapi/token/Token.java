@@ -27,5 +27,7 @@ public abstract class Token {
 
     public abstract TokenType getType();
 
-    public abstract boolean requiresJsonQuery();
+    public boolean requiresJsonQuery() {
+        return false;
+    };
 }

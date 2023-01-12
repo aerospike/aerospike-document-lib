@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.token.filterCriteria;
+package com.aerospike.documentapi.token.filterExpr;
 
 import java.util.Arrays;
 
@@ -23,7 +23,9 @@ public class Operator {
         return Arrays.stream(Special.values()).anyMatch((t) -> t.name().equalsIgnoreCase(op));
     }
 
-    public enum Simple {
+    public interface OperatorType {}
+
+    public enum Simple implements OperatorType {
         EQUAL("=="), UNEQUAL("!="), GREATER(">"), GREATEREQ(">="), LESS("<"), LESSEQ("<=");
 
         private final String name;
@@ -46,7 +48,7 @@ public class Operator {
         }
     }
 
-    public enum Logic {
+    public enum Logic implements OperatorType {
 //        AND("and"), OR("or");
         AND("&&"), OR("||");
 
@@ -70,7 +72,7 @@ public class Operator {
         }
     }
 
-    public enum LogicUnary {
+    public enum LogicUnary implements OperatorType {
         NOT_EXISTS("!"), EXISTS("EXISTS");
 
         private final String name;
@@ -93,7 +95,7 @@ public class Operator {
         }
     }
 
-    public enum Special {
+    public enum Special implements OperatorType {
         LAST_UPDATE, VOID_TIME, DIGEST_MODULO, STRING_REGEX, GEOJSON_WITHIN, GEOJSON_CONTAINS, LIST_ITERATE_OR, MAPKEY_ITERATE_OR, MAPVAL_ITERATE_OR, LIST_ITERATE_AND, MAPKEY_ITERATE_AND, MAPVAL_ITERATE_AND
     }
 }

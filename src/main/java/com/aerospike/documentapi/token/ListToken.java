@@ -84,11 +84,6 @@ public class ListToken extends ContextAwareToken {
     }
 
     @Override
-    public boolean requiresJsonQuery() {
-        return false;
-    }
-
-    @Override
     public boolean read(String strPart) {
         setString(OPEN_BRACKET + String.valueOf(listPosition) + CLOSE_BRACKET);
 

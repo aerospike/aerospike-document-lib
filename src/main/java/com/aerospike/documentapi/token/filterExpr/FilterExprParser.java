@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.token.filterCriteria;
+package com.aerospike.documentapi.token.filterExpr;
 
 import com.aerospike.client.exp.Exp;
 import com.aerospike.client.exp.Expression;
@@ -12,12 +12,14 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.aerospike.documentapi.token.filterCriteria.Operator.LogicUnary.EXISTS;
-import static com.aerospike.documentapi.token.filterCriteria.Operator.LogicUnary.NOT_EXISTS;
+import static com.aerospike.documentapi.token.filterExpr.Operator.LogicUnary.EXISTS;
+import static com.aerospike.documentapi.token.filterExpr.Operator.LogicUnary.NOT_EXISTS;
 
-public class FilterCriteria {
+public class FilterExprParser {
 
-    protected static final Pattern pattern = Pattern.compile("(\\))|(\\()|([^\\s)(]+)", Pattern.CASE_INSENSITIVE);
+    //    protected static final Pattern pattern = Pattern.compile("(\\))|(\\()|([^\\s)(]+)", Pattern.CASE_INSENSITIVE);
+    protected static final Pattern pattern = Pattern.compile("(\\))|(\\()|([^)(<>=~!&|]+)|([<>=~!&|]+)",
+            Pattern.CASE_INSENSITIVE);
 
     protected static List<String> parseExpressionString(String expression) {
         Matcher matcher = pattern.matcher(expression);
@@ -25,7 +27,11 @@ public class FilterCriteria {
         while (matcher.find()) {
             tokens.add(matcher.group());
         }
-        return tokens;
+        if (tokens.isEmpty()) {
+            throw new RuntimeException(String.format("Unable to parse filter expression '%s'", expression));
+        } else {
+            return tokens;
+        }
     }
 
     protected static <U> boolean forAllEqual(Collection<U> list) {
@@ -44,18 +50,21 @@ public class FilterCriteria {
         Stack<NestedBlock> stack = new Stack<>();
         stack.push(new NestedBlock());
 
-        for (int i = 0; i < tokens.size(); i++) {
+        for (int i = 0; i < tokens.size(); i++) { // TODO =~
             String token = tokens.get(i).trim();
             if (token.equals("(")) {
                 stack.push(new NestedBlock());
             } else if (token.equals(")")) {
                 NestedBlock block = stack.pop();
-                Exp exp = null;
                 checkUnaryLogicalOpExp(block, stack); // TODO: build a NE/E Exp
-                exp = block.filters.get(0);
+                Exp exp = block.filters.get(0);
+                if (exp == null) {
+                    throw new RuntimeException("Empty block filters stack"); // TODO
+                }
                 if (!block.logicOperators.isEmpty()) {
                     Preconditions.checkState(forAllEqual(block.logicOperators),
-                            String.format("Only equal logic operations are required on the same level, given '%s'",
+                            String.format("Only equal logic operations are required on the same level, cannot process '%s'." +
+                                            " Use parentheses to combine both logical operators if needed.",
                                     asString(block.logicOperators)));
                     exp = FilterExpFactory.getLogicalExp(block.logicOperators.pop(), block.filters.toArray(new Exp[0]));
                 }
@@ -71,22 +80,29 @@ public class FilterCriteria {
                 stack.peek().unaryLogicOperators.push(token);
             } else if (Operator.isSpecial(token)) {
                 // read special operation
-                StringBuilder buff = new StringBuilder();
-                do {
-                    buff.append(tokens.get(++i));
-                } while (!tokens.get(i).equals(")"));
-                Exp special = FilterExpFactory.getSpecialExp(token, buff.toString());
-                if (!stack.peek().unaryLogicOperators.isEmpty())
-                    special = FilterExpFactory.getNotExistsLogicalExp(stack.peek().unaryLogicOperators.pop(), special);
-                stack.peek().filters.push(special);
+                StringBuilder buff = new StringBuilder(); // TODO: check and edit
+//                do {
+//                    buff.append(tokens.get(++i));
+//                } while (!tokens.get(i).equals(")"));
+//                Exp special = FilterExpFactory.getSpecialExp(token, buff.toString()); // TODO: check and edit
+//                if (!stack.peek().unaryLogicOperators.isEmpty())
+//                    special = FilterExpFactory.getNotExistsLogicalExp(stack.peek().unaryLogicOperators.pop(), special);
+//                stack.peek().filters.push(special);
             } else {
                 // is operand
                 if (stack.peek().simpleOperators.size() > 0) {
                     if (stack.peek().operands.size() == 1) {
-                        Exp exp = FilterExpFactory.getCompareExp(stack.peek().operands.pop(),
-                                stack.peek().simpleOperators.pop(), token);
-                        if (stack.peek().unaryLogicOperators.size() > 0) // TODO: check and edit
-                            exp = FilterExpFactory.getNotExistsLogicalExp(stack.peek().unaryLogicOperators.pop(), exp);
+//                        Exp exp = FilterExpFactory.getCompareExp(stack.peek().operands.pop(),
+//                                stack.peek().simpleOperators.pop(), token);
+                        Exp exp = null;
+                        FilterExpFactory.FilterCriterion filterCriterion = FilterExpFactory.getFilterCriterion(
+                                stack.peek().simpleOperators.pop(),
+                                stack.peek().operands.pop(),
+                                token
+                        );
+//                        if (stack.peek().unaryLogicOperators.size() > 0) { // TODO: check and edit
+//                            exp = FilterExpFactory.getNotExistsLogicalExp(stack.peek().unaryLogicOperators.pop(), exp);
+//                    }
                         stack.peek().filters.push(exp);
                     }
                 } else {
@@ -99,7 +115,8 @@ public class FilterCriteria {
         Exp exp = block.filters.get(0);
         if (!block.logicOperators.isEmpty()) {
             Preconditions.checkState(forAllEqual(block.logicOperators),
-                    String.format("Only equal logic operations are required on the same level, given '%s'",
+                    String.format("Only equal logic operations are required on the same level, cannot process '%s'." +
+                                    " Use parentheses to combine both logical operators if needed.",
                             asString(block.logicOperators)));
             exp = FilterExpFactory.getLogicalExp(block.logicOperators.peek(), block.filters.toArray(new Exp[0]));
         }
@@ -134,13 +151,15 @@ public class FilterCriteria {
         Stack<String> unaryLogicOperators;
         Stack<String> operands;
         Stack<Exp> filters;
+//        Stack<FilterCriterion> criteria;
 
         NestedBlock() {
             simpleOperators = new Stack<>();
             logicOperators = new Stack<>();
             unaryLogicOperators = new Stack<>();
             operands = new Stack<>();
-            filters = new Stack<Exp>();
+            filters = new Stack<>();
+//            criteria = new Stack<>();
         }
     }
 }
