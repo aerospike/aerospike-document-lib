@@ -3,11 +3,14 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
+import com.aerospike.documentapi.data.DocumentQueryStatement;
+import com.aerospike.documentapi.data.KeyResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public interface IAerospikeDocumentClient {
 
@@ -119,4 +122,6 @@ public interface IAerospikeDocumentClient {
      * @throws IllegalArgumentException if the batch has multiple two-step operations with the same key.
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel);
+
+    Stream<KeyResult> query(DocumentQueryStatement queryStatement);
 }

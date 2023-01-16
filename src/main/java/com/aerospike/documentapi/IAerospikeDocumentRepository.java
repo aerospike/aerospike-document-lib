@@ -4,7 +4,10 @@ import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
+import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.RecordSet;
+import com.aerospike.client.query.Statement;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -33,4 +36,6 @@ public interface IAerospikeDocumentRepository {
     void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject);
 
     boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords);
+
+    RecordSet query(QueryPolicy policy, Statement statement);
 }

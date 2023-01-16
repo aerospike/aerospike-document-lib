@@ -10,7 +10,10 @@ import com.aerospike.client.Record;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
+import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.RecordSet;
+import com.aerospike.client.query.Statement;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
@@ -206,6 +209,15 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public boolean batchPerform(BatchPolicy batchPolicy, List<BatchRecord> batchRecords) {
         try {
             return client.operate(batchPolicy, batchRecords);
+        } catch (AerospikeException e) {
+            throw DocumentApiException.toDocumentException(e);
+        }
+    }
+
+    @Override
+    public RecordSet query(QueryPolicy policy, Statement statement) {
+        try {
+            return client.query(policy, statement);
         } catch (AerospikeException e) {
             throw DocumentApiException.toDocumentException(e);
         }

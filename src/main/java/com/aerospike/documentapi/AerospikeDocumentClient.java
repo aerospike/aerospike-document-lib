@@ -5,8 +5,11 @@ import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
+import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.documentapi.batch.BatchOperation;
+import com.aerospike.documentapi.data.DocumentQueryStatement;
+import com.aerospike.documentapi.data.KeyResult;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
@@ -19,8 +22,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Primary object for accessing and mutating documents.
@@ -31,12 +37,14 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     private final Policy readPolicy;
     private final WritePolicy writePolicy;
     private final BatchPolicy batchPolicy;
+    private final QueryPolicy queryPolicy;
 
     public AerospikeDocumentClient(IAerospikeClient client) {
         this.aerospikeDocumentRepository = new AerospikeDocumentRepository(client);
         this.readPolicy = client.getReadPolicyDefault();
         this.writePolicy = client.getWritePolicyDefault();
         this.batchPolicy = client.getBatchPolicyDefault();
+        this.queryPolicy = client.getQueryPolicyDefault();
     }
 
     public AerospikeDocumentClient(IAerospikeClient client, DocumentPolicy documentPolicy) {
@@ -44,6 +52,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         this.readPolicy = documentPolicy.getReadPolicy();
         this.writePolicy = documentPolicy.getWritePolicy();
         this.batchPolicy = documentPolicy.getBatchPolicy();
+        this.queryPolicy = documentPolicy.getQueryPolicy();
     }
 
     @Override
@@ -173,6 +182,19 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         return getBatchOpStream(batchOperations, parallel)
                 .map(BatchOperation::getBatchRecord)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Stream<KeyResult> query(DocumentQueryStatement queryStatement) {
+        return StreamSupport
+                .stream(Spliterators.spliteratorUnknownSize(
+                        aerospikeDocumentRepository.query(queryPolicy, queryStatement.toStatement()).iterator(),
+                        Spliterator.ORDERED
+                ), false)
+                .map(keyRecord -> new KeyResult(
+                        keyRecord.key,
+                        null // TODO: run jayway using queryStatement.getSelectJsonPath() on bin values
+                ));
     }
 
     private WritePolicy getLutPolicy(Map<String, Object> result) {
