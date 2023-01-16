@@ -12,7 +12,7 @@ public class ScanToken extends Token {
         if (!DEEP_SCAN.equals(strPart)) return false;
 
         setString(strPart);
-        // a dot is added during concatenation to a query string
+        // a dot is added during concatenation
         setQueryConcatString(String.valueOf(DOT));
         return true;
     }

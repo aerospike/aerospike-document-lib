@@ -23,10 +23,21 @@ public class Operator {
         return Arrays.stream(Special.values()).anyMatch((t) -> t.name().equalsIgnoreCase(op));
     }
 
+    public static boolean isSpecial(OperatorType op) {
+        return isSpecial(op.toString());
+    }
+
     public interface OperatorType {}
 
     public enum Simple implements OperatorType {
-        EQUAL("=="), UNEQUAL("!="), GREATER(">"), GREATEREQ(">="), LESS("<"), LESSEQ("<=");
+        GTE(">="),
+        LTE("<="),
+        EQ("=="),
+        TSEQ("==="), // Type safe equals
+        NE("!="),
+        TSNE("!=="), // Type safe not equals
+        LT("<"),
+        GT(">");
 
         private final String name;
 
@@ -49,7 +60,6 @@ public class Operator {
     }
 
     public enum Logic implements OperatorType {
-//        AND("and"), OR("or");
         AND("&&"), OR("||");
 
         private final String name;
@@ -96,6 +106,37 @@ public class Operator {
     }
 
     public enum Special implements OperatorType {
-        LAST_UPDATE, VOID_TIME, DIGEST_MODULO, STRING_REGEX, GEOJSON_WITHIN, GEOJSON_CONTAINS, LIST_ITERATE_OR, MAPKEY_ITERATE_OR, MAPVAL_ITERATE_OR, LIST_ITERATE_AND, MAPKEY_ITERATE_AND, MAPVAL_ITERATE_AND
+        REGEX("=~"),
+        NIN("NIN"),
+        IN("IN"),
+        CONTAINS("CONTAINS"),
+        ALL("ALL"),
+        SIZE("SIZE"),
+        TYPE("TYPE"),
+        MATCHES("MATCHES"),
+        EMPTY("EMPTY"), // TODO: followed by true/false?
+        SUBSETOF("SUBSETOF"),
+        ANYOF("ANYOF"),
+        NONEOF("NONEOF");
+
+
+        private final String name;
+
+        Special(String op) {
+            name = op;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public static Special fromString(String name) {
+            for (Special v : Special.values()) {
+                if (v.name.equalsIgnoreCase(name)) {
+                    return v;
+                }
+            }
+            return null;
+        }
     }
 }

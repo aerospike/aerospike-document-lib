@@ -51,7 +51,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
 
     @Override
     public void setFirstStepRecord() {
-        final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
+        final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
         List<Operation> batchOperations = binNames.stream()
                 .map(binName -> pathDetails.getFinalToken()
                         .toAerospikeGetOperation(binName, pathDetails.getCtxArray()))

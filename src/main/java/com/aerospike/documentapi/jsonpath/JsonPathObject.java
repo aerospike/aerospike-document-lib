@@ -11,13 +11,13 @@ import static com.aerospike.documentapi.jsonpath.JsonPathParser.DOT;
 
 public class JsonPathObject {
 
-    private final List<ContextAwareToken> pathTokens;
+    private final List<ContextAwareToken> notQueryTokens;
     private final List<Token> queryTokens;
     private String jsonPathSecondStepQuery = "";
     private boolean requiresJsonPathQuery;
 
     public JsonPathObject() {
-        pathTokens = new ArrayList<>();
+        notQueryTokens = new ArrayList<>();
         queryTokens = new ArrayList<>();
     }
 
@@ -26,7 +26,7 @@ public class JsonPathObject {
         boolean newRequiresJsonPathQuery = requiresJsonPathQuery();
 
         JsonPathObject newJsonPathObject = new JsonPathObject();
-        for (Token token : pathTokens) {
+        for (Token token : notQueryTokens) {
             newJsonPathObject.addToken(token);
         }
         newJsonPathObject.setJsonPathSecondStepQuery(newJsonPathSecondStepQuery);
@@ -34,16 +34,16 @@ public class JsonPathObject {
         return newJsonPathObject;
     }
 
-    public List<ContextAwareToken> getPathTokensWithoutQuery() {
-        return pathTokens;
+    public List<ContextAwareToken> getTokensNotRequiringSecondStepQuery() {
+        return notQueryTokens;
     }
 
-    public List<Token> getQueryTokens() {
+    public List<Token> getTokensRequiringSecondStepQuery() {
         return queryTokens;
     }
 
     public void addToken(Token token) {
-        // pathTokens get here as well after setRequiresJsonPathQuery has been switched to true
+        // other tokens get here as well after class level requiresJsonPathQuery has been switched to true
         if (token.requiresJsonQuery() || this.requiresJsonPathQuery) {
             addQueryToken(token);
             setRequiresJsonPathQuery(true);
@@ -58,7 +58,7 @@ public class JsonPathObject {
     }
 
     public void addPathToken(ContextAwareToken token) {
-        pathTokens.add(token);
+        notQueryTokens.add(token);
     }
 
     public boolean requiresJsonPathQuery() {

@@ -9,8 +9,14 @@ import com.aerospike.client.query.KeyRecord;
 import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.RegexFlag;
 import com.aerospike.client.query.Statement;
+import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
+import com.aerospike.documentapi.token.ContextAwareToken;
+import com.aerospike.documentapi.token.Token;
+import com.aerospike.documentapi.token.filterExpr.FilterExp;
 import com.aerospike.documentapi.util.DocumentExp;
+import com.aerospike.documentapi.util.JsonConverters;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static com.aerospike.documentapi.util.DocumentExp.validateJsonPath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -44,6 +51,9 @@ class DocumentExpTests extends BaseTestConfig {
                 new Bin(LIST_BIN_NAME, listBin(0)));
         client.put(writePolicy(), QUERY_KEY_2, new Bin(MAP_BIN_NAME, mapBin(100)),
                 new Bin(LIST_BIN_NAME, listBin(100)));
+        AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(storeJson);
+        documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
     }
 
     @AfterAll
@@ -53,7 +63,7 @@ class DocumentExpTests extends BaseTestConfig {
     }
 
     @Test
-    void testDocumentExpMap() throws JsonPathParser.JsonParseException {
+    void testDocumentExpMap() throws DocumentApiException {
         String jsonPath = "$.mapKey.k1.k11";
         Exp exp = DocumentExp.ge(MAP_BIN_NAME, jsonPath, 100);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -65,7 +75,7 @@ class DocumentExpTests extends BaseTestConfig {
     }
 
     @Test
-    void testDocumentExpList() throws JsonPathParser.JsonParseException {
+    void testDocumentExpList() throws DocumentApiException {
         String jsonPath = "$.listKey[0].k11";
         Exp exp = DocumentExp.lt(MAP_BIN_NAME, jsonPath, 100);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -77,7 +87,32 @@ class DocumentExpTests extends BaseTestConfig {
     }
 
     @Test
-    void testDocumentExpListRegex() throws JsonPathParser.JsonParseException {
+    void testDocumentExpFilter() throws DocumentApiException {
+        String jsonPath = "$.store.book[?(@.price > 10)]";
+//        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = new JsonPathParser().parse(jsonPath);
+        Exp exp = null;
+        int tokensSize = jsonPathObject.getTokensRequiringSecondStepQuery().size();
+        FilterExp filterCriteria = tokensSize > 0 ?
+                jsonPathObject.getTokensRequiringSecondStepQuery().get(tokensSize - 1).getFilterCriteria()
+                : null;
+        if (filterCriteria != null && filterCriteria.getValues().length >= 1) {
+            if (filterCriteria.getValues().length == 2) {
+                FilterExp rightOperand = (FilterExp) filterCriteria.getValues()[1];
+                List<Token> leftOperandTokens = ((FilterExp) filterCriteria.getValues()[0]).getTokens();
+                exp = DocumentExp.ge(DOCUMENT_BIN_NAME, jsonPathObject, leftOperandTokens, rightOperand.getValues()[0]);
+            }
+        }
+        QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
+        queryPolicy.filterExp = Exp.build(exp);
+
+        List<KeyRecord> keyRecords = recordSetToList(client.query(queryPolicy, statement()));
+        assertEquals(1, keyRecords.size());
+        assertEquals("key2", keyRecords.get(0).key.userKey.getObject());
+    }
+
+    @Test
+    void testDocumentExpListRegex() throws DocumentApiException {
         String jsonPath = "$.listKey[2]";
         Exp exp = DocumentExp.regex(MAP_BIN_NAME, jsonPath, "10.*", RegexFlag.ICASE);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -89,7 +124,7 @@ class DocumentExpTests extends BaseTestConfig {
     }
 
     @Test
-    void testDocumentExpRootList() throws JsonPathParser.JsonParseException {
+    void testDocumentExpRootList() throws DocumentApiException {
         String jsonPath = "$[1]";
         Exp exp = DocumentExp.ne(LIST_BIN_NAME, jsonPath, 102);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -104,7 +139,7 @@ class DocumentExpTests extends BaseTestConfig {
     void testInvalidJsonPath() {
         String jsonPath = "abc";
         assertThrows(
-                JsonPathParser.JsonParseException.class,
+                DocumentApiException.class,
                 () -> DocumentExp.eq(MAP_BIN_NAME, jsonPath, 100)
         );
     }

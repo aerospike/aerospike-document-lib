@@ -45,7 +45,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                                    JsonPathObject jsonPathObject, boolean withLut) {
         Map<String, Object> results = new HashMap<>();
         // If there are no parts, retrieve the full document
-        if (jsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
+        if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             List<Operation> operations = new ArrayList<>();
             for (String binName : binNames) {
                 operations.add(Operation.get(binName));
@@ -59,7 +59,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                 results.putAll(rec.bins);
             }
         } else { // else retrieve using pure contexts
-            PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
+            PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
 
             List<Operation> operations = binNames.stream()
                     .map(binName -> pathDetails.getFinalToken().toAerospikeGetOperation(
@@ -100,7 +100,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                     JsonPathObject jsonPathObject) {
         Operation[] operations;
         // If there are no parts, put the full document
-        if (jsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
+        if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             operations = binNames.stream()
                     .map(bn -> {
                         Bin bin = new Bin(bn, jsonObject);
@@ -109,7 +109,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                     .toArray(Operation[]::new);
             client.operate(writePolicy, key, operations);
         } else { // else put using contexts
-            PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
+            PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
 
             try {
                 operations = binNames.stream()
@@ -129,7 +129,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void put(WritePolicy writePolicy, Key key, Map<String, Object> queryResults, JsonPathObject jsonPathObject) {
         Operation[] operations;
         // If there are no parts, put the full document
-        if (jsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
+        if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             operations = queryResults.entrySet().stream()
                     .map(e -> {
                         Bin bin = new Bin(e.getKey(), e.getValue());
@@ -138,7 +138,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
                     .toArray(Operation[]::new);
             client.operate(writePolicy, key, operations);
         } else { // else put using contexts
-            PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
+            PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
 
             try {
                 operations = queryResults.entrySet().stream()
@@ -158,10 +158,10 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     public void append(WritePolicy writePolicy, Key key, Collection<String> binNames, String jsonPath,
                        Object jsonObject, JsonPathObject jsonPathObject) {
         // If there are no parts, you can't append
-        if (jsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
+        if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             throw new DocumentApiException.JsonAppendException(jsonPath);
         } else {
-            PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), false);
+            PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), false);
 
             try {
                 Operation[] operations = binNames.stream()
@@ -180,13 +180,13 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
     @Override
     public void delete(WritePolicy writePolicy, Key key, Collection<String> binNames, JsonPathObject jsonPathObject) {
         // If there are no parts, put an empty map in each given bin
-        if (jsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
+        if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             Operation[] operations = binNames.stream()
                     .map(MapOperation::clear)
                     .toArray(Operation[]::new);
             client.operate(writePolicy, key, operations);
         } else {
-            PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), true);
+            PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
 
             try {
                 Operation[] operations = binNames.stream()

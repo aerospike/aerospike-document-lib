@@ -34,20 +34,20 @@ public class AppendBatchOperation extends AbstractBatchOperation {
     public BatchRecord setSecondStepRecordAndGet() {
         Operation[] batchOps;
 
-        if (originalJsonPathObject.getPathTokensWithoutQuery().isEmpty()) {
+        if (originalJsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             // If there are no parts, you cannot append
             throw new AerospikeException(new DocumentApiException.JsonAppendException(getJsonPath()));
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathTokensWithoutQuery(), true);
+                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
                         .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
                         .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
                 // needs to be treated without modifying
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathTokensWithoutQuery(), false);
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), false);
                 batchOps = binNames.stream()
                         .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
                         .filter(Objects::nonNull)

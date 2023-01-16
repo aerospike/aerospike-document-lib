@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.CLOSE_BRACKET;
+import static com.aerospike.documentapi.jsonpath.JsonPathParser.CURR_ELEM;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.DOC_ROOT;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.OPEN_BRACKET;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.WILDCARD;
@@ -30,7 +31,6 @@ public class ListToken extends ContextAwareToken {
         this.listPosition = listPosition;
     }
 
-//    static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[([\\*\\d+])\\])*$");
     static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[([\\*\\d]+)\\])*$");
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[([\\*\\d]+)\\])");
 
@@ -119,7 +119,10 @@ public class ListToken extends ContextAwareToken {
         Matcher keyMatcher = PATH_PATTERN.matcher(strPart);
         if ((!strPart.contains("[")) && (!strPart.contains("]"))) {
             // ignoring * wildcard after a dot, it's the same as ending with a .path
-            if (!strPart.equals(String.valueOf(WILDCARD)) && !strPart.equals(String.valueOf(DOC_ROOT))) {
+            if (!strPart.equals(String.valueOf(WILDCARD))
+                    && !strPart.equals(String.valueOf(DOC_ROOT))
+                    && !strPart.equals(String.valueOf(CURR_ELEM))
+            ) {
                 token = new MapToken(strPart);
                 token.read(strPart);
                 list.add(token);
@@ -127,6 +130,7 @@ public class ListToken extends ContextAwareToken {
         } else if (keyMatcher.find()) {
             String key = keyMatcher.group(1);
             if (!key.equals(String.valueOf(DOC_ROOT))
+                    && !strPart.equals(String.valueOf(CURR_ELEM))
                     && key.length() > 0
                     && key.charAt(0) != OPEN_BRACKET && key.charAt(key.length() - 1) != CLOSE_BRACKET) {
                 token = new MapToken(key);

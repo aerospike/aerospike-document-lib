@@ -41,10 +41,14 @@ public class JsonPathParser {
             "max()",
             "avg()",
             "stddev()",
-            "length()"
+            "length()",
+            "sum()",
+            "keys()",
+            "first()",
+            "last()" // TODO: concat(), append(), index()
     );
-    public static final String filterStartIndication = "[?(";
-    public static final String filterEndIndication = ")]";
+    public static final String FILTER_START_INDICATION = "[?(";
+    public static final String FILTER_END_INDICATION = ")]";
     public static final char DOC_ROOT = '$';
     public static final char CURR_ELEM = '@';
     public static final char DOT = '.';
@@ -122,11 +126,11 @@ public class JsonPathParser {
         for (int i = 0; i < pathList.size(); i++) {
             String curr = pathList.get(i);
             if (prev != null && curr != null && !curr.isEmpty()
-                    && prev.contains(filterStartIndication) // TODO: should likely be a regex
+                    && prev.contains(FILTER_START_INDICATION)
                     && !prev.contains(String.valueOf(CLOSE_BRACKET)) // has "[?", and not ']'
             ) {
                 if (!filterProcStarted) {
-                    int filterBeginningIdx = prev.indexOf(filterStartIndication);
+                    int filterBeginningIdx = prev.indexOf(FILTER_START_INDICATION);
                     if (filterBeginningIdx > 0) {
                         preFilter = prev.substring(0, filterBeginningIdx);
                         filter = prev.substring(filterBeginningIdx);
@@ -135,7 +139,7 @@ public class JsonPathParser {
                     filterProcStarted = true;
                 }
 
-                if (curr.contains(filterEndIndication)) { // TODO: separate to .endsWith() and .contains()
+                if (curr.contains(FILTER_END_INDICATION)) { // TODO: separate to .endsWith() and .contains()?
                     filter += DOT + curr;
                     newList.add(filter); // combined filter value between "[?" and "]"
                     prev = curr;
@@ -186,67 +190,67 @@ public class JsonPathParser {
         }
     }
 
-    private List<Token> parseToken(String jsonPathPart) {
+    private List<Token> parseToken(String token) {
         // the initial string has been split between '.' and validated
-        if (jsonPathPart.length() == 0) {
-            jsonPathPart = DEEP_SCAN;
-            Optional<Token> tokenOpt = ScanToken.match(jsonPathPart);
-            return tokensListOrFail(tokenOpt, jsonPathPart);
+        if (token.length() == 0) {
+            token = DEEP_SCAN;
+            Optional<Token> optional = ScanToken.match(token);
+            return tokensListOrFail(optional, token);
         }
 
-        switch (jsonPathPart.charAt(jsonPathPart.length() - 1)) {
+        switch (token.charAt(token.length() - 1)) {
             case DOC_ROOT:
-                Optional<Token> tokenOpt = RootToken.match(jsonPathPart);
-                return tokensListOrFail(tokenOpt, jsonPathPart);
+                Optional<Token> optional = RootToken.match(token);
+                return tokensListOrFail(optional, token);
             case CLOSE_BRACKET:
-                return processPartWithBracketsOrFail(jsonPathPart);
+                return processPartWithBracketsOrFail(token);
             case WILDCARD:
-                tokenOpt = WildcardToken.match(jsonPathPart);
-                return tokensListOrFail(tokenOpt, jsonPathPart);
+                optional = WildcardToken.match(token);
+                return tokensListOrFail(optional, token);
             default:
-                return processDefaultOrFail(jsonPathPart);
+                return processDefaultOrFail(token);
         }
     }
 
-    private List<Token> processDefaultOrFail(String jsonPathPart) {
+    private List<Token> processDefaultOrFail(String token) {
         List<Token> list = processToken(
                 Arrays.asList(
-                        MapToken.match(jsonPathPart),
-                        FunctionToken.match(jsonPathPart),
-                        FilterToken.match(jsonPathPart)
+                        MapToken.match(token),
+                        FunctionToken.match(token),
+                        FilterToken.match(token)
                 )
         );
 
         if (list != null && !list.isEmpty()) {
             return list;
         } else {
-            throw new DocumentApiException.JsonPathException(jsonPathPart);
+            throw new DocumentApiException.JsonPathException(token);
         }
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private List<Token> tokensListOrFail(Optional<Token> tokenOpt, String jsonPathPart) {
+    private List<Token> tokensListOrFail(Optional<Token> tokenOpt, String token) {
         if (tokenOpt.isPresent()) {
             return Collections.singletonList(tokenOpt.get());
         } else {
-            throw new DocumentApiException.JsonPathException(jsonPathPart);
+            throw new DocumentApiException.JsonPathException(token);
         }
     }
 
-    private List<Token> processPartWithBracketsOrFail(String jsonPathPart) {
+    private List<Token> processPartWithBracketsOrFail(String token) {
         List<Token> list = processToken(
                 Arrays.asList(
-                        WildcardToken.match(jsonPathPart),
-                        FilterToken.match(jsonPathPart)
+                        WildcardToken.match(token),
+                        FilterToken.match(token)
                 )
         );
         if (list != null && !list.isEmpty()) {
             return list;
         } else {
-            list = ListToken.parseToList(jsonPathPart);
+            list = ListToken.parseToList(token);
         }
         if (list.size() == 0) {
-            throw new DocumentApiException.JsonPathException(jsonPathPart);
+            throw new DocumentApiException.JsonPathException(token);
         } else {
             return list;
         }

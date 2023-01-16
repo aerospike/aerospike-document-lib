@@ -66,8 +66,8 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(1, jsonPathObject.getPathTokensWithoutQuery().size());
-        assertEquals(new ListToken(1), jsonPathObject.getPathTokensWithoutQuery().get(0));
+        assertEquals(1, jsonPathObject.getTokensNotRequiringSecondStepQuery().size());
+        assertEquals(new ListToken(1), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(0));
     }
 
     /**
@@ -83,8 +83,8 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(1, jsonPathObject.getPathTokensWithoutQuery().size());
-        assertEquals(new MapToken("key"), jsonPathObject.getPathTokensWithoutQuery().get(0));
+        assertEquals(1, jsonPathObject.getTokensNotRequiringSecondStepQuery().size());
+        assertEquals(new MapToken("key"), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(0));
     }
 
     /**
@@ -100,9 +100,9 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(2, jsonPathObject.getPathTokensWithoutQuery().size());
-        assertEquals(new MapToken("key"), jsonPathObject.getPathTokensWithoutQuery().get(0));
-        assertEquals(new ListToken(2), jsonPathObject.getPathTokensWithoutQuery().get(1));
+        assertEquals(2, jsonPathObject.getTokensNotRequiringSecondStepQuery().size());
+        assertEquals(new MapToken("key"), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(0));
+        assertEquals(new ListToken(2), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(1));
     }
 
     /**
@@ -118,10 +118,10 @@ class JsonPathParserTest {
         } catch (DocumentApiException e) {
             fail("Should not be here, parser should not have thrown error");
         }
-        assertEquals(3, jsonPathObject.getPathTokensWithoutQuery().size());
-        assertEquals(new MapToken("key"), jsonPathObject.getPathTokensWithoutQuery().get(0));
-        assertEquals(new ListToken(1), jsonPathObject.getPathTokensWithoutQuery().get(1));
-        assertEquals(new ListToken(2), jsonPathObject.getPathTokensWithoutQuery().get(2));
+        assertEquals(3, jsonPathObject.getTokensNotRequiringSecondStepQuery().size());
+        assertEquals(new MapToken("key"), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(0));
+        assertEquals(new ListToken(1), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(1));
+        assertEquals(new ListToken(2), jsonPathObject.getTokensNotRequiringSecondStepQuery().get(2));
     }
 
     /**
