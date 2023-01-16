@@ -2,6 +2,7 @@ package com.aerospike.documentapi.util;
 
 import com.aerospike.client.Bin;
 import com.aerospike.client.cdt.CTX;
+import com.aerospike.client.cdt.MapOrder;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.token.ContextAwareToken;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
+import java.util.Map;
 
 @UtilityClass
 public class Utils {
@@ -18,6 +20,14 @@ public class Utils {
             return new Bin(binName, JsonConverters.convertJsonNodeToList(jsonNode));
         } else {
             return new Bin(binName, JsonConverters.convertJsonNodeToMap(jsonNode));
+        }
+    }
+
+    public static Bin createBin(String binName, Object jsonObject) {
+        if (jsonObject instanceof Map) {
+            return new Bin(binName, (Map<?, ?>) jsonObject, MapOrder.KEY_ORDERED);
+        } else {
+            return new Bin(binName, jsonObject);
         }
     }
 

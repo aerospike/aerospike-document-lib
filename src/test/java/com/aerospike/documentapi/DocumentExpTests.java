@@ -108,7 +108,7 @@ class DocumentExpTests extends BaseTestConfig {
 
         List<KeyRecord> keyRecords = recordSetToList(client.query(queryPolicy, statement()));
         assertEquals(1, keyRecords.size());
-        assertEquals("key2", keyRecords.get(0).key.userKey.getObject());
+        assertEquals(JSON_EXAMPLE_KEY, keyRecords.get(0).key.userKey.getObject());
     }
 
     @Test

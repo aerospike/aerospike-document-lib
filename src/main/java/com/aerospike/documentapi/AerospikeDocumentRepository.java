@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.aerospike.documentapi.util.Utils.createBin;
 import static com.aerospike.documentapi.util.Utils.getPathDetails;
 
 class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
@@ -102,8 +103,8 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         // If there are no parts, put the full document
         if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             operations = binNames.stream()
-                    .map(bn -> {
-                        Bin bin = new Bin(bn, jsonObject);
+                    .map(binName -> {
+                        Bin bin = createBin(binName, jsonObject);
                         return Operation.put(bin);
                     })
                     .toArray(Operation[]::new);
@@ -132,7 +133,7 @@ class AerospikeDocumentRepository implements IAerospikeDocumentRepository {
         if (jsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             operations = queryResults.entrySet().stream()
                     .map(e -> {
-                        Bin bin = new Bin(e.getKey(), e.getValue());
+                        Bin bin = createBin(e.getKey(), e.getValue());
                         return Operation.put(bin);
                     })
                     .toArray(Operation[]::new);
