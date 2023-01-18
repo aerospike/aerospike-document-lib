@@ -3,11 +3,15 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
+import com.aerospike.client.exp.Exp;
+import com.aerospike.client.exp.Expression;
 import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.Filter;
 import com.aerospike.documentapi.batch.BatchOperation;
+import com.aerospike.documentapi.data.DocumentFilter;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
@@ -15,8 +19,10 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.policy.DocumentPolicy;
 import com.aerospike.documentapi.util.Lut;
+import com.aerospike.documentapi.util.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -185,16 +191,55 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public Stream<KeyResult> query(DocumentQueryStatement queryStatement) {
+    public Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... docFilters) {
+        QueryPolicy policy = new QueryPolicy(queryPolicy);
+        policy.filterExp = getFilterExp(docFilters);
+//        policy.filterExp = Exp.build(DocumentExp.ge("mapBin", queryStatement.getSelectJsonPath(), 100));
+
+        Filter secIndFilter = getSecondaryIndexFilter(docFilters);
         return StreamSupport
                 .stream(Spliterators.spliteratorUnknownSize(
-                        aerospikeDocumentRepository.query(queryPolicy, queryStatement.toStatement()).iterator(),
+                        aerospikeDocumentRepository.query(policy, queryStatement.toStatement(secIndFilter)).iterator(),
                         Spliterator.ORDERED
                 ), false)
                 .map(keyRecord -> new KeyResult(
                         keyRecord.key,
-                        null // TODO: run jayway using queryStatement.getSelectJsonPath() on bin values
+                        getResults(queryStatement.getJsonPath(), keyRecord.record.bins)
                 ));
+    }
+
+    private Expression getFilterExp(DocumentFilter[] docFilters) {
+        if (docFilters == null || docFilters.length == 0) return null;
+        List<Exp> filterExps = Arrays.stream(docFilters)
+                .filter(Objects::nonNull)
+                .map(DocumentFilter::toFilterExpression)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (filterExps.isEmpty()) return null;
+
+        Exp expResult = filterExps.size() == 1 ?
+                filterExps.get(0)
+                : Exp.and(filterExps.toArray(new Exp[0]));
+        return Exp.build(expResult);
+    }
+
+    private Filter getSecondaryIndexFilter(DocumentFilter[] docFilters) {
+        return Arrays.stream(docFilters)
+                .filter(Objects::nonNull)
+                .filter(docFilter -> docFilter.toFilter() != null)
+                .findFirst()
+                .map(DocumentFilter::toFilter)
+                .orElse(null);
+    }
+
+    private Object getResults(String jsonPath, Map<String, Object> bins) {
+        if (Utils.isBlank(jsonPath)) return null;
+
+        return bins.values().stream()
+                .map(val -> JsonPathQuery.read(val, jsonPath))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private WritePolicy getLutPolicy(Map<String, Object> result) {

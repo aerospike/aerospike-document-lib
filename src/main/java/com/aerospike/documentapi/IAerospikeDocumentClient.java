@@ -3,6 +3,7 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
+import com.aerospike.documentapi.data.DocumentFilter;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -123,5 +124,5 @@ public interface IAerospikeDocumentClient {
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel);
 
-    Stream<KeyResult> query(DocumentQueryStatement queryStatement);
+    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... documentFilters);
 }

@@ -79,10 +79,10 @@ public class JsonPathParser {
      * Given a list of path parts, convert this to the list of contexts you would need
      * to retrieve the JSON path represented by the list of path parts.
      *
-     * @param tokens pathParts list to convert.
+     * @param tokens tokens list to convert.
      * @return an array of contexts (CTXs).
      */
-    public static CTX[] pathPartsToContextArray(List<ContextAwareToken> tokens) {
+    public static CTX[] pathTokensToContextArray(List<ContextAwareToken> tokens) {
         return tokens.stream()
                 .map(ContextAwareToken::toAerospikeContext)
                 .toArray(CTX[]::new);

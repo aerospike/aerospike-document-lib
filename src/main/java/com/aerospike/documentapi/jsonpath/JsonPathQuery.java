@@ -33,6 +33,19 @@ public class JsonPathQuery {
         }
     }
 
+    public static Object read(Object json, String jsonPath) {
+        validateNotNull(json);
+
+        try {
+            String resultJson = JsonConverters.writeValueAsString(json);
+            return JsonPath.read(resultJson, jsonPath);
+        } catch (PathNotFoundException e) {
+            return null;
+        } catch (Exception e) {
+            throw DocumentApiException.toDocumentException(e);
+        }
+    }
+
     /**
      * Put a value according to JSON path query and return the updated JSON.
      *

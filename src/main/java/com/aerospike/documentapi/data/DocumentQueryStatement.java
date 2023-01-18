@@ -1,5 +1,6 @@
 package com.aerospike.documentapi.data;
 
+import com.aerospike.client.query.Filter;
 import com.aerospike.client.query.Statement;
 import lombok.Builder;
 import lombok.Value;
@@ -13,10 +14,9 @@ public class DocumentQueryStatement {
     String[] binNames;
     long maxRecords;
     int recordsPerSecond;
-    String selectJsonPath;
-    String whereJsonPath;
+    String jsonPath;
 
-    public Statement toStatement() {
+    public Statement toStatement(Filter secIndexFilter) {
         Statement statement = new Statement();
         statement.setNamespace(namespace);
         statement.setSetName(setName);
@@ -24,7 +24,7 @@ public class DocumentQueryStatement {
         statement.setBinNames(binNames);
         statement.setMaxRecords(maxRecords);
         statement.setRecordsPerSecond(recordsPerSecond);
-        statement.setFilter(null); // TODO: create a Filter out of the whereJsonPath field
+        statement.setFilter(secIndexFilter);
         return statement;
     }
 }

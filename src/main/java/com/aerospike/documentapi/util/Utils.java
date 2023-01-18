@@ -42,7 +42,7 @@ public class Utils {
         ContextAwareToken finalToken = modify ? JsonPathParser.extractLastPathPartAndModifyList(tokens)
                 : JsonPathParser.extractLastPathPart(tokens);
         // Then turn the rest into the contexts representation
-        CTX[] ctxArray = JsonPathParser.pathPartsToContextArray(tokens);
+        CTX[] ctxArray = JsonPathParser.pathTokensToContextArray(tokens);
 
         return new PathDetails(finalToken, ctxArray);
     }
