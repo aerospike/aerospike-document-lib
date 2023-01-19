@@ -12,8 +12,6 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.token.ContextAwareToken;
 import com.aerospike.documentapi.token.ListToken;
 import com.aerospike.documentapi.token.MapToken;
-import com.aerospike.documentapi.token.Token;
-import com.aerospike.documentapi.token.TokenType;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
@@ -21,15 +19,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>Utility class for converting JSON path to FilterExp.</p>
+ * Utility class for converting JSON path to Aerospike {@link Exp}.
+ *
  * <p>Supported JSON paths: containing only map and/or array elements,
  * without wildcards, recursive descent, filter expressions, functions and scripts.
+ *
  * <p>Examples of supported JSON paths: </p>
  * <ul>
  * <li>$.store.book,</li>
  * <li>$[0],</li>
  * <li> $.store.book[0],</li>
- * <li>$.store.book[0][1].title.</li></ul>
+ * <li>$.store.book[0][1].title.</li>
+ * </ul>
+ *
  * <p>Examples of unsupported JSON paths: </p>
  * <ul>
  * <li>$.store.book[*].author, </li>

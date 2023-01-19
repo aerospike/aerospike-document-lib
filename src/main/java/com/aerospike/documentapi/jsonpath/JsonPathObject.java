@@ -1,7 +1,7 @@
 package com.aerospike.documentapi.jsonpath;
 
-import com.aerospike.documentapi.token.Token;
 import com.aerospike.documentapi.token.ContextAwareToken;
+import com.aerospike.documentapi.token.Token;
 import com.aerospike.documentapi.token.TokenType;
 
 import java.util.ArrayList;

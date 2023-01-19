@@ -16,7 +16,7 @@ public class ScanToken extends Token {
     }
 
     public static Optional<Token> match(String strPart) {
-        Token token = null;
+        Token token;
         try {
             token = new ScanToken(strPart);
         } catch (IllegalArgumentException e) {

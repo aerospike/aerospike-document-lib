@@ -12,7 +12,7 @@ public class FilterToken extends Token {
     }
 
     public static Optional<Token> match(String strPart) {
-        Token token = null;
+        Token token;
         try {
             token = new FilterToken(strPart);
         } catch (IllegalArgumentException e) {

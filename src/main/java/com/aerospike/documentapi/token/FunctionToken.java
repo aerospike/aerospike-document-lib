@@ -5,6 +5,7 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import java.util.Optional;
 
 public class FunctionToken extends Token {
+
     public FunctionToken(String strPart) {
         if (JsonPathParser.functionIndication.stream().noneMatch(strPart::contains))
             throw new IllegalArgumentException();
@@ -13,7 +14,7 @@ public class FunctionToken extends Token {
     }
 
     public static Optional<Token> match(String strPart) {
-        Token token = null;
+        Token token;
         try {
             token = new FunctionToken(strPart);
         } catch (IllegalArgumentException e) {

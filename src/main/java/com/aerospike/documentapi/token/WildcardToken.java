@@ -24,7 +24,7 @@ public class WildcardToken extends Token {
     }
 
     public static Optional<Token> match(String strPart) {
-        Token token = null;
+        Token token;
         try {
             token = new WildcardToken(strPart);
         } catch (IllegalArgumentException e) {

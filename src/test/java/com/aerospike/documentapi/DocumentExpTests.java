@@ -51,6 +51,7 @@ class DocumentExpTests extends BaseTestConfig {
     private static final Key QUERY_KEY_2 = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "key2");
     private static final String MAP_BIN_NAME = "mapBin";
     private static final String LIST_BIN_NAME = "listBin";
+
     private final Bin mapBin1 = new Bin(MAP_BIN_NAME, mapBin(0));
     private final Bin listBin1 = new Bin(LIST_BIN_NAME, listBin(0));
     private final Bin mapBin2 = new Bin(MAP_BIN_NAME, mapBin(100));
@@ -350,6 +351,7 @@ class DocumentExpTests extends BaseTestConfig {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void createIndex(
             IAerospikeClient client,
             String namespace,
@@ -358,7 +360,7 @@ class DocumentExpTests extends BaseTestConfig {
             String binName
     ) throws RuntimeException {
         Policy policy = new Policy();
-        policy.socketTimeout = 0; // Do not timeout on index create.
+        policy.socketTimeout = 0; // Do not time out on index create.
 
         try {
             IndexTask task = client.createIndex(policy, namespace, set, indexName, binName,

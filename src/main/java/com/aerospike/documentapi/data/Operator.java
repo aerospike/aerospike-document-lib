@@ -8,26 +8,24 @@ public class Operator {
     }
 
     public static boolean isSimple(String op) {
-        return Arrays.stream(Simple.values()).anyMatch((t) -> t.getName().equalsIgnoreCase(op));
+        return Arrays.stream(Simple.values()).anyMatch(t -> t.getName().equalsIgnoreCase(op));
     }
 
     public static boolean isLogic(String op) {
-        return Arrays.stream(Logic.values()).anyMatch((t) -> t.getName().equalsIgnoreCase(op));
+        return Arrays.stream(Logic.values()).anyMatch(t -> t.getName().equalsIgnoreCase(op));
     }
 
     public static boolean isLogicUnary(String op) {
-        return Arrays.stream(LogicUnary.values()).anyMatch((t) -> t.getName().equalsIgnoreCase(op));
+        return Arrays.stream(LogicUnary.values()).anyMatch(t -> t.getName().equalsIgnoreCase(op));
     }
 
     public static boolean isSpecial(String op) {
-        return Arrays.stream(Special.values()).anyMatch((t) -> t.name().equalsIgnoreCase(op));
+        return Arrays.stream(Special.values()).anyMatch(t -> t.name().equalsIgnoreCase(op));
     }
 
     public static boolean isSpecial(OperatorType op) {
         return isSpecial(op.toString());
     }
-
-    public interface OperatorType {}
 
     public enum Simple implements OperatorType {
         GTE(">="),
@@ -43,10 +41,6 @@ public class Operator {
             name = op;
         }
 
-        public String getName() {
-            return this.name;
-        }
-
         public static Simple fromString(String name) {
             for (Simple v : Simple.values()) {
                 if (v.name.equalsIgnoreCase(name)) {
@@ -54,6 +48,10 @@ public class Operator {
                 }
             }
             return null;
+        }
+
+        public String getName() {
+            return this.name;
         }
     }
 
@@ -66,10 +64,6 @@ public class Operator {
             name = op;
         }
 
-        public String getName() {
-            return this.name;
-        }
-
         public static Logic fromString(String name) {
             for (Logic v : Logic.values()) {
                 if (v.name.equalsIgnoreCase(name)) {
@@ -77,6 +71,10 @@ public class Operator {
                 }
             }
             return null;
+        }
+
+        public String getName() {
+            return this.name;
         }
     }
 
@@ -89,10 +87,6 @@ public class Operator {
             name = op;
         }
 
-        public String getName() {
-            return this.name;
-        }
-
         public static LogicUnary fromString(String name) {
             for (LogicUnary v : LogicUnary.values()) {
                 if (v.name.equalsIgnoreCase(name)) {
@@ -100,6 +94,10 @@ public class Operator {
                 }
             }
             return null;
+        }
+
+        public String getName() {
+            return this.name;
         }
     }
 
@@ -119,15 +117,10 @@ public class Operator {
         ANYOF("ANYOF"),
         NONEOF("NONEOF");
 
-
         private final String name;
 
         Special(String op) {
             name = op;
-        }
-
-        public String getName() {
-            return this.name;
         }
 
         public static Special fromString(String name) {
@@ -138,5 +131,12 @@ public class Operator {
             }
             return null;
         }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
+    public interface OperatorType {
     }
 }

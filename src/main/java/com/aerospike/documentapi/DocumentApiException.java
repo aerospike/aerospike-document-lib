@@ -72,5 +72,4 @@ public class DocumentApiException extends RuntimeException {
             super(String.format("Unable to parse '%s' as jsonPath token", jsonPathPart));
         }
     }
-
 }
