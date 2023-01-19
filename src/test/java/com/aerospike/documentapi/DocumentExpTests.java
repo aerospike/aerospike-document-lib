@@ -1,19 +1,25 @@
 package com.aerospike.documentapi;
 
+import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
+import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
+import com.aerospike.client.ResultCode;
 import com.aerospike.client.exp.Exp;
+import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.Filter;
+import com.aerospike.client.query.IndexCollectionType;
+import com.aerospike.client.query.IndexType;
 import com.aerospike.client.query.KeyRecord;
 import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.RegexFlag;
 import com.aerospike.client.query.Statement;
-import com.aerospike.documentapi.data.DocumentFilter;
+import com.aerospike.client.task.IndexTask;
 import com.aerospike.documentapi.data.DocumentFilterExp;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
-import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.util.DocumentExp;
 import net.minidev.json.JSONArray;
 import org.junit.jupiter.api.AfterAll;
@@ -32,7 +38,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.aerospike.documentapi.token.filterExpr.Operator.Simple.GTE;
+import static com.aerospike.documentapi.data.Operator.Simple.GT;
+import static com.aerospike.documentapi.data.Operator.Simple.GTE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,45 +60,19 @@ class DocumentExpTests extends BaseTestConfig {
     void setUp() {
         client.put(writePolicy(), QUERY_KEY_1, mapBin1, listBin1);
         client.put(writePolicy(), QUERY_KEY_2, mapBin2, listBin2);
+        // create collection index on mapKey
+        createIndex(client, AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "mapkey_index", MAP_BIN_NAME);
     }
 
     @AfterAll
     void tearDown() {
         client.delete(null, QUERY_KEY_1);
         client.delete(null, QUERY_KEY_2);
+        client.dropIndex(null, AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "mapkey_index");
     }
 
     @Test
-    void testDocumentExpMap() throws DocumentApiException {
-        String jsonPath = "$.mapKey.k1.k11";
-        Exp exp = DocumentExp.ge(MAP_BIN_NAME, jsonPath, 100);
-        QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
-//        queryPolicy.filterExp = Exp.build(exp);
-
-        List<KeyRecord> keyRecords = recordSetToList(client.query(queryPolicy, statement()));
-        assertEquals(1, keyRecords.size());
-        assertEquals("key2", keyRecords.get(0).key.userKey.getObject());
-    }
-
-    @Test
-    void testDocumentExpMap_2() throws DocumentApiException {
-        String jsonPath = "$.mapKey.k1.k11";
-
-        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
-                .namespace(AEROSPIKE_NAMESPACE)
-                .setName(AEROSPIKE_SET)
-                .jsonPath(jsonPath)
-                .build();
-
-        DocumentFilter filterExp = new DocumentFilterExp(jsonPath, GTE, MAP_BIN_NAME, 100); // TODO: multiple bins
-        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
-        List<KeyResult> keyResults = test.collect(Collectors.toList());
-        assertEquals(1, keyResults.size());
-        assertEquals("key2", keyResults.get(0).getKey().userKey.toString());
-    }
-
-    @Test
-    void testDocumentExpList() throws DocumentApiException {
+    void queryList() throws DocumentApiException {
         String jsonPath = "$.listKey[0].k11";
         Exp exp = DocumentExp.lt(MAP_BIN_NAME, jsonPath, 100);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -103,36 +84,181 @@ class DocumentExpTests extends BaseTestConfig {
     }
 
     @Test
-    void testDocumentExpFilter() throws DocumentApiException {
+    void queryMap() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11";
+
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .jsonPaths(new String[]{jsonPath})
+                .build();
+
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(1, keyResults.size());
+        assertEquals("key2", keyResults.get(0).getKey().userKey.toString());
+    }
+
+    @Test
+    void queryMapSecondaryIndex() throws DocumentApiException {
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .secondaryIndexFilter(Filter.contains(MAP_BIN_NAME, IndexCollectionType.MAPKEYS, "listKey"))
+                .build();
+
+        DocumentFilterExp filterExp = null;
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(2, keyResults.size());
+    }
+
+    @Test
+    void queryMapSecondaryIndexNoMatch() throws DocumentApiException {
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .secondaryIndexFilter(Filter.contains(MAP_BIN_NAME, IndexCollectionType.MAPKEYS, "lllll"))
+                .build();
+
+        DocumentFilterExp filterExp = null;
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(0, keyResults.size());
+    }
+
+    @Test
+    void queryMapSecondaryIndexJsonPathFilterExp() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11";
+
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .jsonPaths(new String[]{jsonPath})
+                .secondaryIndexFilter(Filter.contains(MAP_BIN_NAME, IndexCollectionType.MAPKEYS, "listKey"))
+                .build();
+
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(1, keyResults.size());
+        assertEquals("key2", keyResults.get(0).getKey().userKey.toString());
+    }
+
+    @Test
+    void queryMapMultipleBins() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11";
+
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .binNames(new String[] {LIST_BIN_NAME, MAP_BIN_NAME})
+                .jsonPaths(new String[]{jsonPath})
+                .build();
+
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(1, keyResults.size());
+    }
+
+    @Test
+    void queryMapEmptyResult() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11"; // value exists in MapBin
+
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .binNames(new String[] {LIST_BIN_NAME}) // requiring only ListBin
+                .jsonPaths(new String[]{jsonPath})
+                .build();
+
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(0, keyResults.size());
+    }
+
+    @Test
+    void queryMapMultiplePathsNoFilterExp() throws DocumentApiException {
+        String jsonPathMapKey = "$.mapKey.k1.k11";
+        String jsonPathListKey = "$.listKey[0].k11";
+        String jsonPathListBin = "$[0]]";
+
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .jsonPaths(new String[] {jsonPathMapKey, jsonPathListKey, jsonPathListBin})
+                .build();
+
+        DocumentFilterExp filterExp = null;
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(2, keyResults.size());
+        //noinspection unchecked
+        assertEquals(3, ((Map<String, Object>) keyResults.get(0).getResult()).keySet().size());
+        assertEquals(keyResults.get(0).getResult(), keyResults.get(0).getResult());
+    }
+
+    @Test
+    void queryMapMultiplePathsAndFilterExps() throws DocumentApiException {
+        String jsonPathMapKey = "$.mapKey.k1.k11";
+        String jsonPathListKey = "$.listKey[0].k11";
+        String jsonPathListBin = "$[0]]";
+
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .jsonPaths(new String[] {jsonPathMapKey, jsonPathListKey, jsonPathListBin})
+                .build();
+
+        DocumentFilterExp filterExpMapKeyGte100 = new DocumentFilterExp(MAP_BIN_NAME, jsonPathMapKey, GTE,100);
+        DocumentFilterExp filterExpListKeyGte100 = new DocumentFilterExp(MAP_BIN_NAME, jsonPathListKey, GT,100);
+        DocumentFilterExp filterExpListBin = new DocumentFilterExp(LIST_BIN_NAME, jsonPathListBin, GTE,100);
+        Stream<KeyResult> test = documentClient.query(queryStatement,
+                filterExpMapKeyGte100, filterExpListKeyGte100, filterExpListBin);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(1, keyResults.size());
+        assertEquals("key2", keyResults.get(0).getKey().userKey.toString());
+    }
+
+    @Test
+    void queryFilter() throws DocumentApiException {
         String jsonPath = "$.listKey[?(@.k11 < 20)]";
 
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-//                .binNames(new String[]{mapBin1.name, listBin1.name}) // are bins applicable here?/*addi*/
-                .jsonPath(jsonPath)
+                .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilter filterExp = null;
+        DocumentFilterExp filterExp = null;
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
-        assertEquals(2, keyResults.size());
-        //noinspection unchecked
+        assertEquals(1, keyResults.size());
+
+        @SuppressWarnings("unchecked")
         List<KeyResult> nonEmptyKeyResults = keyResults.stream()
-                .filter(keyRes -> ((List<JSONArray>) keyRes.getResult()).stream().anyMatch(arr -> !arr.isEmpty()))
+                .filter(keyRes -> ((Map<String, JSONArray>) keyRes.getResult()).values()
+                        .stream()
+                        .anyMatch(arr -> !arr.isEmpty()))
                 .collect(Collectors.toList());
         assertEquals(1, nonEmptyKeyResults.size());
+
         @SuppressWarnings("unchecked")
-        List<JSONArray> jsonArrays = ((List<JSONArray>) nonEmptyKeyResults.get(0).getResult());
+        List<JSONArray> jsonArrays = new ArrayList<>(((Map<String, JSONArray>)
+                nonEmptyKeyResults.get(0).getResult()).values());
         assertEquals(1, jsonArrays.size());
-        assertEquals(2, ((Map<?, ?>) jsonArrays.get(0).get(0)).keySet().size());
-        assertTrue(((Map<?, ?>) jsonArrays.get(0).get(0)).containsKey("k12"));
-        assertTrue(((Map<?, ?>) jsonArrays.get(0).get(0)).containsKey("k11"));
+        Map<?, ?> result = ((Map<?, ?>) jsonArrays.get(0).get(0));
+        assertEquals(2, result.keySet().size());
+        assertTrue(result.containsKey("k12"));
+        assertTrue(result.containsKey("k11"));
         assertEquals("key1", nonEmptyKeyResults.get(0).getKey().userKey.toString());
     }
 
     @Test
-    void testDocumentExpListRegex() throws DocumentApiException {
+    void queryListRegex() throws DocumentApiException {
         String jsonPath = "$.listKey[2]";
         Exp exp = DocumentExp.regex(MAP_BIN_NAME, jsonPath, "10.*", RegexFlag.ICASE);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -144,7 +270,7 @@ class DocumentExpTests extends BaseTestConfig {
     }
 
     @Test
-    void testDocumentExpRootList() throws DocumentApiException {
+    void queryRootList() throws DocumentApiException {
         String jsonPath = "$[1]";
         Exp exp = DocumentExp.ne(LIST_BIN_NAME, jsonPath, 102);
         QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
@@ -222,5 +348,27 @@ class DocumentExpTests extends BaseTestConfig {
                 2 + offset,
                 3 + offset
         );
+    }
+
+    private void createIndex(
+            IAerospikeClient client,
+            String namespace,
+            String set,
+            String indexName,
+            String binName
+    ) throws RuntimeException {
+        Policy policy = new Policy();
+        policy.socketTimeout = 0; // Do not timeout on index create.
+
+        try {
+            IndexTask task = client.createIndex(policy, namespace, set, indexName, binName,
+                    IndexType.STRING, IndexCollectionType.MAPKEYS);
+            task.waitTillComplete();
+        }
+        catch (AerospikeException ae) {
+            if (ae.getResultCode() != ResultCode.INDEX_ALREADY_EXISTS) {
+                throw ae;
+            }
+        }
     }
 }

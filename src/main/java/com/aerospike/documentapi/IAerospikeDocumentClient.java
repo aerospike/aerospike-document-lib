@@ -3,7 +3,7 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.data.DocumentFilter;
+import com.aerospike.documentapi.data.DocumentFilterExp;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -124,5 +124,21 @@ public interface IAerospikeDocumentClient {
      */
     List<BatchRecord> batchPerform(List<BatchOperation> batchOperations, boolean parallel);
 
-    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... documentFilters);
+    /**
+     * Perform query.
+     * <p>Filtering can be done by setting one or more of the following items:</p>
+     * <ul>
+     * <li>optional secondary index filter (record level),</li>
+     * <li>optional document filter expressions (record level),</li>
+     * <li>optional bin names (bin level),</li>
+     * <li>optional json paths (inner objects less than a bin if necessary).</li>
+     * </ul>
+     *
+     * @param queryStatement            object for building query definition, storing required bin names, json paths
+     *                                  and secondary index filter
+     * @param documentFilterExpressions filter expressions
+     * @return stream of {@link KeyResult} objects
+     * @throws DocumentApiException if query fails
+     */
+    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilterExp... documentFilterExpressions);
 }

@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
  */
 public class JsonPathParser {
 
-    static final String JSON_PATH_SEPARATOR = ".";
     static final String DOCUMENT_ROOT_TOKEN = "$";
     public static final String DEEP_SCAN = "..";
 
@@ -26,16 +25,6 @@ public class JsonPathParser {
     // This pattern to extract index1,index2 ...
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
 
-    private final List<String> jsonPathQueryIndications = Arrays.asList(
-            "[*]",
-            "..",
-            "[?",
-            ".min()",
-            ".max()",
-            ".avg()",
-            ".stddev()",
-            ".length()"
-    );
     public static final List<String> functionIndication = Arrays.asList(
             "min()",
             "max()",
@@ -45,22 +34,17 @@ public class JsonPathParser {
             "sum()",
             "keys()",
             "first()",
-            "last()" // TODO: concat(), append(), index()
+            "last()"
     );
     public static final String FILTER_START_INDICATION = "[?(";
     public static final String FILTER_END_INDICATION = ")]";
     public static final char DOC_ROOT = '$';
-    public static final char CURR_ELEM = '@';
     public static final char DOT = '.';
     public static final char OPEN_BRACKET = '[';
     public static final char CLOSE_BRACKET = ']';
-    public static final char OPEN_PARENTHESIS = '(';
-    public static final char CLOSE_PARENTHESIS = ')';
     public static final char WILDCARD = '*';
-    public static final char QUESTION_MARK = '?';
-    public static final char EXCLAMATION_MARK = '!';
 
-    // Store our representation of the individual path parts
+    // Store representation of json path tokens
     private final JsonPathObject jsonPathObject;
 
     public JsonPathParser() {
@@ -76,8 +60,8 @@ public class JsonPathParser {
     }
 
     /**
-     * Given a list of path parts, convert this to the list of contexts you would need
-     * to retrieve the JSON path represented by the list of path parts.
+     * Given a list of tokens, convert this to the list of contexts you would need
+     * to retrieve the JSON path represented by the list of tokens.
      *
      * @param tokens tokens list to convert.
      * @return an array of contexts (CTXs).
@@ -127,7 +111,7 @@ public class JsonPathParser {
             String curr = pathList.get(i);
             if (prev != null && curr != null && !curr.isEmpty()
                     && prev.contains(FILTER_START_INDICATION)
-                    && !prev.contains(String.valueOf(CLOSE_BRACKET)) // has "[?", and not ']'
+                    && !prev.contains(String.valueOf(CLOSE_BRACKET)) // has "[?" and not "]"
             ) {
                 if (!filterProcStarted) {
                     int filterBeginningIdx = prev.indexOf(FILTER_START_INDICATION);
@@ -139,7 +123,7 @@ public class JsonPathParser {
                     filterProcStarted = true;
                 }
 
-                if (curr.contains(FILTER_END_INDICATION)) { // TODO: separate to .endsWith() and .contains()?
+                if (curr.contains(FILTER_END_INDICATION)) {
                     filter += DOT + curr;
                     newList.add(filter); // combined filter value between "[?" and "]"
                     prev = curr;

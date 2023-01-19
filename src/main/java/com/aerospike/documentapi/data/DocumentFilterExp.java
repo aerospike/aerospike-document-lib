@@ -1,15 +1,13 @@
 package com.aerospike.documentapi.data;
 
 import com.aerospike.client.exp.Exp;
-import com.aerospike.client.query.Filter;
-import com.aerospike.documentapi.token.filterExpr.Operator;
 import com.aerospike.documentapi.util.DocumentExp;
 
-public class DocumentFilterExp implements DocumentFilter {
+public class DocumentFilterExp {
     
     private Exp exp;
 
-    public DocumentFilterExp(String jsonPath, Operator.Simple operator, String binName, Object value) {
+    public DocumentFilterExp(String binName, String jsonPath, Operator.Simple  operator,Object value) {
         switch (operator) {
 
             case LT:
@@ -37,12 +35,6 @@ public class DocumentFilterExp implements DocumentFilter {
         }
     }
 
-    @Override
-    public Filter toFilter() {
-        return null;
-    }
-
-    @Override
     public Exp toFilterExpression() {
         return exp;
     }

@@ -1,4 +1,4 @@
-package com.aerospike.documentapi.token.filterExpr;
+package com.aerospike.documentapi.data;
 
 import java.util.Arrays;
 
@@ -114,7 +114,7 @@ public class Operator {
         SIZE("SIZE"),
         TYPE("TYPE"),
         MATCHES("MATCHES"),
-        EMPTY("EMPTY"), // TODO: followed by true/false?
+        EMPTY("EMPTY"),
         SUBSETOF("SUBSETOF"),
         ANYOF("ANYOF"),
         NONEOF("NONEOF");

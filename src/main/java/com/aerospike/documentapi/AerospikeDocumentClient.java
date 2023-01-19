@@ -9,9 +9,9 @@ import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.client.query.Filter;
+import com.aerospike.client.query.KeyRecord;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.data.DocumentFilter;
+import com.aerospike.documentapi.data.DocumentFilterExp;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
@@ -19,12 +19,13 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.JsonPathQuery;
 import com.aerospike.documentapi.policy.DocumentPolicy;
 import com.aerospike.documentapi.util.Lut;
-import com.aerospike.documentapi.util.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.minidev.json.JSONArray;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -191,28 +192,37 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... docFilters) {
+    public Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilterExp... docFilters) {
         QueryPolicy policy = new QueryPolicy(queryPolicy);
         policy.filterExp = getFilterExp(docFilters);
-//        policy.filterExp = Exp.build(DocumentExp.ge("mapBin", queryStatement.getSelectJsonPath(), 100));
 
-        Filter secIndFilter = getSecondaryIndexFilter(docFilters);
-        return StreamSupport
-                .stream(Spliterators.spliteratorUnknownSize(
-                        aerospikeDocumentRepository.query(policy, queryStatement.toStatement(secIndFilter)).iterator(),
-                        Spliterator.ORDERED
-                ), false)
-                .map(keyRecord -> new KeyResult(
-                        keyRecord.key,
-                        getResults(queryStatement.getJsonPath(), keyRecord.record.bins)
-                ));
+        Stream<KeyRecord> keyRecords = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                aerospikeDocumentRepository.query(policy, queryStatement.toStatement()).iterator(),
+                Spliterator.ORDERED
+        ), false);
+
+        // no need to parse if there is no jsonPath given
+        if (queryStatement.getJsonPaths() == null || queryStatement.getJsonPaths().length == 0) {
+            return keyRecords.map(keyRecord -> new KeyResult(keyRecord.key, keyRecord.record));
+        }
+
+        // parsing KeyRecords to return the required objects
+        return keyRecords
+                .map(keyRecord -> getKeyResult(keyRecord.key,
+                        getResults(queryStatement.getJsonPaths(), keyRecord.record.bins)))
+                .filter(Objects::nonNull);
     }
 
-    private Expression getFilterExp(DocumentFilter[] docFilters) {
+    private KeyResult getKeyResult(Key key, Map<String, Object> results) {
+        return results.isEmpty() ? null : new KeyResult(key, results);
+    }
+
+    private Expression getFilterExp(DocumentFilterExp[] docFilters) {
         if (docFilters == null || docFilters.length == 0) return null;
+
         List<Exp> filterExps = Arrays.stream(docFilters)
                 .filter(Objects::nonNull)
-                .map(DocumentFilter::toFilterExpression)
+                .map(DocumentFilterExp::toFilterExpression)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
@@ -224,22 +234,21 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         return Exp.build(expResult);
     }
 
-    private Filter getSecondaryIndexFilter(DocumentFilter[] docFilters) {
-        return Arrays.stream(docFilters)
-                .filter(Objects::nonNull)
-                .filter(docFilter -> docFilter.toFilter() != null)
-                .findFirst()
-                .map(DocumentFilter::toFilter)
-                .orElse(null);
+    private Map<String, Object> getResults(String[] jsonPaths, Map<String, Object> bins) {
+        if (jsonPaths == null || jsonPaths.length == 0) return null;
+
+        Map<String, Object> res = new HashMap<>();
+        bins.values()
+                .forEach(binValue -> Arrays.stream(jsonPaths)
+                        .forEach(jsonPath -> addNonNull(jsonPath, JsonPathQuery.read(binValue, jsonPath), res))
+                );
+        return res;
     }
 
-    private Object getResults(String jsonPath, Map<String, Object> bins) {
-        if (Utils.isBlank(jsonPath)) return null;
+    private void addNonNull(String jsonPath, Object readRes, Map<String, Object> res) {
+        if (readRes == null || (readRes instanceof JSONArray && ((JSONArray) readRes).isEmpty())) return;
 
-        return bins.values().stream()
-                .map(val -> JsonPathQuery.read(val, jsonPath))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        res.put(jsonPath, readRes);
     }
 
     private WritePolicy getLutPolicy(Map<String, Object> result) {
