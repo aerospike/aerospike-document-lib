@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
 
-class DocumentAPITest extends BaseTestConfig {
+class DocumentAPITests extends BaseTestConfig {
 
     /**
      * Check that the following paths will correctly retrieve document content when content exists:

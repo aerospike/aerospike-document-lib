@@ -34,20 +34,20 @@ public class AppendBatchOperation extends AbstractBatchOperation {
     public BatchRecord setSecondStepRecordAndGet() {
         Operation[] batchOps;
 
-        if (originalJsonPathObject.getPathParts().isEmpty()) {
+        if (originalJsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             // If there are no parts, you cannot append
             throw new AerospikeException(new DocumentApiException.JsonAppendException(getJsonPath()));
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts(), true);
+                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
                         .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
                         .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
                 // needs to be treated without modifying
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), false);
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), false);
                 batchOps = binNames.stream()
                         .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
                         .filter(Objects::nonNull)
@@ -70,7 +70,7 @@ public class AppendBatchOperation extends AbstractBatchOperation {
 
     protected Operation toAppendOperation(String binName, Object objToAppend, PathDetails pathDetails) {
         try {
-            return pathDetails.getFinalPathPart()
+            return pathDetails.getFinalToken()
                     .toAerospikeAppendOperation(binName, objToAppend, pathDetails.getCtxArray());
         } catch (IllegalArgumentException e) {
             errorBinName = binName;

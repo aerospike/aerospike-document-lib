@@ -24,7 +24,7 @@ public class GetBatchOperation extends AbstractBatchOperation {
 
     @Override
     public BatchRecord setSecondStepRecordAndGet() {
-        if (originalJsonPathObject.getPathParts().isEmpty()) {
+        if (originalJsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             batchRecord = new BatchRead(key, binNames.stream().map(Operation::get).toArray(Operation[]::new));
         } else {
             if (isRequiringJsonPathQuery()) {

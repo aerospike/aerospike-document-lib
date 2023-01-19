@@ -2,20 +2,44 @@ package com.aerospike.documentapi.util;
 
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.ListReturnType;
+import com.aerospike.client.cdt.MapReturnType;
 import com.aerospike.client.exp.Exp;
 import com.aerospike.client.exp.ListExp;
 import com.aerospike.client.exp.MapExp;
+import com.aerospike.documentapi.DocumentApiException;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
-import com.aerospike.documentapi.jsonpath.pathpart.ListPathPart;
-import com.aerospike.documentapi.jsonpath.pathpart.MapPathPart;
-import com.aerospike.documentapi.jsonpath.pathpart.PathPart;
+import com.aerospike.documentapi.token.ContextAwareToken;
+import com.aerospike.documentapi.token.ListToken;
+import com.aerospike.documentapi.token.MapToken;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Utility class for converting JSON path to Aerospike {@link Exp}.
+ *
+ * <p>Supported JSON paths: containing only map and/or array elements,
+ * without wildcards, recursive descent, filter expressions, functions and scripts.
+ *
+ * <p>Examples of supported JSON paths: </p>
+ * <ul>
+ * <li>$.store.book,</li>
+ * <li>$[0],</li>
+ * <li> $.store.book[0],</li>
+ * <li>$.store.book[0][1].title.</li>
+ * </ul>
+ *
+ * <p>Examples of unsupported JSON paths: </p>
+ * <ul>
+ * <li>$.store.book[*].author, </li>
+ * <li>$.store..price, </li>
+ * <li>$.store.book[?(@.price < 10)]</li>
+ * <li>$..book[(@.length-1)]</li>
+ * </ul>
+ */
 @UtilityClass
 public class DocumentExp {
 
@@ -26,10 +50,10 @@ public class DocumentExp {
      * @param jsonPath the JSON path to build a filter expression from.
      * @param value    the value object to compare with.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp eq(String binName, String jsonPath, Object value)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.eq(
                 buildExp(binName, value, jsonPathObject),
@@ -44,10 +68,10 @@ public class DocumentExp {
      * @param jsonPath the JSON path to build a filter expression from.
      * @param value    the value object to compare with.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp ne(String binName, String jsonPath, Object value)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.ne(
                 buildExp(binName, value, jsonPathObject),
@@ -62,10 +86,10 @@ public class DocumentExp {
      * @param jsonPath the JSON path to build a filter expression from.
      * @param value    the value object to compare with.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp gt(String binName, String jsonPath, Object value)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.gt(
                 buildExp(binName, value, jsonPathObject),
@@ -80,10 +104,10 @@ public class DocumentExp {
      * @param jsonPath the JSON path to build a filter expression from.
      * @param value    the value object to compare with.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp ge(String binName, String jsonPath, Object value)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.ge(
                 buildExp(binName, value, jsonPathObject),
@@ -98,10 +122,10 @@ public class DocumentExp {
      * @param jsonPath the JSON path to build a filter expression from.
      * @param value    the value object to compare with.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp lt(String binName, String jsonPath, Object value)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.lt(
                 buildExp(binName, value, jsonPathObject),
@@ -116,10 +140,10 @@ public class DocumentExp {
      * @param jsonPath the JSON path to build a filter expression from.
      * @param value    the value object to compare with.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp le(String binName, String jsonPath, Object value)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.le(
                 buildExp(binName, value, jsonPathObject),
@@ -135,10 +159,10 @@ public class DocumentExp {
      * @param regex    the regular expression string.
      * @param flags    regular expression bit flags. See {@link com.aerospike.client.query.RegexFlag}.
      * @return the generated filter expression.
-     * @throws JsonPathParser.JsonParseException if fails to parse the jsonPath.
+     * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp regex(String binName, String jsonPath, String regex, int flags)
-            throws JsonPathParser.JsonParseException {
+            throws DocumentApiException {
         JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
         return Exp.regexCompare(
                 regex,
@@ -148,26 +172,26 @@ public class DocumentExp {
     }
 
     private static Exp buildExp(String binName, Object value, JsonPathObject jsonPathObject) {
-        List<PathPart> partList = new ArrayList<>(jsonPathObject.getPathParts());
-        PathPart lastPart = partList.remove(partList.size() - 1);
-        PathPart rootPart = partList.isEmpty() ? lastPart : partList.get(0);
+        List<ContextAwareToken> partList = new ArrayList<>(jsonPathObject.getTokensNotRequiringSecondStepQuery());
+        ContextAwareToken lastPart = partList.remove(partList.size() - 1);
+        ContextAwareToken rootPart = partList.isEmpty() ? lastPart : partList.get(0);
         CTX[] ctx = partList.stream()
-                .map(PathPart::toAerospikeContext)
+                .map(ContextAwareToken::toAerospikeContext)
                 .toArray(CTX[]::new);
 
-        if (lastPart instanceof ListPathPart) {
+        if (lastPart instanceof ListToken) {
             return ListExp.getByIndex(
                     ListReturnType.VALUE,
                     getValueType(value),
-                    Exp.val(((ListPathPart) lastPart).getListPosition()),
+                    Exp.val(((ListToken) lastPart).getListPosition()),
                     binExp(binName, rootPart),
                     ctx
             );
-        } else if (lastPart instanceof MapPathPart) {
+        } else if (lastPart instanceof MapToken) {
             return MapExp.getByKey(
-                    ListReturnType.VALUE,
+                    MapReturnType.VALUE,
                     getValueType(value),
-                    Exp.val(((MapPathPart) lastPart).getKey()),
+                    Exp.val(((MapToken) lastPart).getKey()),
                     binExp(binName, rootPart),
                     ctx
             );
@@ -176,8 +200,8 @@ public class DocumentExp {
         }
     }
 
-    private static Exp binExp(String binName, PathPart root) {
-        if (root instanceof ListPathPart) {
+    private static Exp binExp(String binName, ContextAwareToken root) {
+        if (root instanceof ListToken) {
             return Exp.bin(binName, Exp.Type.LIST);
         }
         return Exp.bin(binName, Exp.Type.MAP);
@@ -225,7 +249,7 @@ public class DocumentExp {
         }
     }
 
-    private static JsonPathObject validateJsonPath(JsonPathObject jsonPathObject) {
+    public static JsonPathObject validateJsonPath(JsonPathObject jsonPathObject) {
         if (jsonPathObject.requiresJsonPathQuery()) {
             throw new IllegalArgumentException("A two-step JSON path cannot be converted to a filter expression");
         }

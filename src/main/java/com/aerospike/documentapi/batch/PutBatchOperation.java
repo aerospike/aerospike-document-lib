@@ -34,7 +34,7 @@ public class PutBatchOperation extends AbstractBatchOperation {
     public BatchRecord setSecondStepRecordAndGet() {
         Operation[] batchOps;
 
-        if (originalJsonPathObject.getPathParts().isEmpty()) {
+        if (originalJsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             // If there are no parts, put an empty map in the given bin
             batchOps = getBinNames().stream()
                     .map(MapOperation::clear)
@@ -42,13 +42,13 @@ public class PutBatchOperation extends AbstractBatchOperation {
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getPathParts(), true);
+                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
                         .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
                         .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getPathParts(), true);
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = binNames.stream()
                         .map(binName -> toPutOperation(binName, objToPut, pathDetails))
                         .filter(Objects::nonNull)

@@ -44,7 +44,7 @@ class JsonPathDeepScanTests extends BaseTestConfig {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
         documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonNode);
 
-        // Give me every thing
+        // Give me everything
         String jsonPath = "$..*";
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         Object expectedObject = JsonPath.read(storeJson, jsonPath);
