@@ -93,7 +93,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
@@ -139,7 +139,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .secondaryIndexFilter(Filter.contains(MAP_BIN_NAME, IndexCollectionType.MAPKEYS, "listKey"))
                 .build();
 
-        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
@@ -153,11 +153,11 @@ class DocumentExpTests extends BaseTestConfig {
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-                .binNames(new String[] {LIST_BIN_NAME, MAP_BIN_NAME})
+                .binNames(new String[]{LIST_BIN_NAME, MAP_BIN_NAME})
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
@@ -170,11 +170,11 @@ class DocumentExpTests extends BaseTestConfig {
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-                .binNames(new String[] {LIST_BIN_NAME}) // requiring only ListBin
+                .binNames(new String[]{LIST_BIN_NAME}) // requiring only ListBin
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE,100);
+        DocumentFilterExp filterExp = new DocumentFilterExp(MAP_BIN_NAME, jsonPath, GTE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(0, keyResults.size());
@@ -189,7 +189,7 @@ class DocumentExpTests extends BaseTestConfig {
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-                .jsonPaths(new String[] {jsonPathMapKey, jsonPathListKey, jsonPathListBin})
+                .jsonPaths(new String[]{jsonPathMapKey, jsonPathListKey, jsonPathListBin})
                 .build();
 
         DocumentFilterExp filterExp = null;
@@ -210,12 +210,12 @@ class DocumentExpTests extends BaseTestConfig {
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-                .jsonPaths(new String[] {jsonPathMapKey, jsonPathListKey, jsonPathListBin})
+                .jsonPaths(new String[]{jsonPathMapKey, jsonPathListKey, jsonPathListBin})
                 .build();
 
-        DocumentFilterExp filterExpMapKeyGte100 = new DocumentFilterExp(MAP_BIN_NAME, jsonPathMapKey, GTE,100);
-        DocumentFilterExp filterExpListKeyGte100 = new DocumentFilterExp(MAP_BIN_NAME, jsonPathListKey, GT,100);
-        DocumentFilterExp filterExpListBin = new DocumentFilterExp(LIST_BIN_NAME, jsonPathListBin, GTE,100);
+        DocumentFilterExp filterExpMapKeyGte100 = new DocumentFilterExp(MAP_BIN_NAME, jsonPathMapKey, GTE, 100);
+        DocumentFilterExp filterExpListKeyGte100 = new DocumentFilterExp(MAP_BIN_NAME, jsonPathListKey, GT, 100);
+        DocumentFilterExp filterExpListBin = new DocumentFilterExp(LIST_BIN_NAME, jsonPathListBin, GTE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement,
                 filterExpMapKeyGte100, filterExpListKeyGte100, filterExpListBin);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
@@ -364,8 +364,7 @@ class DocumentExpTests extends BaseTestConfig {
             IndexTask task = client.createIndex(policy, namespace, set, indexName, binName,
                     IndexType.STRING, IndexCollectionType.MAPKEYS);
             task.waitTillComplete();
-        }
-        catch (AerospikeException ae) {
+        } catch (AerospikeException ae) {
             if (ae.getResultCode() != ResultCode.INDEX_ALREADY_EXISTS) {
                 throw ae;
             }

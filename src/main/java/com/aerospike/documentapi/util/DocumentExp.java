@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * <p>Utility class for converting JSON path to FilterExp.</p>
  * <p>Supported JSON paths: containing only map and/or array elements,

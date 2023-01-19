@@ -4,7 +4,7 @@ import com.aerospike.client.exp.Exp;
 import com.aerospike.documentapi.util.DocumentExp;
 
 public class DocumentFilterExp {
-    
+
     private Exp exp;
 
     public DocumentFilterExp(String binName, String jsonPath, Operator.Simple operator, Object value) {

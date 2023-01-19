@@ -11,7 +11,7 @@ public class WildcardToken extends Token {
     private final String LIST_WILDCARD = OPEN_BRACKET + String.valueOf(WILDCARD) + CLOSE_BRACKET;
 
     public WildcardToken(String strPart) {
-        if (!String.valueOf(WILDCARD).equals(strPart) && !LIST_WILDCARD.equals(strPart))
+        if (!String.valueOf(WILDCARD).equals(strPart))
             throw new IllegalArgumentException();
         setString(strPart);
     }
@@ -19,7 +19,8 @@ public class WildcardToken extends Token {
     public WildcardToken(String strPart, boolean inList) {
         if (!String.valueOf(WILDCARD).equals(strPart) && !LIST_WILDCARD.equals(strPart))
             throw new IllegalArgumentException();
-        if (inList) setString(LIST_WILDCARD); else setString(strPart);
+        if (inList) setString(LIST_WILDCARD);
+        else setString(strPart);
     }
 
     public static Optional<Token> match(String strPart) {

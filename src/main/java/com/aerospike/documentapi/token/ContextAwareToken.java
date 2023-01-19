@@ -7,7 +7,7 @@ import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.documentapi.util.Utils;
 
 /**
- * AccessPathPart analysis is ultimately used to create CTX (context) objects and operations
+ * Creating CTX (context) objects and operations.
  */
 public abstract class ContextAwareToken extends Token {
 
