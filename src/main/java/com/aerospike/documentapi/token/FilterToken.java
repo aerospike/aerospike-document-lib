@@ -6,17 +6,19 @@ import java.util.Optional;
 
 public class FilterToken extends Token {
 
-    @Override
-    boolean read(String strPart) {
-        if (!strPart.contains(JsonPathParser.FILTER_START_INDICATION)) return false;
+    public FilterToken(String strPart) {
+        if (!strPart.contains(JsonPathParser.FILTER_START_INDICATION)) throw new IllegalArgumentException();
         setString(strPart);
-
-        return true;
     }
 
     public static Optional<Token> match(String strPart) {
-        Token token = new FilterToken();
-        return token.read(strPart) ? Optional.of(token) : Optional.empty();
+        Token token = null;
+        try {
+            token = new FilterToken(strPart);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+        return Optional.of(token);
     }
 
     @Override

@@ -7,14 +7,22 @@ import static com.aerospike.documentapi.jsonpath.JsonPathParser.DOT;
 
 public class ScanToken extends Token {
 
-    @Override
-    public boolean read(String strPart) {
-        if (!DEEP_SCAN.equals(strPart)) return false;
-
+    public ScanToken(String strPart) {
+        if (!DEEP_SCAN.equals(strPart)) throw new IllegalArgumentException();
         setString(strPart);
+
         // a dot is added during concatenation
         setQueryConcatString(String.valueOf(DOT));
-        return true;
+    }
+
+    public static Optional<Token> match(String strPart) {
+        Token token = null;
+        try {
+            token = new ScanToken(strPart);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+        return Optional.of(token);
     }
 
     @Override
@@ -25,10 +33,5 @@ public class ScanToken extends Token {
     @Override
     public boolean requiresJsonQuery() {
         return true;
-    }
-
-    public static Optional<Token> match(String strPart) {
-        Token token = new ScanToken();
-        return token.read(strPart) ? Optional.of(token) : Optional.empty();
     }
 }

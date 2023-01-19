@@ -25,6 +25,7 @@ public class MapToken extends ContextAwareToken {
 
     public MapToken(String key) {
         this.key = key;
+        setString(key);
     }
 
     static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
@@ -78,13 +79,6 @@ public class MapToken extends ContextAwareToken {
         return TokenType.MAP;
     }
 
-    @Override
-    public boolean read(String strPart) {
-        setString(key);
-
-        return true;
-    }
-
     public static Optional<Token> match(String strPart) {
         Token token;
 
@@ -93,14 +87,12 @@ public class MapToken extends ContextAwareToken {
             // ignoring * wildcard after a dot, it's the same as ending with a .path
             if (!strPart.equals(String.valueOf(WILDCARD)) && !strPart.equals(String.valueOf(DOC_ROOT))) {
                 token = new MapToken(strPart);
-                token.read(strPart);
                 return Optional.of(token);
             }
         } else if (keyMatcher.find()) {
             String key = keyMatcher.group(1);
             if (!key.equals(String.valueOf(DOC_ROOT))) {
                 token = new MapToken(strPart);
-                token.read(strPart);
                 return Optional.of(token);
             }
         }

@@ -28,6 +28,7 @@ public class ListToken extends ContextAwareToken {
 
     public ListToken(int listPosition) {
         this.listPosition = listPosition;
+        setString(OPEN_BRACKET + String.valueOf(listPosition) + CLOSE_BRACKET);
     }
 
     static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[([\\*\\d]+)\\])*$");
@@ -82,32 +83,6 @@ public class ListToken extends ContextAwareToken {
         return TokenType.LIST;
     }
 
-    @Override
-    public boolean read(String strPart) {
-        setString(OPEN_BRACKET + String.valueOf(listPosition) + CLOSE_BRACKET);
-
-        return true;
-    }
-
-    // for matching a single ListToken
-    public static Optional<Token> match(String strPart) {
-        Matcher indexMatcher = INDEX_PATTERN.matcher(strPart);
-        if (indexMatcher.find()) {
-            String res = indexMatcher.group(2);
-            if (res.equals("*")) {
-                Token listWToken = new WildcardToken();
-                ((WildcardToken) listWToken).read(strPart, true);
-                return Optional.of(listWToken);
-            } else {
-                Token listToken = new ListToken(Integer.parseInt(res));
-                listToken.read(strPart);
-                return Optional.of(listToken);
-            }
-        }
-
-        return Optional.empty();
-    }
-
     // For reading a path part into a list of tokens (map, list or wildcard).
     // Appends parsed tokens to a list.
     // Expected form of path part is key[index1][index2].
@@ -117,12 +92,9 @@ public class ListToken extends ContextAwareToken {
 
         Matcher keyMatcher = PATH_PATTERN.matcher(strPart);
         if ((!strPart.contains("[")) && (!strPart.contains("]"))) {
-            // ignoring * wildcard after a dot, it's the same as ending with a .path
-            if (!strPart.equals(String.valueOf(WILDCARD))
-                    && !strPart.equals(String.valueOf(DOC_ROOT))
-            ) {
+            // ignoring * wildcard after a dot
+            if (!strPart.equals(String.valueOf(WILDCARD)) && !strPart.equals(String.valueOf(DOC_ROOT))) {
                 token = new MapToken(strPart);
-                token.read(strPart);
                 list.add(token);
             }
         } else if (keyMatcher.find()) {
@@ -131,7 +103,6 @@ public class ListToken extends ContextAwareToken {
                     && key.length() > 0
                     && key.charAt(0) != OPEN_BRACKET && key.charAt(key.length() - 1) != CLOSE_BRACKET) {
                 token = new MapToken(key);
-                token.read(key);
                 list.add(token);
             }
         }
@@ -140,11 +111,9 @@ public class ListToken extends ContextAwareToken {
         while (indexMatcher.find()) {
             String res = indexMatcher.group(2);
             if (res.equals("*")) {
-                token = new WildcardToken();
-                ((WildcardToken) token).read(res, true);
+                token = new WildcardToken(res, true);
             } else {
                 token = new ListToken(Integer.parseInt(res));
-                token.read(res);
             }
             list.add(token);
         }

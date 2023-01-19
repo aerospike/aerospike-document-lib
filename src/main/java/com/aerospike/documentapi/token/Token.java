@@ -8,7 +8,7 @@ public abstract class Token {
     protected void setString(String string) {
         this.string = string;
         this.queryConcatString = string;
-    };
+    }
 
     protected void setQueryConcatString(String queryConcatString) {
         this.queryConcatString = queryConcatString;
@@ -22,11 +22,9 @@ public abstract class Token {
         return queryConcatString;
     }
 
-    abstract boolean read(String strPart);
-
     public abstract TokenType getType();
 
     public boolean requiresJsonQuery() {
         return false;
-    };
+    }
 }

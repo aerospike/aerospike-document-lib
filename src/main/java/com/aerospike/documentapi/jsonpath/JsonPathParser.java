@@ -197,19 +197,17 @@ public class JsonPathParser {
     }
 
     private List<Token> processDefaultOrFail(String token) {
-        List<Token> list = processToken(
-                Arrays.asList(
-                        MapToken.match(token),
-                        FunctionToken.match(token),
-                        FilterToken.match(token)
-                )
-        );
+        Optional<Token> tokenOpt;
+        tokenOpt = FunctionToken.match(token);
+        if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
-        if (list != null && !list.isEmpty()) {
-            return list;
-        } else {
-            throw new DocumentApiException.JsonPathException(token);
-        }
+        tokenOpt = MapToken.match(token);
+        if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
+
+        tokenOpt = FilterToken.match(token);
+        if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
+
+        throw new DocumentApiException.JsonPathException(token);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -222,34 +220,16 @@ public class JsonPathParser {
     }
 
     private List<Token> processPartWithBracketsOrFail(String token) {
-        List<Token> list = processToken(
-                Arrays.asList(
-                        WildcardToken.match(token),
-                        FilterToken.match(token)
-                )
-        );
-        if (list != null && !list.isEmpty()) {
-            return list;
-        } else {
-            list = ListToken.parseToList(token);
-        }
-        if (list.size() == 0) {
-            throw new DocumentApiException.JsonPathException(token);
-        } else {
-            return list;
-        }
-    }
+        Optional<Token> tokenOpt = WildcardToken.match(token);
+        if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
-    private List<Token> processToken(List<Optional<Token>> list) {
-        List<Token> resList = null;
+        tokenOpt = FilterToken.match(token);
+        if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
-        for (Optional<Token> tokenOpt : list) {
-            if (tokenOpt.isPresent()) {
-                resList = Collections.singletonList(tokenOpt.get());
-            }
-        }
+        List<Token> tokens = ListToken.parseToList(token);
+        if (tokens.size() > 0) return tokens;
 
-        return resList;
+        throw new DocumentApiException.JsonPathException(token);
     }
 
     private void validateJsonPathPrefix(String jsonPath) {

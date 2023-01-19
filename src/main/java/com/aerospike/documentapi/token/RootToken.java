@@ -5,22 +5,23 @@ import java.util.Optional;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.DOC_ROOT;
 
 public class RootToken extends Token {
-
-    @Override
-    public boolean read(String strPart) {
-        if (!String.valueOf(DOC_ROOT).equals(strPart)) return false;
-
+    public RootToken(String strPart) {
+        if (!String.valueOf(DOC_ROOT).equals(strPart)) throw new IllegalArgumentException();
         setString(strPart);
-        return true;
+    }
+
+    public static Optional<Token> match(String strPart) {
+        Token token = null;
+        try {
+            token = new RootToken(strPart);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+        return Optional.of(token);
     }
 
     @Override
     public TokenType getType() {
         return TokenType.ROOT;
-    }
-
-    public static Optional<Token> match(String strPart) {
-        Token token = new RootToken();
-        return token.read(strPart) ? Optional.of(token) : Optional.empty();
     }
 }
