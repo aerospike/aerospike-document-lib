@@ -43,7 +43,7 @@ public class JsonPathObject {
     }
 
     public void addToken(Token token) {
-        // other tokens get here as well after class level requiresJsonPathQuery has been switched to true
+        // other tokens get here as well after class level requiresJsonPathQuery switches to true
         if (token.requiresJsonQuery() || this.requiresJsonPathQuery) {
             addQueryToken(token);
             setRequiresJsonPathQuery(true);

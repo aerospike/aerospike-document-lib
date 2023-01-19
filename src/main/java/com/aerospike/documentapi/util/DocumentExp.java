@@ -20,6 +20,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * <p>Utility class for converting JSON path to FilterExp.</p>
+ * <p>Supported JSON paths: containing only map and/or array elements,
+ * without wildcards, recursive descent, filter expressions, functions and scripts.
+ * <p>Examples of supported JSON paths: </p>
+ * <ul>
+ * <li>$.store.book,</li>
+ * <li>$[0],</li>
+ * <li> $.store.book[0],</li>
+ * <li>$.store.book[0][1].title.</li></ul>
+ * <p>Examples of unsupported JSON paths: </p>
+ * <ul>
+ * <li>$.store.book[*].author, </li>
+ * <li>$.store..price, </li>
+ * <li>$.store.book[?(@.price < 10)]</li>
+ * <li>$..book[(@.length-1)]</li>
+ * </ul>
+ */
 @UtilityClass
 public class DocumentExp {
 
@@ -95,14 +114,6 @@ public class DocumentExp {
         );
     }
 
-    public static Exp ge(String binName, JsonPathObject jsonPathObject, List<Token> leftOperandTokens, Object value)
-            throws DocumentApiException {
-        return Exp.ge(
-                buildExp(binName, value, jsonPathObject, leftOperandTokens),
-                getValueExp(value)
-        );
-    }
-
     /**
      * Create less than (<) expression.
      *
@@ -162,42 +173,6 @@ public class DocumentExp {
     private static Exp buildExp(String binName, Object value, JsonPathObject jsonPathObject) {
         List<ContextAwareToken> partList = new ArrayList<>(jsonPathObject.getTokensNotRequiringSecondStepQuery());
         ContextAwareToken lastPart = partList.remove(partList.size() - 1);
-        ContextAwareToken rootPart = partList.isEmpty() ? lastPart : partList.get(0);
-        CTX[] ctx = partList.stream()
-                .map(ContextAwareToken::toAerospikeContext)
-                .toArray(CTX[]::new);
-
-        if (lastPart instanceof ListToken) {
-            return ListExp.getByIndex(
-                    ListReturnType.VALUE,
-                    getValueType(value),
-                    Exp.val(((ListToken) lastPart).getListPosition()),
-                    binExp(binName, rootPart),
-                    ctx
-            );
-        } else if (lastPart instanceof MapToken) {
-            return MapExp.getByKey(
-                    MapReturnType.VALUE,
-                    getValueType(value),
-                    Exp.val(((MapToken) lastPart).getKey()),
-                    binExp(binName, rootPart),
-                    ctx
-            );
-        } else {
-            throw new IllegalArgumentException("Unexpected PathPart type");
-        }
-    }
-
-    private static Exp buildExp(String binName, Object value, JsonPathObject jsonPathObject, List<Token> leftOperandTokens) {
-        List<ContextAwareToken> partList = new ArrayList<>(jsonPathObject.getTokensNotRequiringSecondStepQuery());
-//        ContextAwareToken lastPart = partList.remove(partList.size() - 1);
-        ContextAwareToken lastPart = null;
-        if (leftOperandTokens != null && !leftOperandTokens.isEmpty()) {
-            Token lastToken = leftOperandTokens.get(leftOperandTokens.size() - 1);
-            if (lastToken.getType() == TokenType.LIST || lastToken.getType() == TokenType.MAP) {
-                lastPart = (ContextAwareToken) lastToken;
-            }
-        }
         ContextAwareToken rootPart = partList.isEmpty() ? lastPart : partList.get(0);
         CTX[] ctx = partList.stream()
                 .map(ContextAwareToken::toAerospikeContext)

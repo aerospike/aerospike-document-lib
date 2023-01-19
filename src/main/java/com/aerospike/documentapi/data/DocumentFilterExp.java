@@ -7,7 +7,7 @@ public class DocumentFilterExp {
     
     private Exp exp;
 
-    public DocumentFilterExp(String binName, String jsonPath, Operator.Simple  operator, Object value) {
+    public DocumentFilterExp(String binName, String jsonPath, Operator.Simple operator, Object value) {
         switch (operator) {
 
             case LT:
@@ -27,10 +27,6 @@ public class DocumentFilterExp {
                 break;
             case NE:
                 exp = DocumentExp.ne(binName, jsonPath, value);
-                break;
-            case TSEQ:
-                break;
-            case TSNE:
                 break;
         }
     }

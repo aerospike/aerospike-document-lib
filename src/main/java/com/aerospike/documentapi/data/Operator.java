@@ -33,9 +33,7 @@ public class Operator {
         GTE(">="),
         LTE("<="),
         EQ("=="),
-        TSEQ("==="), // Type safe equals
         NE("!="),
-        TSNE("!=="), // Type safe not equals
         LT("<"),
         GT(">");
 
@@ -106,6 +104,8 @@ public class Operator {
     }
 
     public enum Special implements OperatorType {
+        TSEQ("==="), // Type safe equals
+        TSNE("!=="), // Type safe not equals
         REGEX("=~"),
         NIN("NIN"),
         IN("IN"),
