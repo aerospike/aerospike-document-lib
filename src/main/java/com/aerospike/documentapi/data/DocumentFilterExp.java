@@ -9,7 +9,6 @@ public class DocumentFilterExp {
 
     public DocumentFilterExp(String binName, String jsonPath, Operator.Simple operator, Object value) {
         switch (operator) {
-
             case LT:
                 exp = DocumentExp.lt(binName, jsonPath, value);
                 break;
