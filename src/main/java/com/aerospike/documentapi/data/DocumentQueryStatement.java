@@ -15,7 +15,7 @@ public class DocumentQueryStatement {
     long maxRecords;
     int recordsPerSecond;
     String[] jsonPaths;
-    Filter secondaryIndexFilter;
+    DocumentFilter documentFilter;
 
     public Statement toStatement() {
         Statement statement = new Statement();
@@ -25,7 +25,7 @@ public class DocumentQueryStatement {
         statement.setBinNames(binNames);
         statement.setMaxRecords(maxRecords);
         statement.setRecordsPerSecond(recordsPerSecond);
-        statement.setFilter(secondaryIndexFilter);
+        statement.setFilter(documentFilter == null ? null : documentFilter.toSecIndexFilter());
         return statement;
     }
 }

@@ -3,7 +3,7 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.data.DocumentFilterExp;
+import com.aerospike.documentapi.data.DocumentFilter;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -140,5 +140,5 @@ public interface IAerospikeDocumentClient {
      * @return stream of {@link KeyResult} objects
      * @throws DocumentApiException if query fails
      */
-    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilterExp... documentFilterExpressions);
+    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... documentFilterExpressions);
 }

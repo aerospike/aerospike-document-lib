@@ -11,7 +11,7 @@ import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.KeyRecord;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.data.DocumentFilterExp;
+import com.aerospike.documentapi.data.DocumentFilter;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
@@ -192,7 +192,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     @Override
-    public Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilterExp... docFilters) {
+    public Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... docFilters) {
         QueryPolicy policy = new QueryPolicy(queryPolicy);
         policy.filterExp = getFilterExp(docFilters);
 
@@ -217,12 +217,12 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         return results.isEmpty() ? null : new KeyResult(key, results);
     }
 
-    private Expression getFilterExp(DocumentFilterExp[] docFilters) {
+    private Expression getFilterExp(DocumentFilter[] docFilters) {
         if (docFilters == null || docFilters.length == 0) return null;
 
         List<Exp> filterExps = Arrays.stream(docFilters)
                 .filter(Objects::nonNull)
-                .map(DocumentFilterExp::toFilterExpression)
+                .map(DocumentFilter::toFilterExpression)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
