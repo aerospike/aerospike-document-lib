@@ -2,30 +2,13 @@ package com.aerospike.documentapi.data;
 
 public enum Operator {
 
-    GTE(">="),
-    LTE("<="),
     EQ("=="),
     NE("!="),
     LT("<"),
     GT(">"),
+    GE(">="),
+    LE("<="),
     REGEX("=~");
-//    AND("&&"),
-//    OR("||"),
-//    NOT_EXISTS("!"),
-//    EXISTS("EXISTS"),
-//    TSEQ("==="), // Type safe equals
-//    TSNE("!=="), // Type safe not equals
-//    NIN("NIN"),
-//    IN("IN"),
-//    CONTAINS("CONTAINS"),
-//    ALL("ALL"),
-//    SIZE("SIZE"),
-//    TYPE("TYPE"),
-//    MATCHES("MATCHES"),
-//    EMPTY("EMPTY"),
-//    SUBSETOF("SUBSETOF"),
-//    ANYOF("ANYOF"),
-//    NONEOF("NONEOF");
 
     private final String name;
 

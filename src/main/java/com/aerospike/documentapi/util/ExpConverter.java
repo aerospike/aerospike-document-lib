@@ -30,7 +30,7 @@ import static com.aerospike.documentapi.util.Utils.validateJsonPathSingleStep;
  * <ul>
  * <li>$.store.book,</li>
  * <li>$[0],</li>
- * <li> $.store.book[0],</li>
+ * <li>$.store.book[0],</li>
  * <li>$.store.book[0][1].title.</li>
  * </ul>
  *

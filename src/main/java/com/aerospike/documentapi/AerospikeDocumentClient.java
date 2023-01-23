@@ -9,10 +9,13 @@ import com.aerospike.client.policy.BatchPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.Filter;
 import com.aerospike.client.query.KeyRecord;
 import com.aerospike.documentapi.batch.BatchOperation;
 import com.aerospike.documentapi.data.DocumentFilter;
+import com.aerospike.documentapi.data.DocumentFilterExp;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
+import com.aerospike.documentapi.data.DocumentFilterSecIndex;
 import com.aerospike.documentapi.data.KeyResult;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
@@ -196,8 +199,9 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
         QueryPolicy policy = new QueryPolicy(queryPolicy);
         policy.filterExp = getFilterExp(docFilters);
 
+        Filter secIndexFilter = getSecIndexFilter(docFilters);
         Stream<KeyRecord> keyRecords = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                aerospikeDocumentRepository.query(policy, queryStatement.toStatement()).iterator(),
+                aerospikeDocumentRepository.query(policy, queryStatement.toStatement(secIndexFilter)).iterator(),
                 Spliterator.ORDERED
         ), false);
 
@@ -213,6 +217,18 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
                 .filter(Objects::nonNull);
     }
 
+    private Filter getSecIndexFilter(DocumentFilter[] docFilters) {
+        if (docFilters == null || docFilters.length == 0) return null;
+
+        return Arrays.stream(docFilters)
+                .filter(Objects::nonNull)
+                .filter(filter -> filter instanceof DocumentFilterSecIndex)
+                .map(filterExp -> ((DocumentFilterSecIndex) filterExp).toSecIndexFilter())
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+    }
+
     private KeyResult getKeyResult(Key key, Map<String, Object> results) {
         return results.isEmpty() ? null : new KeyResult(key, results);
     }
@@ -222,7 +238,8 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         List<Exp> filterExps = Arrays.stream(docFilters)
                 .filter(Objects::nonNull)
-                .map(DocumentFilter::toFilterExpression)
+                .filter(filter -> filter instanceof DocumentFilterExp)
+                .map(filterExp -> ((DocumentFilterExp) filterExp).toFilterExp())
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 

@@ -5,6 +5,8 @@ import com.aerospike.client.Bin;
 import com.aerospike.client.IAerospikeClient;
 import com.aerospike.client.Key;
 import com.aerospike.client.ResultCode;
+import com.aerospike.client.Value;
+import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.exp.Exp;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.QueryPolicy;
@@ -16,8 +18,11 @@ import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.RegexFlag;
 import com.aerospike.client.query.Statement;
 import com.aerospike.client.task.IndexTask;
-import com.aerospike.documentapi.data.DocumentFilter;
+import com.aerospike.documentapi.data.DocFilterExp;
+import com.aerospike.documentapi.data.DocFilterSecIndex;
+import com.aerospike.documentapi.data.DocumentFilterExp;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
+import com.aerospike.documentapi.data.DocumentFilterSecIndex;
 import com.aerospike.documentapi.data.KeyResult;
 import com.aerospike.documentapi.util.ExpConverter;
 import net.minidev.json.JSONArray;
@@ -38,15 +43,17 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.aerospike.documentapi.data.Operator.EQ;
+import static com.aerospike.documentapi.data.Operator.GE;
 import static com.aerospike.documentapi.data.Operator.GT;
-import static com.aerospike.documentapi.data.Operator.GTE;
+import static com.aerospike.documentapi.data.Operator.LT;
 import static com.aerospike.documentapi.data.Operator.REGEX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DocumentExpTests extends BaseTestConfig {
+class DocumentQueryTests extends BaseTestConfig {
 
     private static final Key QUERY_KEY_1 = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "key1");
     private static final Key QUERY_KEY_2 = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "key2");
@@ -62,8 +69,11 @@ class DocumentExpTests extends BaseTestConfig {
     void setUp() {
         client.put(writePolicy(), QUERY_KEY_1, mapBin1, listBin1);
         client.put(writePolicy(), QUERY_KEY_2, mapBin2, listBin2);
-        // create collection index on mapBin
-        createIndex(client, AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "mapkey_index", MAP_BIN_NAME);
+        createIndex(client, AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "mapkey_k1_k11_idx", MAP_BIN_NAME,
+                IndexType.NUMERIC, IndexCollectionType.DEFAULT,
+                CTX.mapKey(Value.get("mapKey")),
+                CTX.mapKey(Value.get("k1")),
+                CTX.mapKey(Value.get("k11")));
     }
 
     @AfterAll
@@ -76,13 +86,17 @@ class DocumentExpTests extends BaseTestConfig {
     @Test
     void queryList() throws DocumentApiException {
         String jsonPath = "$.listKey[0].k11";
-        Exp exp = ExpConverter.lt(MAP_BIN_NAME, jsonPath, 100);
-        QueryPolicy queryPolicy = new QueryPolicy(writePolicy());
-        queryPolicy.filterExp = Exp.build(exp);
+        DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                .namespace(AEROSPIKE_NAMESPACE)
+                .setName(AEROSPIKE_SET)
+                .jsonPaths(new String[]{jsonPath})
+                .build();
 
-        List<KeyRecord> keyRecords = recordSetToList(client.query(queryPolicy, statement()));
-        assertEquals(1, keyRecords.size());
-        assertEquals("key1", keyRecords.get(0).key.userKey.getObject());
+        DocumentFilterExp filterExp = new DocFilterExp(MAP_BIN_NAME, jsonPath, LT, 100);
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        List<KeyResult> keyResults = test.collect(Collectors.toList());
+        assertEquals(1, keyResults.size());
+        assertEquals("key1", keyResults.get(0).getKey().userKey.getObject());
     }
 
     @Test
@@ -94,7 +108,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilter filterExp = new DocumentFilter(MAP_BIN_NAME, jsonPath, GTE, 100);
+        DocumentFilterExp filterExp = new DocFilterExp(MAP_BIN_NAME, jsonPath, GE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
@@ -104,55 +118,86 @@ class DocumentExpTests extends BaseTestConfig {
     @Test
     void queryMapSecondaryIndex() throws DocumentApiException {
         String jsonPath = "$.mapKey.k1.k11";
-        DocumentFilter secIndexFilter = new DocumentFilter(MAP_BIN_NAME, jsonPath, GTE, 100);
-        secIndexFilter.setIndexCollectionType(IndexCollectionType.MAPKEYS);
 
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-                .documentFilter(secIndexFilter)
                 .build();
 
-        DocumentFilter filterExp = null; // TODO: ability to apply secIndexFilter and FilterExp separately?
-        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        DocumentFilterSecIndex sIndexFilter = new DocFilterSecIndex(MAP_BIN_NAME, jsonPath, GT, 11);
+        Stream<KeyResult> test = documentClient.query(queryStatement, sIndexFilter);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
-        assertEquals(2, keyResults.size());
+        assertEquals(1, keyResults.size());
     }
 
     @Test
     void queryMapSecondaryIndexNoMatch() throws DocumentApiException {
         String jsonPath = "$.mapKey.k1.k11";
-        // secIndexFilter should find nothing as there are only 11 and 111 values of k11
-        DocumentFilter secIndexFilter = new DocumentFilter(MAP_BIN_NAME, jsonPath, EQ, 100);
-//        DocumentFilter secIndexFilter = new DocumentFilter(MAP_BIN_NAME, jsonPath, EQ, "100");
-        secIndexFilter.setIndexCollectionType(IndexCollectionType.MAPKEYS);
+        // there are only 11 and 111 values of k11
+        DocumentFilterSecIndex secIndexFilter = new DocFilterSecIndex(MAP_BIN_NAME, jsonPath, EQ, 100);
 
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
-                .documentFilter(secIndexFilter)
                 .build();
 
-        DocumentFilter filterExp = null;
-        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        Stream<KeyResult> test = documentClient.query(queryStatement, secIndexFilter);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(0, keyResults.size());
     }
 
     @Test
+    void queryMapSecondaryIndexUnsupportedValueTypeDouble() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11";
+        // float and double numbers are not supported
+        try {
+            DocumentFilterSecIndex secIndexFilter = new DocFilterSecIndex(MAP_BIN_NAME, jsonPath, EQ, 110.335);
+
+            DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                    .namespace(AEROSPIKE_NAMESPACE)
+                    .setName(AEROSPIKE_SET)
+                    .jsonPaths(new String[]{jsonPath})
+                    .build();
+
+            Stream<KeyResult> test = documentClient.query(queryStatement, secIndexFilter);
+            fail("IllegalArgumentException should have been thrown");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
+    void queryMapSecondaryIndexUnsupportedValueTypeCollection() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11";
+        // Collections are not supported
+        try {
+            DocumentFilterSecIndex secIndexFilter = new DocFilterSecIndex(MAP_BIN_NAME, jsonPath, EQ,
+                    new ArrayList<Integer>());
+
+            DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                    .namespace(AEROSPIKE_NAMESPACE)
+                    .setName(AEROSPIKE_SET)
+                    .jsonPaths(new String[]{jsonPath})
+                    .build();
+
+            Stream<KeyResult> test = documentClient.query(queryStatement, secIndexFilter);
+            fail("IllegalArgumentException should have been thrown");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
     void queryMapSecondaryIndexJsonPathFilterExp() throws DocumentApiException {
         String jsonPath = "$.mapKey.k1.k11";
-        DocumentFilter filter = new DocumentFilter(MAP_BIN_NAME, jsonPath, GTE, 100);
-        filter.setIndexCollectionType(IndexCollectionType.MAPKEYS);
+        DocumentFilterSecIndex secIndexFilter = new DocFilterSecIndex(MAP_BIN_NAME, jsonPath, GE, 100);
 
         DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
                 .namespace(AEROSPIKE_NAMESPACE)
                 .setName(AEROSPIKE_SET)
                 .jsonPaths(new String[]{jsonPath})
-                .documentFilter(filter)
                 .build();
 
-        Stream<KeyResult> test = documentClient.query(queryStatement, filter);
+        DocumentFilterExp filterExp = new DocFilterExp(MAP_BIN_NAME, jsonPath, GE, 100);
+        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp, secIndexFilter);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
         assertEquals("key2", keyResults.get(0).getKey().userKey.toString());
@@ -168,7 +213,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilter filterExp = new DocumentFilter(MAP_BIN_NAME, jsonPath, GTE, 100);
+        DocumentFilterExp filterExp = new DocFilterExp(MAP_BIN_NAME, jsonPath, GE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
@@ -184,7 +229,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilter filterExp = new DocumentFilter(MAP_BIN_NAME, jsonPath, GTE, 100);
+        DocumentFilterExp filterExp = new DocFilterExp(MAP_BIN_NAME, jsonPath, GE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(0, keyResults.size());
@@ -202,8 +247,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPathMapKey, jsonPathListKey, jsonPathListBin})
                 .build();
 
-        DocumentFilter filterExp = null;
-        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        Stream<KeyResult> test = documentClient.query(queryStatement);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(2, keyResults.size());
         //noinspection unchecked
@@ -223,9 +267,9 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPathMapKey, jsonPathListKey, jsonPathListBin})
                 .build();
 
-        DocumentFilter filterExpMapKeyGte100 = new DocumentFilter(MAP_BIN_NAME, jsonPathMapKey, GTE, 100);
-        DocumentFilter filterExpListKeyGte100 = new DocumentFilter(MAP_BIN_NAME, jsonPathListKey, GT, 100);
-        DocumentFilter filterExpListBin = new DocumentFilter(LIST_BIN_NAME, jsonPathListBin, GTE, 100);
+        DocumentFilterExp filterExpMapKeyGte100 = new DocFilterExp(MAP_BIN_NAME, jsonPathMapKey, GE, 100);
+        DocumentFilterExp filterExpListKeyGte100 = new DocFilterExp(MAP_BIN_NAME, jsonPathListKey, GT, 100);
+        DocumentFilterExp filterExpListBin = new DocFilterExp(LIST_BIN_NAME, jsonPathListBin, GE, 100);
         Stream<KeyResult> test = documentClient.query(queryStatement,
                 filterExpMapKeyGte100, filterExpListKeyGte100, filterExpListBin);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
@@ -243,8 +287,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilter filterExp = null;
-        Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
+        Stream<KeyResult> test = documentClient.query(queryStatement);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(1, keyResults.size());
 
@@ -276,7 +319,7 @@ class DocumentExpTests extends BaseTestConfig {
                 .jsonPaths(new String[]{jsonPath})
                 .build();
 
-        DocumentFilter filterExp = new DocumentFilter(MAP_BIN_NAME, jsonPath, REGEX, "10.*");
+        DocumentFilterExp filterExp = new DocFilterExp(MAP_BIN_NAME, jsonPath, REGEX, "10.*");
         filterExp.setRegexFlags(RegexFlag.ICASE);
         Stream<KeyResult> test = documentClient.query(queryStatement, filterExp);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
@@ -371,14 +414,17 @@ class DocumentExpTests extends BaseTestConfig {
             String namespace,
             String set,
             String indexName,
-            String binName
+            String binName,
+            IndexType idxType,
+            IndexCollectionType collectionType,
+            CTX... ctx
     ) throws RuntimeException {
         Policy policy = new Policy();
         policy.socketTimeout = 0; // Do not time out on index create.
 
         try {
             IndexTask task = client.createIndex(policy, namespace, set, indexName, binName,
-                    IndexType.STRING, IndexCollectionType.MAPKEYS);
+                    idxType, collectionType, ctx);
             task.waitTillComplete();
         } catch (AerospikeException ae) {
             if (ae.getResultCode() != ResultCode.INDEX_ALREADY_EXISTS) {
