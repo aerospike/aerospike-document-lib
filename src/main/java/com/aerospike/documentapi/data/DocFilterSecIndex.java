@@ -33,10 +33,8 @@ public class DocFilterSecIndex implements DocumentFilterSecIndex {
                 return FilterConverter.ge(binName, jsonPath, value, idxCollectionType);
             case EQ:
                 return FilterConverter.eq(binName, jsonPath, value);
-            case NE:
-                throw new UnsupportedOperationException("'Not equals' secondary filter is not supported");
             default:
-                return null;
+                throw new UnsupportedOperationException(String.format("'%s' secondary filter is not supported", operator));
         }
     }
 

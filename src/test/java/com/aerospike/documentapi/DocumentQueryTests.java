@@ -46,6 +46,7 @@ import static com.aerospike.documentapi.data.Operator.EQ;
 import static com.aerospike.documentapi.data.Operator.GE;
 import static com.aerospike.documentapi.data.Operator.GT;
 import static com.aerospike.documentapi.data.Operator.LT;
+import static com.aerospike.documentapi.data.Operator.NE;
 import static com.aerospike.documentapi.data.Operator.REGEX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -144,6 +145,24 @@ class DocumentQueryTests extends BaseTestConfig {
         Stream<KeyResult> test = documentClient.query(queryStatement, secIndexFilter);
         List<KeyResult> keyResults = test.collect(Collectors.toList());
         assertEquals(0, keyResults.size());
+    }
+
+    @Test
+    void queryMapSecondaryIndexUnsupportedOperator() throws DocumentApiException {
+        String jsonPath = "$.mapKey.k1.k11";
+        // NE is not supported
+        try {
+            DocumentFilterSecIndex secIndexFilter = new DocFilterSecIndex(MAP_BIN_NAME, jsonPath, NE, 100);
+
+            DocumentQueryStatement queryStatement = DocumentQueryStatement.builder()
+                    .namespace(AEROSPIKE_NAMESPACE)
+                    .setName(AEROSPIKE_SET)
+                    .build();
+
+            Stream<KeyResult> test = documentClient.query(queryStatement, secIndexFilter);
+            fail("IllegalArgumentException should have been thrown");
+        } catch (UnsupportedOperationException ignored) {
+        }
     }
 
     @Test

@@ -222,7 +222,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         return Arrays.stream(docFilters)
                 .filter(Objects::nonNull)
-                .filter(filter -> filter instanceof DocumentFilterSecIndex)
+                .filter(DocumentFilterSecIndex.class::isInstance)
                 .map(filterExp -> ((DocumentFilterSecIndex) filterExp).toSecIndexFilter())
                 .filter(Objects::nonNull)
                 .findFirst()
@@ -238,7 +238,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
 
         List<Exp> filterExps = Arrays.stream(docFilters)
                 .filter(Objects::nonNull)
-                .filter(filter -> filter instanceof DocumentFilterExp)
+                .filter(DocumentFilterExp.class::isInstance)
                 .map(filterExp -> ((DocumentFilterExp) filterExp).toFilterExp())
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -252,7 +252,7 @@ public class AerospikeDocumentClient implements IAerospikeDocumentClient {
     }
 
     private Map<String, Object> getResults(String[] jsonPaths, Map<String, Object> bins) {
-        if (jsonPaths == null || jsonPaths.length == 0) return null;
+        if (jsonPaths == null || jsonPaths.length == 0) return Collections.emptyMap();
 
         Map<String, Object> res = new HashMap<>();
         bins.values()
