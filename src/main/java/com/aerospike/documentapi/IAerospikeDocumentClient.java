@@ -3,7 +3,8 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.data.DocumentFilterExp;
+import com.aerospike.documentapi.data.DocFilterExp;
+import com.aerospike.documentapi.data.DocumentFilter;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -134,11 +135,11 @@ public interface IAerospikeDocumentClient {
      * <li>optional json paths (inner objects less than a bin if necessary).</li>
      * </ul>
      *
-     * @param queryStatement            object for building query definition, storing required bin names, json paths
-     *                                  and secondary index filter
-     * @param documentFilterExpressions filter expressions
+     * @param queryStatement            object for building query definition, storing required bin names and json paths
+     * @param documentFilters filters (can include one secondary index filter and/or one or more filter expressions;
+     *                        if there are multiple filter expressions given they are concatenated using logical AND)
      * @return stream of {@link KeyResult} objects
      * @throws DocumentApiException if query fails
      */
-    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilterExp... documentFilterExpressions);
+    Stream<KeyResult> query(DocumentQueryStatement queryStatement, DocumentFilter... documentFilters);
 }

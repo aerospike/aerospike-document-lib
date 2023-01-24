@@ -1,36 +1,24 @@
 package com.aerospike.documentapi.data;
 
 import com.aerospike.client.exp.Exp;
-import com.aerospike.documentapi.util.DocumentExp;
 
-public class DocumentFilterExp {
+/**
+ * Base interface for creating filter expression.
+ *
+ * <p>For the supported json paths see {@link com.aerospike.documentapi.util.ExpConverter}.</p>
+ * <p>Supported operators: </p>
+ * <ul>
+ * <li>EQ</li>
+ * <li>NE</li>
+ * <li>GT</li>
+ * <li>GE</li>
+ * <li>LT</li>
+ * <li>LE</li>
+ * <li>REGEX</li>
+ * </ul>
+ */
+public interface DocumentFilterExp extends DocumentFilter {
+    Exp toFilterExp();
 
-    private Exp exp;
-
-    public DocumentFilterExp(String binName, String jsonPath, Operator.Simple operator, Object value) {
-        switch (operator) {
-            case LT:
-                exp = DocumentExp.lt(binName, jsonPath, value);
-                break;
-            case GT:
-                exp = DocumentExp.gt(binName, jsonPath, value);
-                break;
-            case LTE:
-                exp = DocumentExp.le(binName, jsonPath, value);
-                break;
-            case GTE:
-                exp = DocumentExp.ge(binName, jsonPath, value);
-                break;
-            case EQ:
-                exp = DocumentExp.eq(binName, jsonPath, value);
-                break;
-            case NE:
-                exp = DocumentExp.ne(binName, jsonPath, value);
-                break;
-        }
-    }
-
-    public Exp toFilterExpression() {
-        return exp;
-    }
+    void setRegexFlags(int regexFlags);
 }

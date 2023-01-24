@@ -3,6 +3,7 @@ package com.aerospike.documentapi.util;
 import com.aerospike.client.Bin;
 import com.aerospike.client.cdt.CTX;
 import com.aerospike.client.cdt.MapOrder;
+import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.token.ContextAwareToken;
@@ -49,5 +50,12 @@ public class Utils {
 
     public static boolean isBlank(String string) {
         return string == null || string.trim().isEmpty();
+    }
+
+    public static JsonPathObject validateJsonPathSingleStep(JsonPathObject jsonPathObject, String msg) {
+        if (jsonPathObject.requiresJsonPathQuery()) {
+            throw new IllegalArgumentException(msg);
+        }
+        return jsonPathObject;
     }
 }

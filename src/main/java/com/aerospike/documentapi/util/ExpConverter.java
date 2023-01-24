@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.aerospike.documentapi.util.Utils.validateJsonPathSingleStep;
+
 /**
  * Utility class for converting JSON path to Aerospike {@link Exp}.
  *
@@ -28,7 +30,7 @@ import java.util.Map;
  * <ul>
  * <li>$.store.book,</li>
  * <li>$[0],</li>
- * <li> $.store.book[0],</li>
+ * <li>$.store.book[0],</li>
  * <li>$.store.book[0][1].title.</li>
  * </ul>
  *
@@ -41,129 +43,129 @@ import java.util.Map;
  * </ul>
  */
 @UtilityClass
-public class DocumentExp {
+public class ExpConverter {
 
     /**
      * Create equal (==) expression.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param value    the value object to compare with.
-     * @return the generated filter expression.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param value    value object to compare with.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp eq(String binName, String jsonPath, Object value)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.eq(
                 buildExp(binName, value, jsonPathObject),
-                getValueExp(value)
+                getExpValue(value)
         );
     }
 
     /**
      * Create not equal (!=) expression.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param value    the value object to compare with.
-     * @return the generated filter expression.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param value    value object to compare with.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp ne(String binName, String jsonPath, Object value)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.ne(
                 buildExp(binName, value, jsonPathObject),
-                getValueExp(value)
+                getExpValue(value)
         );
     }
 
     /**
      * Create greater than (>) expression.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param value    the value object to compare with.
-     * @return the generated filter expression.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param value    value object to compare with.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp gt(String binName, String jsonPath, Object value)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.gt(
                 buildExp(binName, value, jsonPathObject),
-                getValueExp(value)
+                getExpValue(value)
         );
     }
 
     /**
      * Create greater than or equals (>=) expression.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param value    the value object to compare with.
-     * @return the generated filter expression.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param value    value object to compare with.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp ge(String binName, String jsonPath, Object value)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.ge(
                 buildExp(binName, value, jsonPathObject),
-                getValueExp(value)
+                getExpValue(value)
         );
     }
 
     /**
      * Create less than (<) expression.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param value    the value object to compare with.
-     * @return the generated filter expression.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param value    value object to compare with.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp lt(String binName, String jsonPath, Object value)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.lt(
                 buildExp(binName, value, jsonPathObject),
-                getValueExp(value)
+                getExpValue(value)
         );
     }
 
     /**
      * Create less than or equals (<=) expression.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param value    the value object to compare with.
-     * @return the generated filter expression.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param value    value object to compare with.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp le(String binName, String jsonPath, Object value)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.le(
                 buildExp(binName, value, jsonPathObject),
-                getValueExp(value)
+                getExpValue(value)
         );
     }
 
     /**
      * Create expression that performs a regex match on a value specified by a JSON path.
      *
-     * @param binName  the document bin name in a record.
-     * @param jsonPath the JSON path to build a filter expression from.
-     * @param regex    the regular expression string.
+     * @param binName  document bin name in a record.
+     * @param jsonPath JSON path to build a filter expression from.
+     * @param regex    regular expression string.
      * @param flags    regular expression bit flags. See {@link com.aerospike.client.query.RegexFlag}.
-     * @return the generated filter expression.
+     * @return generated filter expression.
      * @throws DocumentApiException if fails to parse the jsonPath.
      */
     public static Exp regex(String binName, String jsonPath, String regex, int flags)
             throws DocumentApiException {
-        JsonPathObject jsonPathObject = validateJsonPath(new JsonPathParser().parse(jsonPath));
+        JsonPathObject jsonPathObject = validateJsonPathSingleStep(new JsonPathParser().parse(jsonPath), errMsg(jsonPath));
         return Exp.regexCompare(
                 regex,
                 flags,
@@ -196,7 +198,7 @@ public class DocumentExp {
                     ctx
             );
         } else {
-            throw new IllegalArgumentException("Unexpected PathPart type");
+            throw new IllegalArgumentException(String.format("Unexpected path token type '%s'", lastPart.getType()));
         }
     }
 
@@ -225,7 +227,7 @@ public class DocumentExp {
         }
     }
 
-    private static Exp getValueExp(Object value) {
+    private static Exp getExpValue(Object value) {
         if (value instanceof Integer) {
             return Exp.val((int) value);
         } else if (value instanceof Long) {
@@ -249,10 +251,7 @@ public class DocumentExp {
         }
     }
 
-    public static JsonPathObject validateJsonPath(JsonPathObject jsonPathObject) {
-        if (jsonPathObject.requiresJsonPathQuery()) {
-            throw new IllegalArgumentException("A two-step JSON path cannot be converted to a filter expression");
-        }
-        return jsonPathObject;
+    private static String errMsg(String jsonPath) {
+        return String.format("Two-step JSON path '%s' cannot be converted to a filter expression", jsonPath);
     }
 }
