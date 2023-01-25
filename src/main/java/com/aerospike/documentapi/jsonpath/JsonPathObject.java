@@ -2,7 +2,6 @@ package com.aerospike.documentapi.jsonpath;
 
 import com.aerospike.documentapi.token.ContextAwareToken;
 import com.aerospike.documentapi.token.Token;
-import com.aerospike.documentapi.token.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,8 +78,23 @@ public class JsonPathObject {
 
     public void appendToJsonPathQuery(Token queryToken) {
         String tokenString = queryToken.getQueryConcatString();
-        jsonPathSecondStepQuery += jsonPathSecondStepQuery.isEmpty()
-                ? queryToken.getType() == TokenType.FUNCTION ? DOT + tokenString : tokenString
-                : DOT + tokenString;
+        switch (queryToken.getType()) {
+            case FUNCTION:
+            case WILDCARD:
+                jsonPathSecondStepQuery += DOT + tokenString;
+                break;
+            case LIST:
+            case LIST_WILDCARD:
+            case SCAN:
+            case FILTER:
+                jsonPathSecondStepQuery += tokenString;
+                break;
+            case MAP:
+            default:
+                jsonPathSecondStepQuery += jsonPathSecondStepQuery.isEmpty()
+                        ? tokenString
+                        : DOT + tokenString;
+                break;
+        }
     }
 }

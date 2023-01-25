@@ -251,7 +251,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         // putting to a new position
         inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
         // putting to a new position in a more complex structure
-        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
+        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key10[4]", PUT));
         // putting to a new key
         inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
 

@@ -24,7 +24,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     void testLength() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        String jsonPath = "$.[*].x1.length()";
+        String jsonPath = "$.*.x1.length()";
         JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertArrayEquals(new Integer[]{5, 5, 5, 5}, result.toArray());
 
@@ -37,7 +37,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     void testMin() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        String jsonPath = "$.[*].x1.min()";
+        String jsonPath = "$.*.x1.min()";
         JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertArrayEquals(new Double[]{1.0, 1.0, 1.0, 1.0}, result.toArray());
 
@@ -50,7 +50,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     void testMax() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        String jsonPath = "$.[*].x1.max()";
+        String jsonPath = "$.*.x1.max()";
         JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertArrayEquals(new Double[]{5.0, 5.0, 5.0, 5.0}, result.toArray());
 
@@ -63,7 +63,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     void testAvg() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        String jsonPath = "$.[*].x1.avg()";
+        String jsonPath = "$.*.x1.avg()";
         JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertArrayEquals(new Double[]{3.0, 3.0, 3.0, 3.0}, result.toArray());
 
@@ -76,7 +76,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
     void testStddev() {
         AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 
-        String jsonPath = "$.[*].x1.stddev()";
+        String jsonPath = "$.*.x1.stddev()";
         JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertArrayEquals(new Double[]{1.4142135623730951, 1.4142135623730951, 1.4142135623730951, 1.4142135623730951},
                 result.toArray());

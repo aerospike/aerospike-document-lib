@@ -85,9 +85,10 @@ public class JsonPathParser {
         pathSplit = Collections.unmodifiableList(combineFilterParts(pathSplit));
 
         List<Token> prev = null;
-        for (String pathPart : pathSplit) {
+        for (int i = 0; i < pathSplit.size(); i++) {
+            String pathPart = pathSplit.get(i);
             List<Token> curr = parseToken(pathPart);
-            if (skipIteration(curr, prev)) {
+            if (skipIteration(curr, prev, pathSplit.size() == i + 1)) {
                 prev = curr;
                 continue;
             }
@@ -135,13 +136,13 @@ public class JsonPathParser {
         return newList;
     }
 
-    private boolean skipIteration(List<Token> curr, List<Token> prev) {
+    private boolean skipIteration(List<Token> curr, List<Token> prev, boolean isLast) {
         boolean res = false;
 
         // if path ends with a map wildcard after a map or a list element like $.example.*, $.example[10].* or $.*
         res = (curr != null && prev != null
                 && curr.size() == 1 && prev.size() == 1
-                && curr.get(0).getType() == TokenType.WILDCARD
+                && curr.get(0).getType() == TokenType.WILDCARD && isLast
                 && curr.get(0).getString().charAt(0) == WILDCARD // "*", not "[*]"
                 && (prev.get(0).getType() == TokenType.MAP || prev.get(0).getType() == TokenType.LIST
                 || prev.get(0).getType() == TokenType.ROOT))

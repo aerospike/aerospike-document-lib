@@ -89,7 +89,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
     }
 
     protected Object firstStepJsonPathQuery(Map.Entry<String, Object> entry) {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException("Raw use of a method that should be called from extending classes");
     }
 
     protected Operation toPutOperation(String binName, Object objToPut, PathDetails pathDetails) {

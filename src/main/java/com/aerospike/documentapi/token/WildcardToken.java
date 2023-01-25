@@ -5,10 +5,11 @@ import java.util.Optional;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.CLOSE_BRACKET;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.OPEN_BRACKET;
 import static com.aerospike.documentapi.jsonpath.JsonPathParser.WILDCARD;
+import static com.aerospike.documentapi.token.TokenType.LIST_WILDCARD;
 
 public class WildcardToken extends Token {
 
-    private final String LIST_WILDCARD = OPEN_BRACKET + String.valueOf(WILDCARD) + CLOSE_BRACKET;
+    private boolean isInList;
 
     public WildcardToken(String strPart) {
         if (!String.valueOf(WILDCARD).equals(strPart))
@@ -17,10 +18,15 @@ public class WildcardToken extends Token {
     }
 
     public WildcardToken(String strPart, boolean inList) {
-        if (!String.valueOf(WILDCARD).equals(strPart) && !LIST_WILDCARD.equals(strPart))
+        String WILDCARD_LIST_ELEM = OPEN_BRACKET + String.valueOf(WILDCARD) + CLOSE_BRACKET;
+        if (!String.valueOf(WILDCARD).equals(strPart) && !WILDCARD_LIST_ELEM.equals(strPart))
             throw new IllegalArgumentException();
-        if (inList) setString(LIST_WILDCARD);
-        else setString(strPart);
+        if (inList) {
+            setString(WILDCARD_LIST_ELEM);
+            isInList = true;
+        } else {
+            setString(strPart);
+        }
     }
 
     public static Optional<Token> match(String strPart) {
@@ -35,7 +41,7 @@ public class WildcardToken extends Token {
 
     @Override
     public TokenType getType() {
-        return TokenType.WILDCARD;
+        return isInList ? LIST_WILDCARD : TokenType.WILDCARD;
     }
 
     @Override
