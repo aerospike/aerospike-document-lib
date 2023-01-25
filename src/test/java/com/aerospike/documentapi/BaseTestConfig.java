@@ -19,7 +19,6 @@ public class BaseTestConfig {
     public static final String AEROSPIKE_SET = "documentAPI";
 
     public static final String JSON_EXAMPLE_KEY = "jsonExampleKey";
-    public static final String JSON_EXAMPLE_BIN = "jsonExampleBin";
     public static final String DOCUMENT_BIN_NAME = "documentBin";
 
     public static final Key TEST_AEROSPIKE_KEY = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY);

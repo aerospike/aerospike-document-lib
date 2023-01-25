@@ -10,8 +10,6 @@ import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
 import com.aerospike.documentapi.util.Lut;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -124,12 +122,5 @@ public abstract class AbstractBatchOperation implements BatchOperation {
         }
 
         return new BatchRecord(key, record, -2, false, true);
-    }
-
-    @Value
-    @RequiredArgsConstructor
-    protected static class Bin {
-        String name;
-        Object value;
     }
 }

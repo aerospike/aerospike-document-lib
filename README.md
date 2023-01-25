@@ -5,9 +5,9 @@
 
 This project provides an API for accessing and mutating Aerospike
 [Collection Data Type](https://www.aerospike.com/docs/client/java/index.html) (CDT)
-objects using a [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
+objects using [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
 This effectively provides a document API, with CDT objects used to represent
-JSON documents in the Aerospike database.
+JSON documents in Aerospike database.
 
 ### Documentation
 
@@ -15,8 +15,9 @@ The documentation for this project can be found on [javadoc.io](https://www.java
 
 ### Assumptions
 
- * Familiarity with the Aerospike client for Java (see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
- * Some knowledge of Aerospike CDTs (see reference above)
+* Familiarity with Aerospike client for Java (
+  see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
+* Some knowledge of Aerospike CDTs (see reference above)
 
 ## Getting Started Blog Posts
 
@@ -362,37 +363,63 @@ bins.add(documentBinName2);
 Examples:
 ```java
 // The names of the users of all logout events from each document
-String jsonPath = "$.authentication.logout.name";
-Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+String jsonPath="$.authentication.logout.name";
+        Object objectFromDB=documentClient.get(TEST_AEROSPIKE_KEY,bins,jsonPath);
 
 // Modify the devices of all the authentications (login and logout) to "Mobile"
-jsonPath = "$.authentication..device";
-jsonObject = "Mobile";
-documentClient.put(TEST_AEROSPIKE_KEY, bins, jsonPath, jsonObject);
+        jsonPath="$.authentication..device";
+        jsonObject="Mobile";
+        documentClient.put(TEST_AEROSPIKE_KEY,bins,jsonPath,jsonObject);
 
 // Delete the user field from all of the authentications (login and logout)
-jsonPath = "$.authentication..user";
-documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        jsonPath="$.authentication..user";
+        documentClient.delete(TEST_AEROSPIKE_KEY,bins,jsonPath);
 
 // All the logins with "id" greater than 10
-jsonPath = "$.authentication.login[?(@.id > 10)]";
-objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
+        jsonPath="$.authentication.login[?(@.id > 10)]";
+        objectFromDB=documentClient.get(TEST_AEROSPIKE_KEY,bins,jsonPath);
 ```
+
+### JSONPath query operations
+
+Depending on how JSONPath query operations run they can be split into 2 types.
+
+#### 1-step JSONPath query operations
+
+Contain only array and/or map elements.
+
+    Examples: $.store.book, $[0], $.store.book[0], $.store.book[0][1].title.
+
+#### 2-step JSONPath query operations
+
+Contain wildcards, recursive descent, filters, functions, scripts.
+
+    Examples: $.store.book[*].author, $.store..price, $.store.book[?(@.price < 10)], $..book[(@.length-1)].
 
 ## Batch operations
 
 Starting at version `2.0.0` there is support for batch operations.
 
-You can now send operations (GET, PUT, APPEND, DELETE) in batches using json path or JSONPath query
-for single and multiple bins.
+You can now send CRUD operations (PUT, GET, APPEND, DELETE) in batches using JSONPath
+for single and multiple bins. Each operation in a batch is performed on a single Aerospike key.
 
-Keys related limitations:
+Limitations:
 
-- Operations order in a batch is preserved only for the operations with different keys.
-- JSONPath queries operations are allowed in a batch only if they don't have repeating keys.
+- Insertion order is preserved only for those [1-step JSONPath query operations](#1-step-jsonpath-query-operations)
+  that have unique Aerospike keys within a batch.
+- Every [2-step JSONPath query operation](#2-step-jsonpath-query-operations) should have unique Aerospike key
+  within a batch.
 
-A use-case example can be sending a batch of operations at once to update bins storing events, 
-or append values for single bins storing analytics, when many steps of the same kind need to be executed in sequence.
+Results are returned as a List of BatchRecord objects, each of them contains the following:
+
+- Aerospike key.
+- Result code (0 in case of successful finishing, otherwise another predefined value
+  referring to a particular exception / error).
+- Record (contains requested values mapped to their respective bin names,
+  relevant in case of the GET operation).
+
+A use-case example can be sending a batch of operations at once to update bins storing events,
+or append values for single bins storing analytics, when many steps of the same kind need to be performed.
 
 ### Using batch operations
 
@@ -450,17 +477,19 @@ String binName1 = "events1Bin";
 String binName2 = "events2Bin";
 List<String> bins = new ArrayList<>();
 bins.add(binName1);
-bins.add(binName2);
-BatchOperation operation7 = new GetBatchOperation(
-    key7,
-    bins,
-    "$.authentication.logout.name"
-);
+        bins.add(binName2);
+        BatchOperation operation7=new GetBatchOperation(
+        key7,
+        bins,
+        "$.authentication.logout.name"
+        );
 
-// Collecting operations
-List<BatchOperation> batchOpsList = new ArrayList<>();
-batchOpsList.add(operation1, operation2, operation3, operation4, operation5, operation6, operation7);
-documentClient.batchPerform(batchOpsList, true);
+// Collecting operations and running
+        List<BatchOperation> batchOpsList=new ArrayList<>();
+        batchOpsList.add(operation1,operation2,operation3,operation4,operation5,operation6,operation7);
+        List<BatchRecord> results=documentClient.batchPerform(batchOpsList,true);
+// Checking that all operations finished successfully
+        assertEquals(0,results.stream().filter(res->res.resultCode!=0).count());
 ```
 
 

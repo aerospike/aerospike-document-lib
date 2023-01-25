@@ -20,11 +20,6 @@ public class JsonPathParser {
     static final String DOCUMENT_ROOT_TOKEN = "$";
     public static final String DEEP_SCAN = "..";
 
-    // Paths should match this pattern i.e. key[index1][index2]...
-    static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
-    // This pattern to extract index1,index2 ...
-    static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
-
     public static final List<String> functionIndication = Arrays.asList(
             "min()",
             "max()",
@@ -44,7 +39,7 @@ public class JsonPathParser {
     public static final char CLOSE_BRACKET = ']';
     public static final char WILDCARD = '*';
 
-    // Store representation of json path tokens
+    // For storing representation of json path tokens
     private final JsonPathObject jsonPathObject;
 
     public JsonPathParser() {
@@ -207,7 +202,7 @@ public class JsonPathParser {
         tokenOpt = FilterToken.match(token);
         if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
-        throw new DocumentApiException.JsonPathException(token);
+        throw new DocumentApiException.JsonPathParseException(token);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

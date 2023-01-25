@@ -3,7 +3,6 @@ package com.aerospike.documentapi;
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
 import com.aerospike.documentapi.batch.BatchOperation;
-import com.aerospike.documentapi.data.DocFilterExp;
 import com.aerospike.documentapi.data.DocumentFilter;
 import com.aerospike.documentapi.data.DocumentQueryStatement;
 import com.aerospike.documentapi.data.KeyResult;
@@ -113,9 +112,12 @@ public interface IAerospikeDocumentClient {
 
     /**
      * Perform batch operations.
-     * <p>Operations order is preserved only for the operations with different keys.</p>
-     * <p>The order and consistency of one-step (JSON path) operations with the same keys is not guaranteed.</p>
-     * <p>Two-step (JSONPath query) operations with the same keys are not allowed in a batch.</p>
+     *
+     * <p>Insertion order is preserved only for those 1-step operations
+     * (with JSONPath that contains only array and/or map elements)
+     * that have unique Aerospike keys within a batch.</p>
+     * <p>Every 2-step operation (with JSONPath containing wildcards, recursive descent, filters, functions, scripts)
+     * should have unique Aerospike key within a batch.
      *
      * @param batchOperations a list of batch operations to apply.
      * @param parallel        whether batch processing stream operations should run in parallel.
@@ -127,7 +129,8 @@ public interface IAerospikeDocumentClient {
 
     /**
      * Perform query.
-     * <p>Filtering can be done by setting one or more of the following items:</p>
+     *
+     * <p>Filtering can be done by providing one or more of the following:</p>
      * <ul>
      * <li>optional secondary index filter (record level),</li>
      * <li>optional document filter expressions (record level),</li>
@@ -135,7 +138,7 @@ public interface IAerospikeDocumentClient {
      * <li>optional json paths (inner objects less than a bin if necessary).</li>
      * </ul>
      *
-     * @param queryStatement            object for building query definition, storing required bin names and json paths
+     * @param queryStatement  object for building query definition, storing required bin names and json paths
      * @param documentFilters filters (can include one secondary index filter and/or one or more filter expressions;
      *                        if there are multiple filter expressions given they are concatenated using logical AND)
      * @return stream of {@link KeyResult} objects
