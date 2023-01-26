@@ -17,9 +17,7 @@ import java.util.regex.Pattern;
  */
 public class JsonPathParser {
 
-    static final String DOCUMENT_ROOT_TOKEN = "$";
     public static final String DEEP_SCAN = "..";
-
     public static final List<String> functionIndication = Arrays.asList(
             "min()",
             "max()",
@@ -38,7 +36,7 @@ public class JsonPathParser {
     public static final char OPEN_BRACKET = '[';
     public static final char CLOSE_BRACKET = ']';
     public static final char WILDCARD = '*';
-
+    static final String DOCUMENT_ROOT_TOKEN = "$";
     // For storing representation of json path tokens
     private final JsonPathObject jsonPathObject;
 
@@ -101,7 +99,8 @@ public class JsonPathParser {
     private List<String> combineFilterParts(List<String> pathList) {
         List<String> newList = new ArrayList<>();
         String prev = null;
-        String filter = "", preFilter = "";
+        String filter = "";
+        String preFilter = "";
         boolean filterProcStarted = false;
         for (int i = 0; i < pathList.size(); i++) {
             String curr = pathList.get(i);
@@ -137,7 +136,7 @@ public class JsonPathParser {
     }
 
     private boolean skipIteration(List<Token> curr, List<Token> prev, boolean isLast) {
-        boolean res = false;
+        boolean res;
 
         // if path ends with a map wildcard after a map or a list element like $.example.*, $.example[10].* or $.*
         res = (curr != null && prev != null
@@ -155,7 +154,8 @@ public class JsonPathParser {
 
     private void validatePathSplit(String jsonPath, List<String> jsonPathSplit) {
         Iterator<String> iter = jsonPathSplit.listIterator();
-        String prev = null, next = null;
+        String prev = null;
+        String next;
         while (iter.hasNext()) {
             next = iter.next();
             if (next.equals("")) {
@@ -223,7 +223,7 @@ public class JsonPathParser {
         if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
         List<Token> tokens = ListToken.parseToList(token);
-        if (tokens.size() > 0) return tokens;
+        if (!tokens.isEmpty()) return tokens;
 
         throw new DocumentApiException.JsonPathException(token);
     }

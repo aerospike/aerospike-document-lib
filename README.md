@@ -88,8 +88,8 @@ The Aerospike Document Client is instantiated as follows
 * You can create a new AerospikeClient using other constructors - in this example we are using IP and Port only.
 
 ``` java
-   AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
-   AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
+AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 ```
 
 ### Create
@@ -97,11 +97,11 @@ The Aerospike Document Client is instantiated as follows
 We add the example JSON document to our Aerospike database as follows
 
 ``` java
-   JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
-   // For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
-   Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
-   String documentBinName = "documentBin";
-   documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
+JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
+// For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
+Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
+String documentBinName = "documentBin";
+documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
 ```
 
 ### Insert
@@ -109,9 +109,9 @@ We add the example JSON document to our Aerospike database as follows
 We can add filmography for 2019 using the JSONPath ```$.selected_filmography.2019```
 
 ```java
-  List<String> _2019Films = new Vector<String>();
-  _2019Films.add("Ad Astra");
-  documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019",_2019Films);
+List<String> _2019Films = new Vector<String>();
+_2019Films.add("Ad Astra");
+documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019",_2019Films);
 ```
 
 ### Update
@@ -119,7 +119,7 @@ We can add filmography for 2019 using the JSONPath ```$.selected_filmography.201
 Update Jones' IMDB ranking using the JSONPath ```$.imdb_rank.rank```
 
 ``` java
-  documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
+documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
 ```
 
 ### Append
@@ -127,8 +127,8 @@ Update Jones' IMDB ranking using the JSONPath ```$.imdb_rank.rank```
 We can append to 'Rotten Tomatoes' list of best films using the reference ```$.best_films_ranked[0].films```
 
 ```java
-   documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
-   documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
+ documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
+ documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
 ```
 
 ### Delete
@@ -136,7 +136,7 @@ We can append to 'Rotten Tomatoes' list of best films using the reference ```$.b
 We can delete a node e.g. the Medium reviewer's rankings
 
 ```java
-   documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
+documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
 ```
 
 ### Get
@@ -144,7 +144,7 @@ We can delete a node e.g. the Medium reviewer's rankings
 We can find out the name of Jones' best film according to 'Rotten Tomatoes' using the JSONPath ```$.best_films_ranked[0].films[0]```
 
 ```java
-   documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
+documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
 ```
 
 ## JSONPath Queries
@@ -496,8 +496,6 @@ List<BatchRecord> results=documentClient.batchPerform(batchOpsList,true);
 assertEquals(0,results.stream().filter(res->res.resultCode!=0).count());
 ```
 
-
 ## References
 
  * See [AerospikeDocumentClient.java](https://github.com/aerospike/aerospike-document-lib/blob/main/src/main/java/com/aerospike/documentapi/AerospikeDocumentClient.java) for full details of the API.
-
