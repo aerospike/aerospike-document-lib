@@ -472,11 +472,11 @@ BatchOperation operation5 = new GetBatchOperation(
 BatchOperation operation6 = new PutBatchOperation(
     key6,
     Collections.singletonList(documentBinName2),
-    "$.best_filmes_ranked[*].films.name",
+    "$.best_filmes_ranked[*].films[0]",
     "Men In Black 2"
 );
 
-// Get from multiple similarly structured bins
+// Assuming we have multiple similarly structured bins to read from
 String binName1 = "events1Bin";
 String binName2 = "events2Bin";
 String binName3 = "events3Bin";
@@ -487,7 +487,7 @@ bins.add(binName3);
 BatchOperation operation7 = new GetBatchOperation(
     key7,
     bins,
-    "$.imdb_rank.rank.name"
+    "$.imdb_rank.source"
 );
 
 // Collecting operations and running
