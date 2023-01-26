@@ -385,15 +385,19 @@ Depending on how JSONPath query operations run they can be split into 2 types.
 
 #### 1-step JSONPath query operations
 
-Operations that use JSONPath which contains only array and/or map elements.
+Operations that use JSONPath containing only array and/or map elements.
 
-    Examples: $.store.book, $[0], $.store.book[0], $.store.book[0][1].title.
+Examples:
+
+    $.store.book, $[0], $.store.book[0], $.store.book[0][1].title.
 
 #### 2-step JSONPath query operations
 
-Operations that use JSONPath which contains wildcards, recursive descent, filters, functions, scripts.
+Operations that use JSONPath containing wildcards, recursive descent, filters, functions, scripts.
 
-    Examples: $.store.book[*].author, $.store..price, $.store.book[?(@.price < 10)], $..book[(@.length-1)].
+Examples:
+  
+    $.store.book[*].author, $.store..price, $.store.book[?(@.price < 10)], $..book[(@.length-1)].
 
 ## Batch operations
 
