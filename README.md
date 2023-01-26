@@ -127,8 +127,8 @@ documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
 We can append to 'Rotten Tomatoes' list of best films using the reference ```$.best_films_ranked[0].films```
 
 ```java
- documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
- documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
+documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
+documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
 ```
 
 ### Delete
