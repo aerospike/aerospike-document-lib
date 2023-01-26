@@ -409,11 +409,11 @@ Each operation in a batch is performed on a single Aerospike key.
 
 Limitations:
 
-|                                                       | Unique key<br/>within batch | Non-unique key<br/>within batch | Multiple batch operations<br/>having the same key and the same bin(s)  |
-|-------------------------------------------------------|-----------------------------|---------------------------------|------------------------------------------------------------------------|
-| [1-step operation](#1-step-jsonpath-query-operations) | Supported                   | Operations order not guaranteed | Only GET 1-step operations                                             |
-| [2-step operation](#2-step-jsonpath-query-operations) | Supported                   | Not supported                   | Not supported                                                          |
-|                                                       |                             |                                 |                                                                        |
+|                                                       | Unique keys<br/>within batch | Non-unique keys<br/>within batch | Multiple batch operations<br/>having the same key and the same bin(s)  |
+|-------------------------------------------------------|------------------------------|----------------------------------|------------------------------------------------------------------------|
+| [1-step operation](#1-step-jsonpath-query-operations) | Supported                    | Operations order not guaranteed  | Only GET 1-step operations                                             |
+| [2-step operation](#2-step-jsonpath-query-operations) | Supported                    | Not supported                    | Not supported                                                          |
+|                                                       |                              |                                  |                                                                        |
 
 Results are returned as a List of BatchRecord objects, each of them contains the following:
 
