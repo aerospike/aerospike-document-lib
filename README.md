@@ -483,19 +483,19 @@ String binName2 = "events2Bin";
 List<String> bins = new ArrayList<>();
 bins.add(binName1);
 bins.add(binName2);
-BatchOperation operation7=new GetBatchOperation(
+BatchOperation operation7 = new GetBatchOperation(
     key7,
     bins,
     "$.authentication.logout.name"
 );
 
 // Collecting operations and running
-List<BatchOperation> batchOpsList=new ArrayList<>();
+List<BatchOperation> batchOpsList = new ArrayList<>();
 batchOpsList.add(operation1, operation2, operation3, operation4,
         operation5, operation6, operation7);
-List<BatchRecord> results=documentClient.batchPerform(batchOpsList,true);
+List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
 // Checking that all operations finished successfully
-assertEquals(0,results.stream().filter(res->res.resultCode!=0).count());
+assertEquals(0, results.stream().filter(res -> res.resultCode != 0).count());
 ```
 
 ## References
