@@ -413,7 +413,6 @@ Limitations:
 |-------------------------------------------------------|-----------------------------|------------------------------------------------------------|-----------------------------------------------------------------------|
 | [1-step operation](#1-step-jsonpath-query-operations) | Supported                   | Order of operations with non-unique keys is not guaranteed | Only 1-step GET operations, order not guaranteed                      |
 | [2-step operation](#2-step-jsonpath-query-operations) | Supported                   | Not supported                                              | Not supported                                                         |
-|                                                       |                             |                                                            |                                                                       |
 
 Results are returned as a List of BatchRecord objects, each of them contains the following:
 
