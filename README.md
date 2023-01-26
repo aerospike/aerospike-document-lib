@@ -472,20 +472,22 @@ BatchOperation operation5 = new GetBatchOperation(
 BatchOperation operation6 = new PutBatchOperation(
     key6,
     Collections.singletonList(documentBinName2),
-    "$.authentication..device",
-    "Mobile"
+    "$.best_filmes_ranked[*].films.name",
+    "Men In Black 2"
 );
 
 // Get from multiple similarly structured bins
 String binName1 = "events1Bin";
 String binName2 = "events2Bin";
+String binName3 = "events3Bin";
 List<String> bins = new ArrayList<>();
 bins.add(binName1);
 bins.add(binName2);
+bins.add(binName3);
 BatchOperation operation7 = new GetBatchOperation(
     key7,
     bins,
-    "$.authentication.logout.name"
+    "$.imdb_rank.rank.name"
 );
 
 // Collecting operations and running
