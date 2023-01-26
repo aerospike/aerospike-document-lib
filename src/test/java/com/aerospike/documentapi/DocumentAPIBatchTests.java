@@ -2,6 +2,7 @@ package com.aerospike.documentapi;
 
 import com.aerospike.client.BatchRecord;
 import com.aerospike.client.Key;
+import com.aerospike.client.ResultCode;
 import com.aerospike.documentapi.batch.AppendBatchOperation;
 import com.aerospike.documentapi.batch.BatchOperation;
 import com.aerospike.documentapi.batch.DeleteBatchOperation;
@@ -23,6 +24,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.aerospike.client.ResultCode.BIN_TYPE_ERROR;
+import static com.aerospike.client.ResultCode.OP_NOT_APPLICABLE;
+import static com.aerospike.client.ResultCode.PARAMETER_ERROR;
+import static com.aerospike.client.ResultCode.PARSE_ERROR;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.APPEND;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.DELETE;
 import static com.aerospike.documentapi.DocumentAPIBatchTests.BatchOperationEnum.GET;
@@ -73,6 +78,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         });
 
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         int i = 0;
         for (Map.Entry<String, Object> entry : jsonPathsMap.entrySet()) {
@@ -125,13 +131,63 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertTrue(results.stream().anyMatch(res -> res.resultCode != ResultCode.OK));
 
         // making sure all records contain the resulting record == null and the necessary resulting code
-        // PARAMETER_ERROR = 4, BIN_TYPE_ERROR = 12, OP_NOT_APPLICABLE = 26
-        Integer[] errorCodes = {4, 12, 26};
+        Integer[] errorCodes = {PARAMETER_ERROR, BIN_TYPE_ERROR, OP_NOT_APPLICABLE};
         batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
+    }
+
+    /**
+     * Check the correct document content retrieval in a batch of single step operations with the same keys.
+     * <ul>
+     * <li>The whole document.</li>
+     * <li>First level element.</li>
+     * <li>An array element.</li>
+     * <li>A map element.</li>
+     * </ul>
+     */
+    @Test
+    void testPositiveBatchGetSameKeys() {
+        // Load the test document
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
+        Map<String, Object> jsonNodeAsMap = JsonConverters.convertJsonNodeToMap(jsonNode);
+
+        Map<String, Object> jsonPathsMap = new LinkedHashMap<>();
+        jsonPathsMap.put("$", jsonNodeAsMap);
+        jsonPathsMap.put("$.example1", jsonNodeAsMap.get("example1"));
+        jsonPathsMap.put("$.example3[1]", ((List<?>) jsonNodeAsMap.get("example3")).get(1));
+        jsonPathsMap.put("$.example4.key10", ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key10"));
+        Iterator<String> iterator = jsonPathsMap.keySet().iterator();
+
+        List<BatchOperation> batchOpsList = new ArrayList<>();
+
+        // the same key and the same document bin, different jsonPath strings
+        IntStream.range(0, jsonPathsMap.size()).forEachOrdered(i -> {
+            Key key = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY + "1111");
+            String binName = DOCUMENT_BIN_NAME + "22";
+            documentClient.put(key, binName, jsonNode);
+
+            BatchOperation batchOp = new GetBatchOperation(
+                    key,
+                    Collections.singletonList(binName),
+                    iterator.next()
+            );
+            batchOpsList.add(batchOp);
+        });
+
+        // read operations with the same keys referring to the same bins can run in a batch
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
+
+        int i = 0;
+        for (Map.Entry<String, Object> entry : jsonPathsMap.entrySet()) {
+            String binName = batchOpsList.get(i).getBinNames().iterator().next();
+            assertTrue(TestJsonConverters.jsonEquals(batchRecords.get(i).record.getValue(binName), entry.getValue()));
+            i++;
+        }
     }
 
     /**
@@ -163,7 +219,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, results.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         // Check the value put previously
         for (BatchOperation batchOp : batchOpsList) {
@@ -195,7 +252,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         // putting to a new position
         inputsList.add(new BatchOperationInput("$.example2[*].key01[4]", PUT));
         // putting to a new position in a more complex structure
-        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key01[4]", PUT));
+        inputsList.add(new BatchOperationInput("$.example2[*].key07[*].key10[4]", PUT));
         // putting to a new key
         inputsList.add(new BatchOperationInput("$.example3[*].key76", PUT));
 
@@ -210,7 +267,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, results.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         // Check the value put previously
         for (BatchOperation batchOp : batchOpsList) {
@@ -263,7 +321,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertTrue(results.stream().anyMatch(res -> res.resultCode != ResultCode.OK));
 
         // making sure all records contain the resulting record == null and the necessary resulting code
         // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4
@@ -300,7 +359,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, results.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         for (BatchOperation batchOp : batchOpsList) {
             List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
@@ -346,11 +406,11 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertTrue(results.stream().anyMatch(res -> res.resultCode != ResultCode.OK));
 
         // making sure all records contain the resulting record == null and the necessary resulting code
-        // PARAMETER_ERROR = 4, BIN_TYPE_ERROR = 12, OP_NOT_APPLICABLE = 26
-        Integer[] errorCodes = {4, 12, 26};
+        Integer[] errorCodes = {PARAMETER_ERROR, BIN_TYPE_ERROR, OP_NOT_APPLICABLE};
         batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
                 && (Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode))));
     }
@@ -407,7 +467,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                     || originalObject instanceof List);
         }
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, results.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         // checking the deleted objects
         for (BatchOperation batchOp : batchOpsList) {
@@ -460,9 +521,10 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 false
         );
 
-        documentClient.batchPerform(batchOpsList, true);
+        List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+        assertTrue(results.stream().anyMatch(res -> res.resultCode != ResultCode.OK));
 
-        Integer[] errorCodes = {4, 12, 26};
+        Integer[] errorCodes = {PARAMETER_ERROR, BIN_TYPE_ERROR, OP_NOT_APPLICABLE};
         for (BatchOperation batchOp : batchOpsList) {
             // in case of deleting a non-existing key of the existing map
             // the response has a non-null record with resultCode == 0
@@ -473,7 +535,6 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 assertNull(batchOp.getBatchRecord().record.bins.get(batchOp.getBinNames().iterator().next()));
             } else {
                 // making sure all records contain the resulting record == null and the necessary resulting code
-                // PARAMETER_ERROR = 4, BIN_TYPE_ERROR = 12, OP_NOT_APPLICABLE = 26
                 assertNull(batchOp.getBatchRecord().record);
                 assertTrue(Arrays.asList(errorCodes).contains(batchOp.getBatchRecord().resultCode));
             }
@@ -491,7 +552,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 Collections.singletonList(DOCUMENT_BIN_NAME),
                 jsonPath
         );
-        documentClient.batchPerform(Collections.singletonList(batchOp), true);
+        List<BatchRecord> results = documentClient.batchPerform(Collections.singletonList(batchOp), true);
+        assertEquals(0, results.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertTrue(((Map<?, ?>) objectFromDB).isEmpty());
@@ -534,6 +596,89 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         );
 
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
+
+        final Object[] originalObject = new Object[1];
+
+        Map<String, Object> jsonNodeAsMap = JsonConverters.convertJsonNodeToMap(jsonNode);
+        int i = 0;
+        for (BatchRecord batchRecord : batchRecords) {
+            BatchOperation batchOp = batchOpsList.get(i);
+            String binName = batchOp.getBinNames().iterator().next();
+
+            switch (i) {
+                case 0:
+                    assertTrue(TestJsonConverters.jsonEquals(batchRecord.record.getValue(binName), jsonNodeAsMap));
+                    break;
+                case 1:
+                    Object objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath());
+                    // Check that the last element in the list we put to is the initial put value
+                    assertNotNull(objFromDb);
+                    assertTrue(TestJsonConverters.jsonEquals(objFromDb, objToPut));
+                    break;
+                case 2:
+                    List<?> appendedList = (List<?>) documentClient.get(batchOp.getKey(),
+                            batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
+                    );
+                    // Check that the last element in the list we appended to is the value we added
+                    assertNotNull(appendedList);
+                    assertTrue(TestJsonConverters.jsonEquals(appendedList.get(appendedList.size() - 1), objToAppend));
+                    break;
+                case 3:
+                    assertTrue(jsonPathDoesNotExist(
+                            batchOp.getKey(),
+                            binName,
+                            batchOp.getJsonPath(),
+                            originalObject)
+                    );
+                    break;
+            }
+            i++;
+        }
+    }
+
+    /**
+     * Check a batch of different types single step operations (each with a different bin) using the same keys.
+     * <ul>
+     * <li>Reading the whole json.</li>
+     * <li>Putting a new key into an existing map.</li>
+     * <li>Appending to an array referenced by an index.</li>
+     * <li>Deleting a map entry using a map reference.</li>
+     * </ul>
+     */
+    @Test
+    void testPositiveBatchMixSameKeys() {
+        // Load the test document
+        JsonNode jsonNode = JsonConverters.convertStringToJsonNode(testMaterialJson);
+
+        List<BatchOperationInput> inputsList = new ArrayList<>();
+        // reading the whole json
+        inputsList.add(new BatchOperationInput("$", GET));
+        // putting a new key into an existing map
+        inputsList.add(new BatchOperationInput("$.example1.key27", PUT));
+        // appending to an array referenced by an index
+        inputsList.add(new BatchOperationInput("$.example1.key01", APPEND));
+        // deleting a map entry using a map reference
+        inputsList.add(new BatchOperationInput("$.example1.key01", DELETE));
+
+        int objToPut = 86;
+        int objToAppend = 87;
+
+        // adding similar document bins with different jsonPath strings and different operations
+        List<BatchOperation> batchOpsList = createBatchOperations(
+                jsonNode,
+                inputsList,
+                objToPut,
+                objToAppend,
+                true
+        );
+
+        // operations order is not guaranteed
+        // in this example each operation uses a different bin, so no overlapping / conflicts
+        // otherwise (referring to the same bins) write-type operations with the same keys cannot run in a batch
+        List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         final Object[] originalObject = new Object[1];
 
@@ -618,6 +763,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         );
 
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         Object objFromDb, modifiedJson, expectedObject;
         int i = 0;
@@ -637,7 +783,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                     assertTrue(TestJsonConverters.jsonEquals(batchRecord.record.getValue(binName), expectedObject));
                     break;
                 case 3:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
+                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath()
                     );
                     modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
@@ -646,7 +793,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                     assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
                 case 4:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
+                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath()
                     );
                     modifiedJson = JsonPath.parse(testMaterialJson).add(inputsList.get(i).getJsonPath(), objToAppend).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
@@ -655,7 +803,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                     assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
                     break;
                 case 5:
-                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath()
+                    objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                            batchOp.getJsonPath()
                     );
                     modifiedJson = JsonPath.parse(testMaterialJson).delete(inputsList.get(i).getJsonPath()).json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
@@ -708,6 +857,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         );
 
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
+        assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
         Object objFromDb, modifiedJson, expectedObject;
         DocumentContext context = JsonPath.parse(testMaterialJson);
@@ -723,7 +873,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 expectedObject = JsonPath.read(testMaterialJson, inputsList.get(i).getJsonPath());
                 assertTrue(TestJsonConverters.jsonEquals(batchRecord.record.getValue(binName), expectedObject));
             } else if (batchOp.getClass().equals(PUT.getBatchOperationClass())) {
-                objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                        batchOp.getJsonPath());
 
                 modifiedJson = context.set(inputsList.get(i).getJsonPath(), objToPut).json();
                 expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
@@ -731,14 +882,16 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 assertNotNull(objFromDb);
                 assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
             } else if (batchOp.getClass().equals(APPEND.getBatchOperationClass())) {
-                objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                        batchOp.getJsonPath());
                 modifiedJson = context.add(inputsList.get(i).getJsonPath(), objToAppend).json();
                 expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
                 assertNotNull(objFromDb);
                 assertTrue(TestJsonConverters.jsonEquals(objFromDb, expectedObject));
             } else if (batchOp.getClass().equals(DELETE.getBatchOperationClass())) {
-                objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(), batchOp.getJsonPath());
+                objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
+                        batchOp.getJsonPath());
                 modifiedJson = context.delete(inputsList.get(i).getJsonPath()).json();
                 expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
@@ -822,7 +975,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
 
         // making sure batch record contains the correct result code
-        Integer[] errorCodes = {-2, 26};
+        Integer[] errorCodes = {PARSE_ERROR, OP_NOT_APPLICABLE};
         batchRecords.forEach(batchRec -> assertTrue((Arrays.asList(errorCodes).contains(batchRec.resultCode))));
     }
 

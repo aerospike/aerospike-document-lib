@@ -51,7 +51,7 @@ public class DocumentApiException extends RuntimeException {
      */
     public static class JsonPathException extends DocumentApiException {
         public JsonPathException(String jsonString) {
-            super(String.format("'%s' does not match JsonPath format", jsonString));
+            super(String.format("'%s' does not match JSONPath format", jsonString));
         }
     }
 
@@ -69,7 +69,7 @@ public class DocumentApiException extends RuntimeException {
      */
     public static class JsonPathParseException extends DocumentApiException {
         public JsonPathParseException(String jsonPathPart) {
-            super(String.format("Unable to parse '%s' as jsonPath token", jsonPathPart));
+            super(String.format("Unable to parse '%s' as JSONPath token", jsonPathPart));
         }
     }
 }

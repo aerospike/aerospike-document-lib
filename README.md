@@ -5,7 +5,7 @@
 
 This project provides an API for accessing and mutating Aerospike
 [Collection Data Type](https://www.aerospike.com/docs/client/java/index.html) (CDT)
-objects using a [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
+objects using [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
 This effectively provides a document API, with CDT objects used to represent
 JSON documents in the Aerospike database.
 
@@ -15,8 +15,8 @@ The documentation for this project can be found on [javadoc.io](https://www.java
 
 ### Assumptions
 
- * Familiarity with the Aerospike client for Java (see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
- * Some knowledge of Aerospike CDTs (see reference above)
+- Familiarity with the Aerospike client for Java (see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
+- Some knowledge of the Aerospike CDTs (see reference above)
 
 ## Getting Started Blog Posts
 
@@ -36,7 +36,7 @@ Add the Maven dependency:
 <dependency>
   <groupId>com.aerospike</groupId>
   <artifactId>aerospike-document-api</artifactId>
-  <version>1.2.0</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -88,8 +88,8 @@ The Aerospike Document Client is instantiated as follows
 * You can create a new AerospikeClient using other constructors - in this example we are using IP and Port only.
 
 ``` java
-   AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
-   AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
+AerospikeClient client = new AerospikeClient(AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
+AerospikeDocumentClient documentClient = new AerospikeDocumentClient(client);
 ```
 
 ### Create
@@ -97,11 +97,11 @@ The Aerospike Document Client is instantiated as follows
 We add the example JSON document to our Aerospike database as follows
 
 ``` java
-   JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
-   // For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
-   Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
-   String documentBinName = "documentBin";
-   documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
+JsonNode jsonNode = JsonConverters.convertStringToJsonNode(jsonString);
+// For details of Aerospike namespace/set/key see https://www.aerospike.com/docs/architecture/data-model.html
+Key tommyLeeJonesDBKey = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, "tommy-lee-jones.json");
+String documentBinName = "documentBin";
+documentClient.put(tommyLeeJonesDBKey, documentBinName, jsonNode);
 ```
 
 ### Insert
@@ -109,9 +109,9 @@ We add the example JSON document to our Aerospike database as follows
 We can add filmography for 2019 using the JSONPath ```$.selected_filmography.2019```
 
 ```java
-  List<String> _2019Films = new Vector<String>();
-  _2019Films.add("Ad Astra");
-  documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019",_2019Films);
+List<String> _2019Films = new Vector<String>();
+_2019Films.add("Ad Astra");
+documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.selected_filmography.2019",_2019Films);
 ```
 
 ### Update
@@ -119,7 +119,7 @@ We can add filmography for 2019 using the JSONPath ```$.selected_filmography.201
 Update Jones' IMDB ranking using the JSONPath ```$.imdb_rank.rank```
 
 ``` java
-  documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
+documentClient.put(tommyLeeJonesDBKey, documentBinName, "$.imdb_rank.rank",45);
 ```
 
 ### Append
@@ -127,8 +127,8 @@ Update Jones' IMDB ranking using the JSONPath ```$.imdb_rank.rank```
 We can append to 'Rotten Tomatoes' list of best films using the reference ```$.best_films_ranked[0].films```
 
 ```java
-   documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
-   documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
+documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","Rolling Thunder");
+documentClient.append(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films","The Three Burials");
 ```
 
 ### Delete
@@ -136,7 +136,7 @@ We can append to 'Rotten Tomatoes' list of best films using the reference ```$.b
 We can delete a node e.g. the Medium reviewer's rankings
 
 ```java
-   documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
+documentClient.delete(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[1]");
 ```
 
 ### Get
@@ -144,7 +144,7 @@ We can delete a node e.g. the Medium reviewer's rankings
 We can find out the name of Jones' best film according to 'Rotten Tomatoes' using the JSONPath ```$.best_films_ranked[0].films[0]```
 
 ```java
-   documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
+documentClient.get(tommyLeeJonesDBKey, documentBinName, "$.best_films_ranked[0].films[0]");
 ```
 
 ## JSONPath Queries
@@ -379,20 +379,51 @@ jsonPath = "$.authentication.login[?(@.id > 10)]";
 objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 ```
 
+### JSONPath query operations
+
+Depending on how JSONPath query operations run they can be split into 2 types.
+
+#### 1-step JSONPath query operations
+
+Operations that use JSONPath containing only array and/or map elements.
+
+Examples:
+
+    $.store.book, $[0], $.store.book[0], $.store.book[0][1].title.
+
+#### 2-step JSONPath query operations
+
+Operations that use JSONPath containing wildcards, recursive descent, filters, functions, scripts.
+
+Examples:
+  
+    $.store.book[*].author, $.store..price, $.store.book[?(@.price < 10)], $..book[(@.length-1)].
+
 ## Batch operations
 
 Starting at version `2.0.0` there is support for batch operations.
 
-You can now send operations (GET, PUT, APPEND, DELETE) in batches using json path or JSONPath query
-for single and multiple bins.
+You can now send CRUD operations (PUT, GET, APPEND, DELETE) in batches using JSONPath
+for single and multiple bins. 
+Each operation in a batch is performed on a single Aerospike key.
 
-Keys related limitations:
+Limitations:
 
-- Operations order in a batch is preserved only for the operations with different keys.
-- JSONPath queries operations are allowed in a batch only if they don't have repeating keys.
+|                                                       | Unique key<br/>within batch | Non-unique key<br/>within batch                            | Multiple batch operations<br/>having the same key and the same bin(s) |
+|-------------------------------------------------------|-----------------------------|------------------------------------------------------------|-----------------------------------------------------------------------|
+| [1-step operation](#1-step-jsonpath-query-operations) | Supported                   | Order of operations with non-unique keys is not guaranteed | Only 1-step GET operations, order not guaranteed                      |
+| [2-step operation](#2-step-jsonpath-query-operations) | Supported                   | Not supported                                              | Not supported                                                         |
 
-A use-case example can be sending a batch of operations at once to update bins storing events, 
-or append values for single bins storing analytics, when many steps of the same kind need to be executed in sequence.
+Results are returned as a List of BatchRecord objects, each of them contains the following:
+
+- Aerospike key.
+- Result code (0 in case of operation finished successfully or another predefined number
+  referring to a particular exception / error).
+- Record (contains requested values mapped to their respective bin names,
+  relevant in case of the GET operation).
+
+A use-case example can be sending a batch of operations at once to update bins storing events,
+or append values for single bins storing analytics, when many steps of the same kind need to be performed.
 
 ### Using batch operations
 
@@ -441,30 +472,33 @@ BatchOperation operation5 = new GetBatchOperation(
 BatchOperation operation6 = new PutBatchOperation(
     key6,
     Collections.singletonList(documentBinName2),
-    "$.authentication..device",
-    "Mobile"
+    "$.best_filmes_ranked[*].films[0]",
+    "Men In Black 2"
 );
 
-// Get from multiple similarly structured bins
+// Assuming we have multiple similarly structured bins to read from
 String binName1 = "events1Bin";
 String binName2 = "events2Bin";
+String binName3 = "events3Bin";
 List<String> bins = new ArrayList<>();
 bins.add(binName1);
 bins.add(binName2);
+bins.add(binName3);
 BatchOperation operation7 = new GetBatchOperation(
     key7,
     bins,
-    "$.authentication.logout.name"
+    "$.imdb_rank.source"
 );
 
-// Collecting operations
+// Collecting operations and running
 List<BatchOperation> batchOpsList = new ArrayList<>();
-batchOpsList.add(operation1, operation2, operation3, operation4, operation5, operation6, operation7);
-documentClient.batchPerform(batchOpsList, true);
+batchOpsList.add(operation1, operation2, operation3, operation4,
+        operation5, operation6, operation7);
+List<BatchRecord> results = documentClient.batchPerform(batchOpsList, true);
+// Checking that all operations finished successfully
+assertEquals(0, results.stream().filter(res -> res.resultCode != 0).count());
 ```
-
 
 ## References
 
  * See [AerospikeDocumentClient.java](https://github.com/aerospike/aerospike-document-lib/blob/main/src/main/java/com/aerospike/documentapi/AerospikeDocumentClient.java) for full details of the API.
-

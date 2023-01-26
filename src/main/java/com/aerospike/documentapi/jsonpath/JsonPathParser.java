@@ -17,14 +17,7 @@ import java.util.regex.Pattern;
  */
 public class JsonPathParser {
 
-    static final String DOCUMENT_ROOT_TOKEN = "$";
     public static final String DEEP_SCAN = "..";
-
-    // Paths should match this pattern i.e. key[index1][index2]...
-    static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
-    // This pattern to extract index1,index2 ...
-    static final Pattern INDEX_PATTERN = Pattern.compile("(\\[(\\d+)\\])");
-
     public static final List<String> functionIndication = Arrays.asList(
             "min()",
             "max()",
@@ -43,8 +36,8 @@ public class JsonPathParser {
     public static final char OPEN_BRACKET = '[';
     public static final char CLOSE_BRACKET = ']';
     public static final char WILDCARD = '*';
-
-    // Store representation of json path tokens
+    static final String DOCUMENT_ROOT_TOKEN = "$";
+    // For storing representation of json path tokens
     private final JsonPathObject jsonPathObject;
 
     public JsonPathParser() {
@@ -90,9 +83,10 @@ public class JsonPathParser {
         pathSplit = Collections.unmodifiableList(combineFilterParts(pathSplit));
 
         List<Token> prev = null;
-        for (String pathPart : pathSplit) {
+        for (int i = 0; i < pathSplit.size(); i++) {
+            String pathPart = pathSplit.get(i);
             List<Token> curr = parseToken(pathPart);
-            if (skipIteration(curr, prev)) {
+            if (skipIteration(curr, prev, pathSplit.size() == i + 1)) {
                 prev = curr;
                 continue;
             }
@@ -105,7 +99,8 @@ public class JsonPathParser {
     private List<String> combineFilterParts(List<String> pathList) {
         List<String> newList = new ArrayList<>();
         String prev = null;
-        String filter = "", preFilter = "";
+        String filter = "";
+        String preFilter = "";
         boolean filterProcStarted = false;
         for (int i = 0; i < pathList.size(); i++) {
             String curr = pathList.get(i);
@@ -140,13 +135,13 @@ public class JsonPathParser {
         return newList;
     }
 
-    private boolean skipIteration(List<Token> curr, List<Token> prev) {
-        boolean res = false;
+    private boolean skipIteration(List<Token> curr, List<Token> prev, boolean isLast) {
+        boolean res;
 
         // if path ends with a map wildcard after a map or a list element like $.example.*, $.example[10].* or $.*
         res = (curr != null && prev != null
                 && curr.size() == 1 && prev.size() == 1
-                && curr.get(0).getType() == TokenType.WILDCARD
+                && curr.get(0).getType() == TokenType.WILDCARD && isLast
                 && curr.get(0).getString().charAt(0) == WILDCARD // "*", not "[*]"
                 && (prev.get(0).getType() == TokenType.MAP || prev.get(0).getType() == TokenType.LIST
                 || prev.get(0).getType() == TokenType.ROOT))
@@ -159,7 +154,8 @@ public class JsonPathParser {
 
     private void validatePathSplit(String jsonPath, List<String> jsonPathSplit) {
         Iterator<String> iter = jsonPathSplit.listIterator();
-        String prev = null, next = null;
+        String prev = null;
+        String next;
         while (iter.hasNext()) {
             next = iter.next();
             if (next.equals("")) {
@@ -207,7 +203,7 @@ public class JsonPathParser {
         tokenOpt = FilterToken.match(token);
         if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
-        throw new DocumentApiException.JsonPathException(token);
+        throw new DocumentApiException.JsonPathParseException(token);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -227,7 +223,7 @@ public class JsonPathParser {
         if (tokenOpt.isPresent()) return Collections.singletonList(tokenOpt.get());
 
         List<Token> tokens = ListToken.parseToList(token);
-        if (tokens.size() > 0) return tokens;
+        if (!tokens.isEmpty()) return tokens;
 
         throw new DocumentApiException.JsonPathException(token);
     }
