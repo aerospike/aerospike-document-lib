@@ -164,7 +164,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
 
         List<BatchOperation> batchOpsList = new ArrayList<>();
 
-        // the same key and document bin, different jsonPath strings
+        // the same key and the same document bin, different jsonPath strings
         IntStream.range(0, jsonPathsMap.size()).forEachOrdered(i -> {
             Key key = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY + "1111");
             String binName = DOCUMENT_BIN_NAME + "22";
