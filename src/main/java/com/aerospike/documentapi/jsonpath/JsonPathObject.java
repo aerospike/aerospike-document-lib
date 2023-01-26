@@ -79,21 +79,20 @@ public class JsonPathObject {
     public void appendToJsonPathQuery(Token queryToken) {
         String tokenString = queryToken.getQueryConcatString();
         switch (queryToken.getType()) {
-            case FUNCTION:
-            case WILDCARD:
-                jsonPathSecondStepQuery += DOT + tokenString;
-                break;
             case LIST:
             case LIST_WILDCARD:
             case SCAN:
             case FILTER:
                 jsonPathSecondStepQuery += tokenString;
                 break;
+            case ROOT:
+                throw new UnsupportedOperationException(
+                        "Unsupported operation: root token cannot be added to JSONPath query");
             case MAP:
+            case FUNCTION:
+            case WILDCARD:
             default:
-                jsonPathSecondStepQuery += jsonPathSecondStepQuery.isEmpty()
-                        ? tokenString
-                        : DOT + tokenString;
+                jsonPathSecondStepQuery += DOT + tokenString;
                 break;
         }
     }
