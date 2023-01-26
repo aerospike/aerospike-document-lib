@@ -9,8 +9,8 @@ import static com.aerospike.documentapi.token.TokenType.LIST_WILDCARD;
 
 public class WildcardToken extends Token {
 
+    private static final String WILDCARD_LIST_ELEM = OPEN_BRACKET + String.valueOf(WILDCARD) + CLOSE_BRACKET;
     private boolean isInList;
-    private final static String WILDCARD_LIST_ELEM = OPEN_BRACKET + String.valueOf(WILDCARD) + CLOSE_BRACKET;
 
     public WildcardToken(String strPart) {
         if (!String.valueOf(WILDCARD).equals(strPart))
