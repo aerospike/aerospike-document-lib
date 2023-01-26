@@ -7,7 +7,7 @@ This project provides an API for accessing and mutating Aerospike
 [Collection Data Type](https://www.aerospike.com/docs/client/java/index.html) (CDT)
 objects using [JSONPath](https://goessner.net/articles/JsonPath/) syntax.
 This effectively provides a document API, with CDT objects used to represent
-JSON documents in Aerospike database.
+JSON documents in the Aerospike database.
 
 ### Documentation
 
@@ -15,9 +15,8 @@ The documentation for this project can be found on [javadoc.io](https://www.java
 
 ### Assumptions
 
-* Familiarity with Aerospike client for Java (
-  see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
-* Some knowledge of Aerospike CDTs (see reference above)
+- Familiarity with the Aerospike client for Java (see [Introduction - Java Client](https://www.aerospike.com/docs/client/java/index.html))
+- Some knowledge of the Aerospike CDTs (see reference above)
 
 ## Getting Started Blog Posts
 
@@ -363,21 +362,21 @@ bins.add(documentBinName2);
 Examples:
 ```java
 // The names of the users of all logout events from each document
-String jsonPath="$.authentication.logout.name";
-        Object objectFromDB=documentClient.get(TEST_AEROSPIKE_KEY,bins,jsonPath);
+String jsonPath = "$.authentication.logout.name";
+Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
 // Modify the devices of all the authentications (login and logout) to "Mobile"
-        jsonPath="$.authentication..device";
-        jsonObject="Mobile";
-        documentClient.put(TEST_AEROSPIKE_KEY,bins,jsonPath,jsonObject);
+jsonPath = "$.authentication..device";
+jsonObject = "Mobile";
+documentClient.put(TEST_AEROSPIKE_KEY, bins, jsonPath, jsonObject);
 
 // Delete the user field from all of the authentications (login and logout)
-        jsonPath="$.authentication..user";
-        documentClient.delete(TEST_AEROSPIKE_KEY,bins,jsonPath);
+jsonPath = "$.authentication..user";
+documentClient.delete(TEST_AEROSPIKE_KEY, bins, jsonPath);
 
 // All the logins with "id" greater than 10
-        jsonPath="$.authentication.login[?(@.id > 10)]";
-        objectFromDB=documentClient.get(TEST_AEROSPIKE_KEY,bins,jsonPath);
+jsonPath = "$.authentication.login[?(@.id > 10)]";
+objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
 ```
 
 ### JSONPath query operations
@@ -386,13 +385,13 @@ Depending on how JSONPath query operations run they can be split into 2 types.
 
 #### 1-step JSONPath query operations
 
-Contain only array and/or map elements.
+Operations that use JSONPath which contains only array and/or map elements.
 
     Examples: $.store.book, $[0], $.store.book[0], $.store.book[0][1].title.
 
 #### 2-step JSONPath query operations
 
-Contain wildcards, recursive descent, filters, functions, scripts.
+Operations that use JSONPath which contains wildcards, recursive descent, filters, functions, scripts.
 
     Examples: $.store.book[*].author, $.store..price, $.store.book[?(@.price < 10)], $..book[(@.length-1)].
 
@@ -477,19 +476,20 @@ String binName1 = "events1Bin";
 String binName2 = "events2Bin";
 List<String> bins = new ArrayList<>();
 bins.add(binName1);
-        bins.add(binName2);
-        BatchOperation operation7=new GetBatchOperation(
-        key7,
-        bins,
-        "$.authentication.logout.name"
-        );
+bins.add(binName2);
+BatchOperation operation7=new GetBatchOperation(
+    key7,
+    bins,
+    "$.authentication.logout.name"
+);
 
 // Collecting operations and running
-        List<BatchOperation> batchOpsList=new ArrayList<>();
-        batchOpsList.add(operation1,operation2,operation3,operation4,operation5,operation6,operation7);
-        List<BatchRecord> results=documentClient.batchPerform(batchOpsList,true);
+List<BatchOperation> batchOpsList=new ArrayList<>();
+batchOpsList.add(operation1, operation2, operation3, operation4,
+        operation5, operation6, operation7);
+List<BatchRecord> results=documentClient.batchPerform(batchOpsList,true);
 // Checking that all operations finished successfully
-        assertEquals(0,results.stream().filter(res->res.resultCode!=0).count());
+assertEquals(0,results.stream().filter(res->res.resultCode!=0).count());
 ```
 
 
