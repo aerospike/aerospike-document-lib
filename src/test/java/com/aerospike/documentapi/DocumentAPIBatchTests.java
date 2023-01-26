@@ -164,10 +164,10 @@ class DocumentAPIBatchTests extends BaseTestConfig {
 
         List<BatchOperation> batchOpsList = new ArrayList<>();
 
-        // adding similar document bins with different jsonPath strings
+        // the same key and document bin, different jsonPath strings
         IntStream.range(0, jsonPathsMap.size()).forEachOrdered(i -> {
             Key key = new Key(AEROSPIKE_NAMESPACE, AEROSPIKE_SET, JSON_EXAMPLE_KEY + "1111");
-            String binName = DOCUMENT_BIN_NAME + i;
+            String binName = DOCUMENT_BIN_NAME + "22";
             documentClient.put(key, binName, jsonNode);
 
             BatchOperation batchOp = new GetBatchOperation(
@@ -178,6 +178,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
             batchOpsList.add(batchOp);
         });
 
+        // read operations with the same keys referring to the same bins can run in a batch
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
         assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 
@@ -638,7 +639,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     /**
-     * Check a batch of different types single step operations using the same keys.
+     * Check a batch of different types single step operations (each with a different bin) using the same keys.
      * <ul>
      * <li>Reading the whole json.</li>
      * <li>Putting a new key into an existing map.</li>
@@ -673,7 +674,9 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 true
         );
 
-        // operations order not guaranteed because of using the same keys
+        // operations order is not guaranteed
+        // in this example each operation uses a different bin, so no overlapping / conflicts
+        // otherwise (referring to the same bins) write-type operations with the same keys cannot run in a batch
         List<BatchRecord> batchRecords = documentClient.batchPerform(batchOpsList, true);
         assertEquals(0, batchRecords.stream().filter(res -> res.resultCode != ResultCode.OK).count());
 

@@ -404,19 +404,21 @@ Examples:
 Starting at version `2.0.0` there is support for batch operations.
 
 You can now send CRUD operations (PUT, GET, APPEND, DELETE) in batches using JSONPath
-for single and multiple bins. Each operation in a batch is performed on a single Aerospike key.
+for single and multiple bins. 
+Each operation in a batch is performed on a single Aerospike key.
 
 Limitations:
 
-- Insertion order is preserved only for those [1-step JSONPath query operations](#1-step-jsonpath-query-operations)
-  that have unique Aerospike keys within a batch.
-- Every [2-step JSONPath query operation](#2-step-jsonpath-query-operations) should have unique Aerospike key
-  within a batch.
+|                                                       | Unique key<br/>within batch | Non-unique key<br/>within batch | Multiple batch operations<br/>having the same key and the same bin(s)  |
+|-------------------------------------------------------|-----------------------------|---------------------------------|------------------------------------------------------------------------|
+| [1-step operation](#1-step-jsonpath-query-operations) | Supported                   | Operations order not guaranteed | Only GET 1-step operations                                             |
+| [2-step operation](#2-step-jsonpath-query-operations) | Supported                   | Not supported                   | Not supported                                                          |
+|                                                       |                             |                                 |                                                                        |
 
 Results are returned as a List of BatchRecord objects, each of them contains the following:
 
 - Aerospike key.
-- Result code (0 in case of successful finishing, otherwise another predefined value
+- Result code (0 in case of operation finished successfully or another predefined number
   referring to a particular exception / error).
 - Record (contains requested values mapped to their respective bin names,
   relevant in case of the GET operation).
