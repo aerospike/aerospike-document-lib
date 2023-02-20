@@ -37,32 +37,32 @@ public class PutBatchOperation extends AbstractBatchOperation {
         if (originalJsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             // If there are no parts, put an empty map in the given bin
             batchOps = getBinNames().stream()
-                .map(MapOperation::clear)
-                .toArray(Operation[]::new);
+                    .map(MapOperation::clear)
+                    .toArray(Operation[]::new);
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
                 final PathDetails pathDetails =
-                    getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
+                        getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
-                    .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
-                    .filter(Objects::nonNull)
-                    .toArray(Operation[]::new);
+                        .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
+                        .filter(Objects::nonNull)
+                        .toArray(Operation[]::new);
             } else {
                 final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(),
-                    true);
+                        true);
                 batchOps = binNames.stream()
-                    .map(binName -> toPutOperation(binName, objToPut, pathDetails))
-                    .filter(Objects::nonNull)
-                    .toArray(Operation[]::new);
+                        .map(binName -> toPutOperation(binName, objToPut, pathDetails))
+                        .filter(Objects::nonNull)
+                        .toArray(Operation[]::new);
             }
         }
 
         if (batchOps.length > 0) {
             batchRecord = new BatchWrite(
-                getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
-                key,
-                batchOps
+                    getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
+                    key,
+                    batchOps
             );
         } else {
             batchRecord = getErrorBatchWriteRecord();

@@ -25,6 +25,7 @@ public class ListToken extends ContextAwareToken {
 
     static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[([\\*\\d]+)\\])*$");
     static final Pattern INDEX_PATTERN = Pattern.compile("(\\[([\\*\\d]+)\\])");
+
     private final int listPosition;
 
     public ListToken(int listPosition) {

@@ -3,6 +3,7 @@ package com.aerospike.documentapi;
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +13,9 @@ import java.util.Map;
 import static com.aerospike.documentapi.BaseTestConfig.AEROSPIKE_SERVER_IP;
 import static com.aerospike.documentapi.BaseTestConfig.AEROSPIKE_SERVER_PORT;
 
-public class InsertPutGetTest {
+class InsertPutGetTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     void test() {
         AerospikeClient client = new AerospikeClient(null, AEROSPIKE_SERVER_IP, AEROSPIKE_SERVER_PORT);
         Key key = new Key("test", "customer1", 1);

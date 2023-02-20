@@ -22,6 +22,7 @@ import static com.aerospike.documentapi.jsonpath.JsonPathParser.WILDCARD;
 public class MapToken extends ContextAwareToken {
 
     static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
+
     private final String key;
 
     public MapToken(String key) {

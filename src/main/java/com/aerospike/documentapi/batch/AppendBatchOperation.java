@@ -41,27 +41,27 @@ public class AppendBatchOperation extends AbstractBatchOperation {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
                 final PathDetails pathDetails =
-                    getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
+                        getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
-                    .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
-                    .filter(Objects::nonNull)
-                    .toArray(Operation[]::new);
+                        .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
+                        .filter(Objects::nonNull)
+                        .toArray(Operation[]::new);
             } else {
                 // needs to be treated without modifying
                 final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(),
-                    false);
+                        false);
                 batchOps = binNames.stream()
-                    .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
-                    .filter(Objects::nonNull)
-                    .toArray(Operation[]::new);
+                        .map(binName -> toAppendOperation(binName, objToAppend, pathDetails))
+                        .filter(Objects::nonNull)
+                        .toArray(Operation[]::new);
             }
         }
 
         if (batchOps.length > 0) {
             batchRecord = new BatchWrite(
-                getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
-                key,
-                batchOps
+                    getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
+                    key,
+                    batchOps
             );
         } else {
             batchRecord = getErrorBatchWriteRecord();
@@ -73,7 +73,7 @@ public class AppendBatchOperation extends AbstractBatchOperation {
     protected Operation toAppendOperation(String binName, Object objToAppend, PathDetails pathDetails) {
         try {
             return pathDetails.getFinalToken()
-                .toAerospikeAppendOperation(binName, objToAppend, pathDetails.getCtxArray());
+                    .toAerospikeAppendOperation(binName, objToAppend, pathDetails.getCtxArray());
         } catch (IllegalArgumentException e) {
             errorBinName = binName;
             return null;

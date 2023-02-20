@@ -89,8 +89,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     /**
-     * Check the correct response of retrieving document content in a batch of single step operations
-     * using incorrect path.
+     * Check the correct response of retrieving document content in a batch of single step operations using incorrect
+     * path.
      * <ul>
      * <li>Non-existing key.</li>
      * <li>Referencing a map as if it were a list.</li>
