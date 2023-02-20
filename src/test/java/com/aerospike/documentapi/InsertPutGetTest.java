@@ -31,7 +31,7 @@ public class InsertPutGetTest {
 
         List<?> addresses = Arrays.asList(address1, address2);
         client.put(null, key,
-            new Bin("name", "joe"),
+            new Bin("name", "Joe"),
             new Bin("age", 28),
             new Bin("addresses", addresses)
         );
