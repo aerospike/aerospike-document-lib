@@ -10,6 +10,7 @@ import lombok.Value;
 @Value
 @Builder
 public class DocumentPolicy {
+
     Policy readPolicy;
     WritePolicy writePolicy;
     BatchPolicy batchPolicy;

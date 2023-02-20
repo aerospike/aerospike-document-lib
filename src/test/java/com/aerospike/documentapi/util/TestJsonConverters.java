@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestJsonConverters {
 
     /**
-     * Determine whether two JSON objects are equivalent -
-     * by serializing maps and list in a specific way and then testing serializations to see if they are equal.
+     * Determine whether two JSON objects are equivalent - by serializing maps and list in a specific way and then
+     * testing serializations to see if they are equal.
      */
     @SuppressWarnings("unchecked")
     public static boolean jsonEquals(Object object1, Object object2) {

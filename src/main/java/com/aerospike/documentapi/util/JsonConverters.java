@@ -53,8 +53,8 @@ public class JsonConverters {
     }
 
     /**
-     * Given an object that represents a list or a map for example an Aerospike database result,
-     * return its equivalent representation as a Json string.
+     * Given an object that represents a list or a map for example an Aerospike database result, return its equivalent
+     * representation as a Json string.
      *
      * @param object the object to parse as a Json string.
      * @return the JSON string representation of the object.

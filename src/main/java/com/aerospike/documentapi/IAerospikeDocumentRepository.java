@@ -23,7 +23,8 @@ public interface IAerospikeDocumentRepository {
 
     void put(WritePolicy writePolicy, Key key, String binName, Map<?, ?> jsonMap);
 
-    void put(WritePolicy writePolicy, Key key, Collection<String> binNames, Object jsonObject, JsonPathObject jsonPathObject);
+    void put(WritePolicy writePolicy, Key key, Collection<String> binNames, Object jsonObject,
+             JsonPathObject jsonPathObject);
 
     void put(WritePolicy writePolicy, Key key, Map<String, Object> queryResults, JsonPathObject jsonPathObject);
 

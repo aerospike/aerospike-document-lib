@@ -42,13 +42,15 @@ public class PutBatchOperation extends AbstractBatchOperation {
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
+                final PathDetails pathDetails =
+                        getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
                         .map(entry -> toPutOperation(entry.getKey(), entry.getValue(), pathDetails))
                         .filter(Objects::nonNull)
                         .toArray(Operation[]::new);
             } else {
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(),
+                        true);
                 batchOps = binNames.stream()
                         .map(binName -> toPutOperation(binName, objToPut, pathDetails))
                         .filter(Objects::nonNull)

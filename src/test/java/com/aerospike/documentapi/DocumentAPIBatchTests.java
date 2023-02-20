@@ -89,8 +89,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
     }
 
     /**
-     * Check the correct response of retrieving document content in a batch
-     * of single step operations using incorrect path.
+     * Check the correct response of retrieving document content in a batch of single step operations using incorrect
+     * path.
      * <ul>
      * <li>Non-existing key.</li>
      * <li>Referencing a map as if it were a list.</li>
@@ -786,7 +786,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                     objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
                             batchOp.getJsonPath()
                     );
-                    modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
+                    modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut)
+                            .json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
                     assertNotNull(objFromDb);
@@ -796,7 +797,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                     objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
                             batchOp.getJsonPath()
                     );
-                    modifiedJson = JsonPath.parse(testMaterialJson).add(inputsList.get(i).getJsonPath(), objToAppend).json();
+                    modifiedJson = JsonPath.parse(testMaterialJson).add(inputsList.get(i).getJsonPath(), objToAppend)
+                            .json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
                     assertNotNull(objFromDb);
@@ -1102,7 +1104,8 @@ class DocumentAPIBatchTests extends BaseTestConfig {
                 case 1:
                     objFromDb = documentClient.get(batchOp.getKey(), batchOp.getBinNames().iterator().next(),
                             batchOp.getJsonPath());
-                    modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut).json();
+                    modifiedJson = JsonPath.parse(testMaterialJson).set(inputsList.get(i).getJsonPath(), objToPut)
+                            .json();
                     expectedObject = JsonPath.read(modifiedJson, inputsList.get(i).getJsonPath());
 
                     assertNotNull(objFromDb);
@@ -1223,6 +1226,7 @@ class DocumentAPIBatchTests extends BaseTestConfig {
 
     @Getter
     private static class BatchOperationInput {
+
         private final String jsonPath;
         private final BatchOperationEnum batchOpEnum;
         @Setter
