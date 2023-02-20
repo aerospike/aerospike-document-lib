@@ -79,7 +79,7 @@ class JsonPathFunctionsTests extends BaseTestConfig {
         String jsonPath = "$.*.x1.stddev()";
         JSONArray result = (JSONArray) documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         assertArrayEquals(new Double[]{1.4142135623730951, 1.4142135623730951, 1.4142135623730951, 1.4142135623730951},
-            result.toArray());
+                result.toArray());
 
         jsonPath = "$.k2.stddev()";
         Object result2 = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);

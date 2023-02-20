@@ -100,37 +100,37 @@ class DocumentAPITests extends BaseTestConfig {
         jsonPath = "$.example4.key13.key15[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         expectedObject = ((List<?>) ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key13")).get("key15"))
-            .get(1);
+                .get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key21";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         expectedObject =
-            ((Map<?, ?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key19")).get(2)).get("key21");
+                ((Map<?, ?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key19")).get(2)).get("key21");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[2].key20[1]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         expectedObject = ((List<?>) ((Map<?, ?>) ((List<?>) ((Map<?, ?>) jsonNodeAsMap.get("example4")).get("key19"))
-            .get(2)).get("key20")).get(1);
+                .get(2)).get("key20")).get(1);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[2].key21.key23";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         expectedObject =
-            ((Map<?, ?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3")).get(2)).get("key21")).get("key23");
+                ((Map<?, ?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3")).get(2)).get("key21")).get("key23");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key16";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         expectedObject = ((Map<?, ?>) ((List<?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3")).get(1))
-            .get("key08")).get(1)).get("key16");
+                .get("key08")).get(1)).get("key16");
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example3[1].key08[1].key17[2]";
         objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath);
         expectedObject = ((List<?>) ((Map<?, ?>) ((List<?>) ((Map<?, ?>) ((List<?>) jsonNodeAsMap.get("example3"))
-            .get(1)).get("key08")).get(1)).get("key17")).get(2);
+                .get(1)).get("key08")).get(1)).get("key17")).get(2);
         assertTrue(TestJsonConverters.jsonEquals(objectFromDB, expectedObject));
 
         jsonPath = "$.example4.key19[3][1]";
@@ -170,7 +170,7 @@ class DocumentAPITests extends BaseTestConfig {
     private boolean isValidInnerMapElement(Object objectFromDB, String mapKey, String testMapValue) {
         @SuppressWarnings("unchecked")
         byte[] res = ((Map<Long, List<Map<Long, Map<String, byte[]>>>>) objectFromDB)
-            .get(2L).get(0).get(3L).get(mapKey);
+                .get(2L).get(0).get(3L).get(mapKey);
 
         return new String(res, StandardCharsets.UTF_8).equals(testMapValue);
     }
@@ -302,21 +302,21 @@ class DocumentAPITests extends BaseTestConfig {
 
         try (MockedStatic<Lut> classMock = mockStatic(Lut.class)) {
             classMock.when(() -> Lut.setLutPolicy(ArgumentMatchers.<WritePolicy>any(), anyLong()))
-                .thenReturn(mockLutWritePolicy());
+                    .thenReturn(mockLutWritePolicy());
 
             final String jsonPath = "$.authentication..id";
             final int putValue = 77;
             DocumentApiException e = assertThrows(
-                DocumentApiException.class,
-                () -> documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue)
+                    DocumentApiException.class,
+                    () -> documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue)
             );
             assertTrue(e.getMessage().contains("Transaction filtered out"));
 
             final String jsonPath2 = "$.authentication..ref[1]";
             final int putValue2 = 78;
             DocumentApiException e2 = assertThrows(
-                DocumentApiException.class,
-                () -> documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath2, putValue2)
+                    DocumentApiException.class,
+                    () -> documentClient.put(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath2, putValue2)
             );
             assertTrue(e2.getMessage().contains("Transaction filtered out"));
         }
@@ -496,13 +496,13 @@ class DocumentAPITests extends BaseTestConfig {
 
         try (MockedStatic<Lut> classMock = mockStatic(Lut.class)) {
             classMock.when(() -> Lut.setLutPolicy(ArgumentMatchers.<WritePolicy>any(), anyLong()))
-                .thenReturn(mockLutWritePolicy());
+                    .thenReturn(mockLutWritePolicy());
 
             final String jsonPath = "$.authentication..ref";
             final int putValue = 78;
             DocumentApiException e = assertThrows(
-                DocumentApiException.class,
-                () -> documentClient.append(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue)
+                    DocumentApiException.class,
+                    () -> documentClient.append(TEST_AEROSPIKE_KEY, DOCUMENT_BIN_NAME, jsonPath, putValue)
             );
             assertTrue(e.getMessage().contains("Transaction filtered out"));
         }
@@ -743,10 +743,10 @@ class DocumentAPITests extends BaseTestConfig {
     private WritePolicy mockLutWritePolicy() {
         WritePolicy writePolicy = new WritePolicy();
         writePolicy.filterExp = Exp.build(
-            Exp.eq(
-                Exp.lastUpdate(),
-                Exp.val(1234L)
-            )
+                Exp.eq(
+                        Exp.lastUpdate(),
+                        Exp.val(1234L)
+                )
         );
         writePolicy.failOnFilteredOut = true;
         return writePolicy;

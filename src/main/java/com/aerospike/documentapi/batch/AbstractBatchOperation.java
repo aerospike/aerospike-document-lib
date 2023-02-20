@@ -51,9 +51,9 @@ public abstract class AbstractBatchOperation implements BatchOperation {
     public void setFirstStepRecord() {
         final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
         List<Operation> batchOperations = binNames.stream()
-                .map(binName -> pathDetails.getFinalToken()
-                        .toAerospikeGetOperation(binName, pathDetails.getCtxArray()))
-                .collect(Collectors.toList());
+            .map(binName -> pathDetails.getFinalToken()
+                .toAerospikeGetOperation(binName, pathDetails.getCtxArray()))
+            .collect(Collectors.toList());
 
         batchOperations.addAll(readOperations());
         batchRecord = new BatchRead(key, batchOperations.toArray(new Operation[0]));
@@ -65,8 +65,8 @@ public abstract class AbstractBatchOperation implements BatchOperation {
 
     protected Optional<Long> getLutValue() {
         return Objects.isNull(batchRecord)
-                ? Optional.empty()
-                : Optional.of(batchRecord.record.getLong(Lut.LUT_BIN));
+            ? Optional.empty()
+            : Optional.of(batchRecord.record.getLong(Lut.LUT_BIN));
     }
 
     protected Map<String, Object> firstStepQueryResults() {
@@ -95,7 +95,7 @@ public abstract class AbstractBatchOperation implements BatchOperation {
     protected Operation toPutOperation(String binName, Object objToPut, PathDetails pathDetails) {
         try {
             return pathDetails.getFinalToken()
-                    .toAerospikePutOperation(binName, objToPut, pathDetails.getCtxArray());
+                .toAerospikePutOperation(binName, objToPut, pathDetails.getCtxArray());
         } catch (IllegalArgumentException e) {
             errorBinName = binName;
             return null;

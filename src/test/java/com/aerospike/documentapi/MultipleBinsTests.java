@@ -34,9 +34,9 @@ class MultipleBinsTests extends BaseTestConfig {
 
         Object objectFromDB = documentClient.get(TEST_AEROSPIKE_KEY, bins, jsonPath);
         Object expectedObject1 =
-            ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMapEvents1.get("authentication")).get("logout")).get("name");
+                ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMapEvents1.get("authentication")).get("logout")).get("name");
         Object expectedObject2 =
-            ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMapEvents2.get("authentication")).get("logout")).get("name");
+                ((Map<?, ?>) ((Map<?, ?>) jsonNodeAsMapEvents2.get("authentication")).get("logout")).get("name");
         Map<String, Object> expectedObjectsCombined = new HashMap<>();
         expectedObjectsCombined.put(documentBinName1, expectedObject1);
         expectedObjectsCombined.put(documentBinName2, expectedObject2);

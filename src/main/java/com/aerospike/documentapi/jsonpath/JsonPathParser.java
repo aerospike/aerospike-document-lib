@@ -53,8 +53,8 @@ public class JsonPathParser {
     }
 
     /**
-     * Given a list of tokens, convert this to the list of contexts you would need
-     * to retrieve the JSON path represented by the list of tokens.
+     * Given a list of tokens, convert this to the list of contexts you would need to retrieve the JSON path represented
+     * by the list of tokens.
      *
      * @param tokens tokens list to convert.
      * @return an array of contexts (CTXs).

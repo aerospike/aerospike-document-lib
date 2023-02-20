@@ -110,8 +110,7 @@ public interface IAerospikeDocumentClient {
      * Perform batch operations.
      *
      * <p>Operations order is preserved only for those 1-step operations
-     * (with JSONPath that contains only array and/or map elements)
-     * that have unique Aerospike keys within a batch.</p>
+     * (with JSONPath that contains only array and/or map elements) that have unique Aerospike keys within a batch.</p>
      * <p>Every 2-step operation (with JSONPath containing wildcards, recursive descent, filters, functions, scripts)
      * should have unique Aerospike key within a batch.
      *

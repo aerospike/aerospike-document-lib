@@ -33,30 +33,32 @@ public class DeleteBatchOperation extends AbstractBatchOperation {
         if (originalJsonPathObject.getTokensNotRequiringSecondStepQuery().isEmpty()) {
             // If there are no parts, put an empty map in the given bin
             batchOps = getBinNames().stream()
-                    .map(MapOperation::clear)
-                    .toArray(Operation[]::new);
+                .map(MapOperation::clear)
+                .toArray(Operation[]::new);
         } else {
             if (isRequiringJsonPathQuery()) {
                 // using the original object as the initially parsed one has already been changed within the 1st step
-                final PathDetails pathDetails = getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
+                final PathDetails pathDetails =
+                    getPathDetails(originalJsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
                 batchOps = firstStepQueryResults().entrySet().stream()
-                        .map(entry -> pathDetails.getFinalToken()
-                                .toAerospikePutOperation(entry.getKey(), entry.getValue(), pathDetails.getCtxArray()))
-                        .toArray(Operation[]::new);
+                    .map(entry -> pathDetails.getFinalToken()
+                        .toAerospikePutOperation(entry.getKey(), entry.getValue(), pathDetails.getCtxArray()))
+                    .toArray(Operation[]::new);
             } else {
-                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(), true);
+                final PathDetails pathDetails = getPathDetails(jsonPathObject.getTokensNotRequiringSecondStepQuery(),
+                    true);
                 batchOps = binNames.stream()
-                        .map(binName -> pathDetails.getFinalToken()
-                                .toAerospikeDeleteOperation(binName, pathDetails.getCtxArray()))
-                        .toArray(Operation[]::new);
+                    .map(binName -> pathDetails.getFinalToken()
+                        .toAerospikeDeleteOperation(binName, pathDetails.getCtxArray()))
+                    .toArray(Operation[]::new);
             }
         }
 
         if (batchOps.length > 0) {
             batchRecord = new BatchWrite(
-                    getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
-                    key,
-                    batchOps
+                getLutValue().map(v -> Lut.setLutPolicy(new BatchWritePolicy(), v)).orElse(null),
+                key,
+                batchOps
             );
         } else {
             batchRecord = getErrorBatchWriteRecord();

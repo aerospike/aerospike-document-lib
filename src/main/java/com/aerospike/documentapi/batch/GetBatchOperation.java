@@ -65,9 +65,9 @@ public class GetBatchOperation extends AbstractBatchOperation {
             }
 
             batchRecord.record = new Record(
-                    bins,
-                    batchRecord.record.generation,
-                    batchRecord.record.expiration
+                bins,
+                batchRecord.record.generation,
+                batchRecord.record.expiration
             );
 
             // this way the record will be filtered out before getting processed again

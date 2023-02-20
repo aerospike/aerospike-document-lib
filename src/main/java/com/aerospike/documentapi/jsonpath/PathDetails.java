@@ -8,6 +8,7 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class PathDetails {
+
     ContextAwareToken finalToken;
     CTX[] ctxArray;
 }

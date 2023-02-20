@@ -21,6 +21,7 @@ import static com.aerospike.documentapi.jsonpath.JsonPathParser.WILDCARD;
  */
 public class MapToken extends ContextAwareToken {
 
+    static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
     private final String key;
 
     public MapToken(String key) {
@@ -28,7 +29,25 @@ public class MapToken extends ContextAwareToken {
         setString(key);
     }
 
-    static final Pattern PATH_PATTERN = Pattern.compile("^([^\\[^\\]]*)(\\[(\\d+)\\])*$");
+    public static Optional<Token> match(String strPart) {
+        Token token;
+        Matcher keyMatcher = PATH_PATTERN.matcher(strPart);
+        if ((!strPart.contains("[")) && (!strPart.contains("]"))) {
+            // ignoring * wildcard after a dot, it's the same as ending with a .path
+            if (!strPart.equals(String.valueOf(WILDCARD)) && !strPart.equals(String.valueOf(DOC_ROOT))) {
+                token = new MapToken(strPart);
+                return Optional.of(token);
+            }
+        } else if (keyMatcher.find()) {
+            String key = keyMatcher.group(1);
+            if (!key.equals(String.valueOf(DOC_ROOT))) {
+                token = new MapToken(strPart);
+                return Optional.of(token);
+            }
+        }
+
+        return Optional.empty();
+    }
 
     public String getKey() {
         return key;
@@ -77,26 +96,5 @@ public class MapToken extends ContextAwareToken {
     @Override
     public TokenType getType() {
         return TokenType.MAP;
-    }
-
-    public static Optional<Token> match(String strPart) {
-        Token token;
-
-        Matcher keyMatcher = PATH_PATTERN.matcher(strPart);
-        if ((!strPart.contains("[")) && (!strPart.contains("]"))) {
-            // ignoring * wildcard after a dot, it's the same as ending with a .path
-            if (!strPart.equals(String.valueOf(WILDCARD)) && !strPart.equals(String.valueOf(DOC_ROOT))) {
-                token = new MapToken(strPart);
-                return Optional.of(token);
-            }
-        } else if (keyMatcher.find()) {
-            String key = keyMatcher.group(1);
-            if (!key.equals(String.valueOf(DOC_ROOT))) {
-                token = new MapToken(strPart);
-                return Optional.of(token);
-            }
-        }
-
-        return Optional.empty();
     }
 }

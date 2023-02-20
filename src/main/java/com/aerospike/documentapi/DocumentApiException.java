@@ -41,6 +41,7 @@ public class DocumentApiException extends RuntimeException {
      * Exception to be thrown in case of invalid json prefix.
      */
     public static class JsonPrefixException extends DocumentApiException {
+
         public JsonPrefixException(String jsonString) {
             super(String.format("'%s' should start with either a '$.' or '$['", jsonString));
         }
@@ -50,6 +51,7 @@ public class DocumentApiException extends RuntimeException {
      * Exception to be thrown in case of invalid json path.
      */
     public static class JsonPathException extends DocumentApiException {
+
         public JsonPathException(String jsonString) {
             super(String.format("'%s' does not match JSONPath format", jsonString));
         }
@@ -59,6 +61,7 @@ public class DocumentApiException extends RuntimeException {
      * Exception to be thrown in case of invalid appending to json.
      */
     public static class JsonAppendException extends DocumentApiException {
+
         public JsonAppendException(String jsonString) {
             super(String.format("Cannot append to '%s'", jsonString));
         }
@@ -68,6 +71,7 @@ public class DocumentApiException extends RuntimeException {
      * Exception to be thrown in case of invalid json path.
      */
     public static class JsonPathParseException extends DocumentApiException {
+
         public JsonPathParseException(String jsonPathPart) {
             super(String.format("Unable to parse '%s' as JSONPath token", jsonPathPart));
         }
