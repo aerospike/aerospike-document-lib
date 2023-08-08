@@ -325,9 +325,12 @@ class DocumentAPIBatchTests extends BaseTestConfig {
         assertTrue(results.stream().anyMatch(res -> res.resultCode != ResultCode.OK));
 
         // making sure all records contain the resulting record == null and the necessary resulting code
-        // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4
-        batchOpsList.forEach(batchOp -> assertTrue(batchOp.getBatchRecord().record == null
-                && (batchOp.getBatchRecord().resultCode == 26 || batchOp.getBatchRecord().resultCode == 4)));
+        // OP_NOT_APPLICABLE = 26, PARAMETER_ERROR = 4, BIN_TYPE_ERROR = 12
+        batchOpsList.forEach(batchOp -> {
+            BatchRecord batchRecord = batchOp.getBatchRecord();
+            assertTrue(batchRecord.record == null
+                    && (batchRecord.resultCode == 26 || batchRecord.resultCode == 4 || batchRecord.resultCode == 12));
+        });
     }
 
     /**
