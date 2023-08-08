@@ -34,7 +34,7 @@
         <json-path.version>2.7.0</json-path.version>
         <lombok.version>1.18.28</lombok.version>
         <junit-jupiter.version>5.10.0</junit-jupiter.version>
-        <mockito-core.version>5.4.0</mockito-core.version>
+        <mockito-core.version>5.2.0</mockito-core.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
     </properties>
 
