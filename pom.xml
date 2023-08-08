@@ -24,17 +24,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
-        <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
-        <maven.javadoc.plugin.version>3.3.0</maven.javadoc.plugin.version>
-        <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
-        <jackson-databind.version>2.14.1</jackson-databind.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>3.5.0</maven.javadoc.plugin.version>
+        <maven.gpg.plugin.version>3.1.0</maven.gpg.plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <jackson-databind.version>2.15.2</jackson-databind.version>
         <aerospike-client.version>7.0.0</aerospike-client.version>
-        <json-path.version>2.7.0</json-path.version>
-        <lombok.version>1.18.24</lombok.version>
-        <junit-jupiter.version>5.9.2</junit-jupiter.version>
-        <mockito.version>4.9.0</mockito.version>
+        <json-path.version>2.8.0</json-path.version>
+        <lombok.version>1.18.28</lombok.version>
+        <junit-jupiter.version>5.10.0</junit-jupiter.version>
+        <mockito-core.version>5.4.0</mockito-core.version>
+        <mockito-inline.version>5.2.0</mockito-inline.version>
     </properties>
 
     <licenses>
@@ -104,13 +105,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
+            <version>${mockito-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>${mockito.version}</version>
+            <version>${mockito-inline.version}</version>
             <scope>test</scope>
         </dependency>
 
