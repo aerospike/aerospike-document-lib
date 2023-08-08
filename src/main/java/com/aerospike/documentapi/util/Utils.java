@@ -1,8 +1,8 @@
 package com.aerospike.documentapi.util;
 
 import com.aerospike.client.Bin;
+import com.aerospike.client.Value;
 import com.aerospike.client.cdt.CTX;
-import com.aerospike.client.cdt.MapOrder;
 import com.aerospike.documentapi.jsonpath.JsonPathObject;
 import com.aerospike.documentapi.jsonpath.JsonPathParser;
 import com.aerospike.documentapi.jsonpath.PathDetails;
@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
-import java.util.Map;
 
 @UtilityClass
 public class Utils {
@@ -25,11 +24,7 @@ public class Utils {
     }
 
     public static Bin createBin(String binName, Object jsonObject) {
-        if (jsonObject instanceof Map) {
-            return new Bin(binName, (Map<?, ?>) jsonObject, MapOrder.KEY_ORDERED);
-        } else {
-            return new Bin(binName, jsonObject);
-        }
+        return new Bin(binName, Value.get(jsonObject));
     }
 
     public static void validateNotArray(Object object) throws IllegalArgumentException {
