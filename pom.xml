@@ -31,7 +31,7 @@
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <jackson-databind.version>2.17.0</jackson-databind.version>
         <aerospike-client.version>7.2.1</aerospike-client.version>
-        <json-path.version>2.9.0</json-path.version>
+        <json-path.version>2.10.0</json-path.version>
         <json-smart.version>2.5.0</json-smart.version>
         <lombok.version>1.18.30</lombok.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
@@ -156,7 +156,7 @@
                     <doctitle>Aerospike Document API</doctitle>
                     <show>public</show>
                     <splitindex>true</splitindex>
-                    <bottom>Copyright &#169; 2020&#x2013;{currentYear} Aerospike, Inc. All rights reserved.</bottom>
+                    <bottom>Copyright © 2020–{currentYear} Aerospike, Inc. All rights reserved.</bottom>
                     <sourcepath>${basedir}/src/main/java</sourcepath>
                     <source>1.8</source>
                 </configuration>
